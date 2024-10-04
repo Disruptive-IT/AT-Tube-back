@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,50 +11,46 @@ datasource db {
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
+  idUser        Int          @id @default(autoincrement())
   avatar        String?
   documentTipe  String
-  documents     String
-  email         String   @unique
-  name          String?
+  document      String
+  name          String
+  phone         String
+  departmentID  Int
+  cityID        Int
+  address       String
+  email         String       @unique
   password      String?
-  rol           Rol      @relation(fields: [rolId], references: [id])
-  state         Boolean  @default(true)
-  createdAt     DateTime @default(now())
+  roles         Role[]       @relation("UserRoles")
+  state         Boolean      @default(true)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
 }
 
-enum roles {
+model Role {
+  rolID      Int       @id @default(autoincrement())
+  name       String
+  createdAt  DateTime  @default(now())
+  users      User[]    @relation("UserRoles") // Relación con User
+}
+
+model Departamento {
+  departmentID  Int         @id 
+  nombre        String
+  municipios    Municipio[] // Relación con Municipio
+}
+
+model Municipio {
+  municipioID    Int         @id 
+  nombre         String
+  departmentID   Int          // Este campo debe estar definido antes de usarlo en la relación
+  departamento   Departamento @relation(fields: [departmentID], references: [departmentID])
+}
+
+// Enum para roles de usuario
+enum UserRole {
   ADMIN
   CLIENT
-}
-
-//! Para el alcance
-model Rol {
-  id            Int             @id @default(autoincrement())
-  name          roles
-  state         Boolean         @default(true)
-  createdAt     DateTime
-  update_date   DateTime?
-  RolPermission RolPermission[]
-  User          User[]
-}
-
-model RolPermission {
-  id           Int      @id @default(autoincrement())
-  useAt        DateTime
-  rolId        Int
-  rol          Rol        @relation(fields: [rolId], references: [id])
-  permissionId Int
-  permission   Permission @relation(fields: [permissionId], references: [id])
-
-  @@unique([rolId, permissionId], map: "id_rol_permission")
-}
-
-model Permission {
-  id            Int             @id @default(autoincrement())
-  description   String
-  state         Boolean         @default(true)
-  createdAt     DateTime
-  update_date   DateTime?
-  RolPermission RolPermission[]
 }
