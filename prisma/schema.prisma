@@ -9,13 +9,55 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
+  id            Int      @id @default(autoincrement())
+  avatar        String?
+  documentTipe  String
+  documents     String
+  email         String   @unique
+  name          String?
+  password      String?
+  rol           Rol      @relation(fields: [rolId], references: [id])
+  state         Boolean  @default(true)
+  createdAt     DateTime @default(now())
+}
+
+enum roles {
+  ADMIN
+  CLIENT
+}
+
+//! Para el alcance
+model Rol {
+  id            Int             @id @default(autoincrement())
+  name          roles
+  state         Boolean         @default(true)
+  createdAt     DateTime
+  update_date   DateTime?
+  RolPermission RolPermission[]
+  User          User[]
+}
+
+model RolPermission {
+  id           Int      @id @default(autoincrement())
+  useAt        DateTime
+  rolId        Int
+  rol          Rol        @relation(fields: [rolId], references: [id])
+  permissionId Int
+  permission   Permission @relation(fields: [permissionId], references: [id])
+
+  @@unique([rolId, permissionId], map: "id_rol_permission")
+}
+
+model Permission {
+  id            Int             @id @default(autoincrement())
+  description   String
+  state         Boolean         @default(true)
+  createdAt     DateTime
+  update_date   DateTime?
+  RolPermission RolPermission[]
 }
