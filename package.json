@@ -3,13 +3,25 @@
   "version": "1.0.0",
   "description": "Apis para la app de nupak",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon index.js",
+    "seed": "node prisma/seed.js",
+    "test": "jest"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   },
   "author": "Disruptive I.T",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.21.0",
-    "nodemon": "^3.1.7"
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7",
+    "prisma": "^5.20.0"
   }
 }
