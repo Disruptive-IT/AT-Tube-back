@@ -16,12 +16,17 @@
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
+    "expess": "^0.0.1-security",
     "express": "^4.21.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.7",
-    "prisma": "^5.20.0"
+    "prisma": "^5.20.0",
+    "standard": "^17.1.2"
+  },
+  "eslintConfig":{
+    "extends": "standard"
   }
 }
