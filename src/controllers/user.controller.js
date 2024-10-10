@@ -1,32 +1,45 @@
-import { getUserAccountService, getAllUsersService } from "../services/user.service.js";
+import {
+  getUserAccountService,
+  getAllUsersService,
+  getAllClientsService
+} from '../services/user.service.js'
 
+// ?Controlador para traer un usuario es especifico
 export const getUserAccount = async (req, res) => {
-
   try {
-      const user_id = parseInt(req.params.id)
+    const useId = parseInt(req.params.id)
 
-      const userAccount = await getUserAccountService(user_id)
+    const userAccount = await getUserAccountService(useId)
 
-      res.status(200).json({ message: 'Usuario Encontrado.', user_account: userAccount })
+    res.status(200).json({ message: 'Usuario Encontrado.', user_account: userAccount })
   } catch (error) {
-
-      console.error("Error buscando el usuario solicitado:", error);
-      return res.status(500).json({ message: "Internal server error." });
+    console.error('Error buscando el usuario solicitado:', error)
+    return res.status(500).json({ message: 'Internal server error.' })
   }
-};
+}
 
+// ?Controlador para traer todos los usuarios
 export const getAllUsers = async (req, res) => {
-
   try {
-      const systemUsers = await getAllUsersService()
+    const systemUsers = await getAllUsersService()
 
-      res.status(200).json({ systemUsers })
+    res.status(200).json({ systemUsers })
   } catch (error) {
-
-      console.error("Error searching user account information:", error);
-      return res.status(500).json({ message: "Internal server error." });
+    console.error('Error searching user account information:', error)
+    return res.status(500).json({ message: 'Internal server error.' })
   }
-};
+}
+
+export const getAllClients = async (req, res) => {
+  try {
+    const systemUsers = await getAllClientsService()
+
+    res.status(200).json({ systemUsers })
+  } catch (error) {
+    console.error('Error searching user account information:', error)
+    return res.status(500).json({ message: 'Internal server error.' })
+  }
+}
 
 // export const personalUpdateUser = async (req, res) => {
 //   try {

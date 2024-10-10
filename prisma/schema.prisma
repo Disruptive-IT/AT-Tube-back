@@ -49,7 +49,6 @@ model Usuarios {
   document_type   Int      // Clave foránea a DocumentType
   document        String
   name            String
-  campo           Int
   id_department   Int      // Clave foránea a Department
   id_city         Int      // Clave foránea a City
   address         String
