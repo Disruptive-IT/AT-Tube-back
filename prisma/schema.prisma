@@ -53,7 +53,7 @@ model Usuarios {
   id_department   Int      // Clave foránea a Department
   id_city         Int      // Clave foránea a City
   address         String
-  phone           BigInt
+  phone           String
   email           String    @unique
   password        String
   id_rol          Int    // Clave foránea a Roles
