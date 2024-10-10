@@ -5,6 +5,37 @@ const prisma = new PrismaClient();
 
 async function main() {
 
+  const hashedPassword = await bcrypt.hash("user123", 10); //?hash de contrasena generica 
+  //?json de usuarios de prueba
+  const usuarios = [
+    {
+      document_type: 1, 
+      document: "123456789", 
+      name: "Juan Perez", 
+      campo: 10, 
+      id_department: 5, 
+      id_city: 330, 
+      address: "123 Calle Falsa", 
+      phone: '3201234567', 
+      email: "juan.perez@example.com", 
+      password: hashedPassword, 
+      id_rol: 1,
+    },
+    {
+      document_type: 2, 
+      document: "123456789", 
+      name: "Ricardo Montana", 
+      campo: 10, 
+      id_department: 5, 
+      id_city: 330, 
+      address: "123 Calle Falsa", 
+      phone: '3201234567', 
+      email: "ricaedo@example.com", 
+      password: hashedPassword, 
+      id_rol: 2,
+    },
+  ]
+
   const tiposDeDocumentos = [
     { id_document_type: 1, name: "CC", description: "Cédula de Ciudadanía" },
     { id_document_type: 2, name: "CE", description: "Cédula de Extranjería" },
@@ -1193,29 +1224,25 @@ async function main() {
   })
 
   
-  const hashedPassword = await bcrypt.hash("admin123", 10);
-
-  await prisma.Usuarios.create({
-    data:{
-      document_type: 1, 
-      document: "123456789", 
-      name: "Juan Perez", 
-      campo: 10, 
-      id_department: 5, 
-      id_city: 330, 
-      address: "123 Calle Falsa", 
-      phone: '3201234567', 
-      email: "juan.perez@example.com", 
-      password: hashedPassword, 
-      id_rol: 1,
-    },
-
-   
+  
+//? Usuarios de prueba 
+  await prisma.Usuarios.createMany({
+    data: usuarios.map((user) => ({
+      document_type :user.document_type ,
+      document      :user.document, 
+      name          :user.name, 
+      campo         :user.campo, 
+      id_department :user.id_department, 
+      id_city       :user.id_city, 
+      address       :user.address, 
+      phone         :user.phone, 
+      email         :user.email, 
+      password      :user.password ,
+      id_rol        :user.id_rol
+    })),
   })
 
-  
-
-  console.log('Seeds creados exitosamente...');
+  console.log('Seeds creados exitosamente... 😎👍👌');
 }
 
 main()
