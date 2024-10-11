@@ -15,7 +15,7 @@ async function main () {
       id_city: 330,
       address: '123 Calle Falsa',
       phone: '3201234567',
-      email: 'juan.perez@example.com',
+      email: 'admin@gmail.com',
       password: hashedPassword,
       id_rol: 1
     },
