@@ -1,8 +1,11 @@
 import express from 'express'
-import { updateUserPasswordController } from '../controllers/profile.controller.js'
+import { updateUserPasswordController, updateUserController, updateUserStatusController } from '../controllers/profile.controller.js'
 
 const router = express.Router()
 
-router.get('/updatepassword', updateUserPasswordController)
+router.post('/updatepassword', updateUserPasswordController) // ?Actualizar contraseña
+router.post('/updateUser', updateUserController) // ?Actualizar información general usuarios
+router.post('/updateUserStatus', updateUserStatusController) // ?Actualizar estado del usuario
+
 
 export default router

@@ -1,4 +1,6 @@
 import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcryptjs'
+
 const prisma = new PrismaClient()
 
 export const getUserAccountService = async (userId) => {
@@ -14,6 +16,30 @@ export const getUserAccountService = async (userId) => {
     return userAccountInfo
   } catch (error) {
     console.error('Error al buscar al usuario: ', error)
+    throw error
+  }
+}
+
+export const createNewUserService = async (data) => {
+  try {
+    const hashedPassword = await bcrypt.hash(data.password, 10) // ?hash de contrasena generica
+    const user = await prisma.usuarios.create({
+      data: { 
+        documentType: {connect: { id_document_type: data.documentType },},
+        document: data.document,
+        name: data.name,
+        department: {connect: {id_department: data.department}},
+        city: {connect: {id_city: data.city}} ,
+        address: data.address,
+        phone: data.phone,
+        email: data.email,
+        password: hashedPassword,
+        role: { connect: {id_rol: 1}}
+      }
+    })
+    return user
+  } catch (error) {
+    console.error('Error al crear el usuario nuevo:', error)
     throw error
   }
 }
