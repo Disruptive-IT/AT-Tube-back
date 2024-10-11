@@ -20,28 +20,35 @@ export const userRegisterService = async (userInformation) => {
       status
     } = userInformation
 
-    const verifyIfUserExists = await prisma.user.findFirst({
+    // Verifica si falta información requerida
+    if (!email || !documentNumber || !name || !password || !documentTypeId || !roleId) {
+      throw new Error('Faltan campos requeridos para el registro del usuario.')
+    }
+
+    // Verifica si ya existe un usuario con el correo o documento en una sola consulta
+    const existingUser = await prisma.user.findFirst({
       where: {
-        email
+        OR: [
+          { email },
+          { documentNumber }
+        ]
       }
     })
 
-    if (verifyIfUserExists) {
-      throw new Error('Ya hay un usuario registrado en el sistema con ese correo electrónico.')
-    }
-
-    const verifyIfDocumentExists = await prisma.user.findFirst({
-      where: {
-        documentNumber
+    if (existingUser) {
+      // Diferencia entre el tipo de duplicación
+      if (existingUser.email === email) {
+        throw new Error('Ya hay un usuario registrado con ese correo electrónico.')
       }
-    })
-
-    if (verifyIfDocumentExists) {
-      throw new Error('Ya hay un usuario registrado en el sistema con ese número de documento.')
+      if (existingUser.documentNumber === documentNumber) {
+        throw new Error('Ya hay un usuario registrado con ese número de documento.')
+      }
     }
 
+    // Hash de la contraseña
     const hashPassword = await bcrypt.hash(password, 10)
 
+    // Crear el nuevo usuario
     const newUser = await prisma.user.create({
       data: {
         document_types: { connect: { id: documentTypeId } },
@@ -52,10 +59,11 @@ export const userRegisterService = async (userInformation) => {
         adress,
         phone,
         email,
-        password,
         role: { connect: { id: roleId } },
         status,
-        credentials: { create: { password: hashPassword } }
+        credentials: {
+          create: { password: hashPassword } // Asegúrate de que tienes un modelo relacionado con credenciales
+        }
       },
       select: {
         id: true,
@@ -67,15 +75,18 @@ export const userRegisterService = async (userInformation) => {
         role: true
       }
     })
+
+    return newUser
   } catch (error) {
-    console.error('Error creating new user: ', error)
-    throw error
+    // Mejor manejo de errores con tipos de respuesta específicos
+    console.error('Error creating new user: ', error.message)
+    throw new Error(`Error en el registro del usuario: ${error.message}`)
   }
 }
 
 export async function userLoginService (email, password) {
   try {
-    // Search user information
+    // Busca la información del usuario junto con sus credenciales en una sola consulta
     const userSearch = await prisma.user.findFirst({
       where: { email },
       select: {
@@ -87,39 +98,38 @@ export async function userLoginService (email, password) {
           select: {
             name: true
           }
+        },
+        credentials: {
+          select: {
+            password: true
+          }
         }
       }
     })
 
+    // Verifica si el usuario existe
     if (!userSearch) {
-      throw new Error('El usuario no se pudo encontrar en el sistema.')
+      throw new Error('Usuario o contraseña incorrectos.') // Mensaje genérico por seguridad
     }
 
-    // Search credentials
-    const userCredentials = await prisma.credentials.findFirst({
-      where: { user_id: userSearch.id },
-      select: { password: true }
-    })
-
-    if (!userCredentials) {
-      throw new Error('Credenciales no encontradas para el usuario.')
-    }
-
-    // Verify the user password
-    const passwordValidation = await bcrypt.compare(password, userCredentials.password)
+    // Verifica la contraseña del usuario
+    const passwordValidation = await bcrypt.compare(password, userSearch.credentials.password)
 
     if (!passwordValidation) {
-      throw new Error('La contraseña es incorrecta.')
+      throw new Error('Usuario o contraseña incorrectos.') // Mensaje genérico por seguridad
     }
 
+    // Transforma los datos para devolver solo lo necesario
     const transformedUserSearch = {
-      ...userSearch,
-      role: userSearch.role?.name // Agrega role_name fuera del array
+      id: userSearch.id,
+      name: userSearch.name,
+      lastName: userSearch.last_name,
+      role: userSearch.role?.name // Extrae solo el nombre del rol
     }
 
     return transformedUserSearch
   } catch (error) {
-    console.error('Error en userLoginService:', error)
-    throw error
+    console.error('Error en userLoginService:', error.message) // Maneja el error de forma más específica
+    throw new Error(`Error en el inicio de sesión: ${error.message}`)
   }
 }
