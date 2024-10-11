@@ -10,4 +10,4 @@ app.use(cors(CorsConfig));
 app.use("/api", routes);
 
 
-export default app;
+export default app
