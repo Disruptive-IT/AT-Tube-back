@@ -47,8 +47,8 @@ export const getAllUsers = async (req, res) => {
 // ?Controlador para traer todos los usuarios clients
 export const getAllClients = async (req, res) => {
   try {
-    const systemUsers = await getAllClientsService()
-    res.status(200).json({ systemUsers })
+    const systemClients = await getAllClientsService()
+    res.status(200).json({ systemClients })
   } catch (error) {
     console.error('Error searching user account information:', error)
     return res.status(500).json({ message: 'Internal server error.' })

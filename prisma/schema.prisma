@@ -46,6 +46,7 @@ model Department {
 
 model Usuarios {
   id_users        String   @id @default(uuid())
+  avatar          String?
   document_type   Int      // Clave foránea a DocumentType
   document        String
   name            String

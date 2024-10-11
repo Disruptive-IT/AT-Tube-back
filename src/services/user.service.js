@@ -55,6 +55,7 @@ export const getAllUsersService = async () => {
       where: { id_rol: 1 },
       select: {
         id_users: true,
+        avatar: true,
         documentType: { select: { name: true } },
         document: true,
         name: true,
@@ -67,10 +68,25 @@ export const getAllUsersService = async () => {
         status: true
       }
     })
+    const formattedUsers = users.map(user => ({
+      id:user.id_users,
+      avatar:user.avatar,
+      idTipe: user.documentType.name,
+      document: user.document,
+      name: user.name,
+      department: user.department.name,
+      city: user.city.name,
+      address: user.address,
+      phone: user.phone,
+      email: user.email,
+      id_rol: user.id_rol,
+      status: user.status,
+      strStatus: !user.status? "Inactivo" : "Activo"
+    }));
     if (!users) {
       throw new Error('0 users found in the database.')
     }
-    return users
+    return formattedUsers
   } catch (error) {
     console.error('Error searching users information: ', error)
     throw error
@@ -96,10 +112,25 @@ export const getAllClientsService = async () => {
         status: true
       }
     })
+
+    const formattedUsers = users.map(user => ({
+      id_users: user.id_users,
+      documentType: user.documentType.name,
+      document: user.document,
+      name: user.name,
+      department: user.department.name,
+      city: user.city.name,
+      address: user.address,
+      phone: user.phone,
+      email: user.email,
+      id_rol: user.id_rol,
+      status: user.status
+    }));
+
     if (!users) {
       throw new Error('0 users found in the database.')
     }
-    return users
+    return formattedUsers
   } catch (error) {
     console.error('Error searching users information: ', error)
     throw error
