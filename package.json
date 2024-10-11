@@ -15,7 +15,6 @@
   "author": "Disruptive I.T",
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "expess": "^0.0.1-security",
     "express": "^4.21.0",

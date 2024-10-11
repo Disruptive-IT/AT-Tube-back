@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,51 +7,116 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id            Int      @id @default(autoincrement())
-  avatar        String?
-  documentTipe  String
-  documents     String
-  email         String   @unique
-  name          String?
-  password      String?
-  rol           Rol      @relation(fields: [rolId], references: [id])
-  state         Boolean  @default(true)
-  createdAt     DateTime @default(now())
+
+model Roles {
+  id_rol   Int   @id 
+  name     String
+  status   Boolean  @default(true)
+  create_at DateTime @default(now())
+
+  Usuarios Usuarios[]  // Relación inversa con Usuarios
 }
 
-enum roles {
-  ADMIN
-  CLIENT
+
+
+model DocumentType {
+  id_document_type Int   @id 
+  name             String
+  description      String
+
+  Usuarios         Usuarios[]  // Relación inversa con Usuarios
 }
 
-//! Para el alcance
-model Rol {
-  id            Int             @id @default(autoincrement())
-  name          roles
-  state         Boolean         @default(true)
-  createdAt     DateTime
-  update_date   DateTime?
-  RolPermission RolPermission[]
-  User          User[]
+model City {
+  id_city        Int       @id 
+  name           String
+  id_department  Int   // Clave foránea a Department
+
+  Department     Department @relation(fields: [id_department], references: [id_department])  // Relación con Department
+  Usuarios       Usuarios[]  // Relación inversa con Usuarios
 }
 
-model RolPermission {
-  id           Int      @id @default(autoincrement())
-  useAt        DateTime
-  rolId        Int
-  rol          Rol        @relation(fields: [rolId], references: [id])
-  permissionId Int
-  permission   Permission @relation(fields: [permissionId], references: [id])
+model Department {
+  id_department Int   @id 
+  name          String
 
-  @@unique([rolId, permissionId], map: "id_rol_permission")
+  Usuarios      Usuarios[]  // Relación inversa con Usuarios
+  City          City[]  // Relación inversa con City
 }
 
-model Permission {
-  id            Int             @id @default(autoincrement())
-  description   String
-  state         Boolean         @default(true)
-  createdAt     DateTime
-  update_date   DateTime?
-  RolPermission RolPermission[]
+model Usuarios {
+  id_users        String   @id @default(uuid())
+  document_type   Int      // Clave foránea a DocumentType
+  document        String
+  name            String
+  campo           Int
+  id_department   Int      // Clave foránea a Department
+  id_city         Int      // Clave foránea a City
+  address         String
+  phone           BigInt
+  email           String    @unique
+  password        String
+  id_rol          Int    // Clave foránea a Roles
+  status          Boolean   @default(true)
+  create_at       DateTime  @default(now())
+  update_at       DateTime  @updatedAt
+
+  department      Department   @relation(fields: [id_department], references: [id_department])   // Relación con Department
+  city            City         @relation(fields: [id_city], references: [id_city])   // Relación con City
+  role            Roles        @relation(fields: [id_rol], references: [id_rol])        // Relación con Roles
+  documentType    DocumentType @relation(fields: [document_type], references: [id_document_type])  // Relación con DocumentType
+  Sales           Sales[]   // Relación inversa con Sales
+}
+
+
+model Sales {
+  id_sales        String    @id @default(uuid())         // Usar UUID para claves primarias
+  id_usuario      String                                    // Clave foránea a Usuarios
+
+  total_price     BigInt
+  finalize_at     DateTime?
+  status          String
+  create_at       DateTime  @default(now())
+  update_at       DateTime  @updatedAt
+
+  usuario         Usuarios  @relation(fields: [id_usuario], references: [id_users])  // Relación con Usuarios
+  SalesTemplate   SalesTemplate[]                 // Relación uno a muchos con SalesTemplate
+}
+
+model SalesTemplate {
+  id_sales        String     // Campo que hace referencia a Sales
+  id_template     String     // Campo que hace referencia a Templates
+  amount          Int
+  create_at       DateTime   @default(now())
+
+  sales           Sales      @relation(fields: [id_sales], references: [id_sales])  // Relación con Sales
+  template        Templates  @relation(fields: [id_template], references: [id_template])  // Relación con Templates
+
+  @@id([id_sales, id_template])  // Llave compuesta (id_sales + id_template)
+}
+
+model ProductType {
+  id_product_type String    @id @default(uuid())         // Usar UUID para claves primarias
+  name            String
+  height          BigInt
+  price           BigInt
+  description     String
+  status          Boolean
+  create_at       DateTime  @default(now())
+
+  Templates       Templates[]                           // Relación inversa: un tipo de producto puede tener varias plantillas
+}
+
+model Templates {
+  id_template     String    @id @default(uuid())         // Usar UUID para claves primarias
+  id_product_type String                                  // Clave foránea a ProductType
+
+  name            String
+  design          Json
+  status          Boolean
+  create_at       DateTime  @default(now())
+  update_at       DateTime  @updatedAt
+
+  productType     ProductType @relation(fields: [id_product_type], references: [id_product_type])  // Relación con ProductType
+  SalesTemplate   SalesTemplate[]
 }
