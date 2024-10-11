@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Prisma } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
@@ -39,8 +39,12 @@ export const createNewUserService = async (data) => {
     })
     return user
   } catch (error) {
-    console.error('Error al crear el usuario nuevo:', error)
-    throw error
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') { // !Este es el error cuando el registro no existe
+      throw new Error('Duplicate Email');
+    } else {
+      console.error('Error al actualizar el usuario:', error);
+      throw error;
+    }
   }
 }
 
