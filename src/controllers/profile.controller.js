@@ -6,6 +6,9 @@ export const updateUserPasswordController = async (req, res) => {
     const userAccount = await UpdatePasswordService(req.body.id, req.body.password)
     res.status(200).json({ message: 'Contraseña Actualizada Exitosamente', user_account: userAccount })
   } catch (error) {
+    if (error.message === 'ID proporcionado no existe.') {
+      return res.status(404).json({ message: 'Usuario no encontrado, Error al actualizar la contraseña.' });
+    }
     console.error('Error al actualizar la contraseña', error)
     return res.status(500).json({ message: 'Internal server error.' })
   }
@@ -17,8 +20,11 @@ export const updateUserController = async (req, res) => {
     const userAccount = await UpdateUserService(req.body)
     res.status(200).json({ message: 'Usuario Actualizado exitosamente' })
   } catch (error) {
-    console.error('Error al actualizar el Usuario', error)
-    return res.status(500).json({ message: 'Internal server error.' })
+    if (error.message === 'ID proporcionado no existe.') {
+      return res.status(404).json({ message: 'Usuario no encontrado, Error al actualizar.' });
+    }
+    console.error('Error al actualizar el Usuario:', error);
+    return res.status(500).json({ message: 'Internal server error.' });
   }
 }
 
@@ -28,6 +34,9 @@ export const updateUserStatusController = async (req, res) => {
     const userAccount = await UpdateStateUserService(req.body)
     res.status(200).json({ message: 'Estado Actualizado exitosamente' })
   } catch (error) {
+    if (error.message === 'ID proporcionado no existe.') {
+      return res.status(404).json({ message: 'Usuario no encontrado, Error al actualizar estado.' });
+    }
     console.error('Error al actualizar el Usuario', error)
     return res.status(500).json({ message: 'Internal server error.' })
   }

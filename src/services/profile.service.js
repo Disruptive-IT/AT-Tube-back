@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Prisma } from '@prisma/client'; // Importa Prisma y PrismaClient
 import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
@@ -13,8 +13,12 @@ export const UpdatePasswordService = async (userId, newPassword) => {
     })
     return users
   } catch (error) {
-    console.error('Error al actualizar la contraseña del usuario:', error)
-    throw error
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') { // !Este es el error cuando el registro no existe
+      throw new Error('ID proporcionado no existe.');
+    } else {
+      console.error('Error al actualizar el usuario:', error);
+      throw error;
+    }
   }
 }
 
@@ -35,8 +39,12 @@ export const UpdateUserService = async (data) => {
     })
     return user
   } catch (error) {
-    console.error('Error al actualizar la contraseña del usuario:', error)
-    throw error
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') { // !Este es el error cuando el registro no existe
+      throw new Error('ID proporcionado no existe.');
+    } else {
+      console.error('Error al actualizar el usuario:', error);
+      throw error;
+    }
   }
 }
 
@@ -51,8 +59,12 @@ export const UpdateStateUserService = async (data) => {
     })
     return users
   } catch (error) {
-    console.error('Error al actualizar el estado del usuario:', error)
-    throw error
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') { // !Este es el error cuando el registro no existe
+      throw new Error('ID proporcionado no existe.');
+    } else {
+      console.error('Error al actualizar el usuario:', error);
+      throw error;
+    }
   }
 }
 
