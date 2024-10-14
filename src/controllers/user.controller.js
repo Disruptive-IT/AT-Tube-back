@@ -2,7 +2,8 @@ import {
   getUserAccountService,
   getAllUsersService,
   getAllClientsService,
-  createNewUserService
+  createNewUserService,
+  DeleteUser
 } from '../services/user.service.js'
 
 
@@ -51,6 +52,20 @@ export const getAllClients = async (req, res) => {
     res.status(200).json({ systemClients })
   } catch (error) {
     console.error('Error searching user account information:', error)
+    return res.status(500).json({ message: 'Internal server error.' })
+  }
+}
+
+// ?Controlador que me permite elimianr usuarios del sistema
+export const deleteUser = async (req, res) => {
+  try {
+    const userAccount = await DeleteUser(req.body.id)
+    res.status(200).json({ message: 'Usuario Eliminado exitosamente', user_account: userAccount })
+  } catch (error) {
+    if (error.message === 'ID proporcionado no existe.') {
+      return res.status(404).json({ message: 'Usuario no encontrado, Error al eliminar el usurio.' })
+    }
+    console.error('Error al actualizar la contraseña', error)
     return res.status(500).json({ message: 'Internal server error.' })
   }
 }
