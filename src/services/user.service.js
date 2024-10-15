@@ -95,7 +95,8 @@ export const getAllClientsService = async () => {
       where: { id_rol: 2 },
       select: {
         id_users: true,
-        documentType: { select: { name: true } },
+        avatar: true,
+        documentType: { select: { name: true, id_document_type:true } },
         document: true,
         name: true,
         department: { select: { name: true } },
@@ -107,10 +108,11 @@ export const getAllClientsService = async () => {
         status: true
       }
     })
-
     const formattedUsers = users.map(user => ({
-      id_users: user.id_users,
-      documentType: user.documentType.name,
+      id: user.id_users,
+      avatar: user.avatar,
+      idTipe: user.documentType.name,
+      strIDTipe: user.documentType.id_document_type,
       document: user.document,
       name: user.name,
       department: user.department.name,
@@ -119,9 +121,9 @@ export const getAllClientsService = async () => {
       phone: user.phone,
       email: user.email,
       id_rol: user.id_rol,
-      status: user.status
+      status: user.status,
+      strStatus: !user.status ? 'Inactivo' : 'Activo'
     }))
-
     if (!users) {
       throw new Error('0 users found in the database.')
     }
