@@ -58,8 +58,13 @@ export const getAllClients = async (req, res) => {
 
 // ?Controlador que me permite elimianr usuarios del sistema
 export const deleteUser = async (req, res) => {
+
   try {
-    const userAccount = await DeleteUser(req.body.id)
+    const userId = req.query.id;
+    if (!userId) {
+      return res.status(400).json({ message: 'ID de usuario no proporcionado.' });
+    }
+    const userAccount = await DeleteUser(userId)
     res.status(200).json({ message: 'Usuario Eliminado exitosamente', user_account: userAccount })
   } catch (error) {
     if (error.message === 'ID proporcionado no existe.') {

@@ -50,7 +50,7 @@ export const getAllUsersService = async () => {
       select: {
         id_users: true,
         avatar: true,
-        documentType: { select: { name: true } },
+        documentType: { select: { name: true, id_document_type:true } },
         document: true,
         name: true,
         department: { select: { name: true } },
@@ -66,6 +66,7 @@ export const getAllUsersService = async () => {
       id: user.id_users,
       avatar: user.avatar,
       idTipe: user.documentType.name,
+      strIDTipe: user.documentType.id_document_type,
       document: user.document,
       name: user.name,
       department: user.department.name,
@@ -138,7 +139,7 @@ export const DeleteUser = async (userId) => {
     if (!userDelete) { throw new Error('Usuario no encontrado.') }
     return userDelete
   } catch (error) {
-    console.error('Error al buscar al usuario: ', error)
+    console.error('Error al eliminar el usuario: ', error)
     throw error
   }
 }
