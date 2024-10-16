@@ -146,13 +146,49 @@ export const getAllClientsService = async () => {
 }
 
 // *servicio que me permite elimianr users del sistema
-export const DeleteUser = async (userId) => {
+export const DeleteUserService = async (userId) => {
   try {
     const userDelete = await prisma.users.delete({ where: { id_users: userId } })
     if (!userDelete) { throw new Error('Usuario no encontrado.') }
     return userDelete
   } catch (error) {
     console.error('Error al eliminar el usuario: ', error)
+    throw error
+  }
+}
+
+// *Servicio para traer todos los paises
+export const getAllCountriesService = async () => {
+  try {
+    const countries = await prisma.country.findMany()
+    if (!countries) { throw new Error('No hay paises en la base de datos.') }
+    return countries
+  } catch (error) {
+    console.error('Error al buscar paises:', error)
+    throw error
+  }
+}
+
+// *Servicio para traer todos los paises
+export const getAllDepartmenService = async (req) => {
+  try {
+    const department = await prisma.department.findMany({ where: { id_country: req } })
+    if (!department) { throw new Error('No hay departamentos en la base de datos.') }
+    return department
+  } catch (error) {
+    console.error('Error al buscar paises:', error)
+    throw error
+  }
+}
+
+// *Servicio para traer todos los paises
+export const getAllCityService = async (req) => {
+  try {
+    const department = await prisma.city.findMany({ where: { id_department: req } })
+    if (!department) { throw new Error('No hay departamentos en la base de datos.') }
+    return department
+  } catch (error) {
+    console.error('Error al buscar paises:', error)
     throw error
   }
 }

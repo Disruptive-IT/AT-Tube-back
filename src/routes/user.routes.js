@@ -1,16 +1,22 @@
 import express from 'express'
 import {
-  getAllUsers,
-  getAllClients,
+  getAllUsersController,
+  getAllClientsController,
   createNewUserController,
-  deleteUser
+  deleteUserController,
+  getallCountriesController,
+  getAllDepartmentController,
+  getAllCityController
 } from '../controllers/user.controller.js'
 
 const router = express.Router()
 
-router.get('/allUsers', getAllUsers)
-router.get('/allClients', getAllClients)
+router.get('/allUsers', getAllUsersController)
+router.get('/allClients', getAllClientsController)
 router.post('/newuseradmin', createNewUserController)
-router.delete('/deleteUser', deleteUser)
+router.delete('/deleteUser', deleteUserController)
+router.get('/getCountries', getallCountriesController)
+router.get('/getDepartments', getAllDepartmentController)
+router.get('/getCities', getAllCityController)
 
 export default router

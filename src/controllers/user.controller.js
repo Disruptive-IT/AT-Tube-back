@@ -3,7 +3,10 @@ import {
   getAllUsersService,
   getAllClientsService,
   createNewUserService,
-  DeleteUser
+  DeleteUserService,
+  getAllCountriesService,
+  getAllCityService,
+  getAllDepartmenService
 } from '../services/user.service.js'
 
 
@@ -35,7 +38,7 @@ export const getUserAccount = async (req, res) => {
 }
 
 // ?Controlador para traer todos los usuarios Admin
-export const getAllUsers = async (req, res) => {
+export const getAllUsersController = async (req, res) => {
   try {
     const systemUsers = await getAllUsersService()
     res.status(200).json({ systemUsers })
@@ -46,7 +49,7 @@ export const getAllUsers = async (req, res) => {
 }
 
 // ?Controlador para traer todos los usuarios clients
-export const getAllClients = async (req, res) => {
+export const getAllClientsController = async (req, res) => {
   try {
     const systemClients = await getAllClientsService()
     res.status(200).json({ systemClients })
@@ -57,14 +60,13 @@ export const getAllClients = async (req, res) => {
 }
 
 // ?Controlador que me permite elimianr usuarios del sistema
-export const deleteUser = async (req, res) => {
-
+export const deleteUserController = async (req, res) => {
   try {
-    const userId = req.query.id;
+    const userId = req.query.id
     if (!userId) {
-      return res.status(400).json({ message: 'ID de usuario no proporcionado.' });
+      return res.status(400).json({ message: 'ID de usuario no proporcionado.' })
     }
-    const userAccount = await DeleteUser(userId)
+    const userAccount = await DeleteUserService(userId)
     res.status(200).json({ message: 'Usuario Eliminado exitosamente', user_account: userAccount })
   } catch (error) {
     if (error.message === 'ID proporcionado no existe.') {
@@ -72,5 +74,40 @@ export const deleteUser = async (req, res) => {
     }
     console.error('Error al actualizar la contraseña', error)
     return res.status(500).json({ message: 'Internal server error.' })
+  }
+}
+
+// ?Controller to call all over the countries
+export const getallCountriesController = async(req, res) => {
+  try {
+    const countries = await getAllCountriesService()
+    res.status(200).json({ countries })
+  } catch (error) {
+    console.error('Error al actualizar la contraseña', error)
+    return res.status(500).json({ message: 'Internal server error.', error })
+  }
+}
+
+// ?Controller to call all over the departments
+export const getAllDepartmentController = async (req, res) => {
+  try {
+    const country = req.body.id_country
+    const deparments = await getAllDepartmenService(country)
+    res.status(200).json({ deparments })
+  } catch (error) {
+    console.error('Error al llamar los departamentos', error)
+    return res.status(500).json({ message: 'Internal server error.', error })
+  }
+}
+
+// ?Controller to call all over the departments
+export const getAllCityController = async (req, res) => {
+  try {
+    const city = req.body.id_department
+    const deparments = await getAllCityService(city)
+    res.status(200).json({ deparments })
+  } catch (error) {
+    console.error('Error al llamar las ciudades', error)
+    return res.status(500).json({ message: 'Internal server error.', error })
   }
 }
