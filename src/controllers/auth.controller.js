@@ -1,8 +1,3 @@
-// import { PrismaClient } from '@prisma/client'
-// import bcrypt from 'bcrypt'
-
-// import jwt from 'jsonwebtoken';
-
 import { userRegisterService, userLoginService } from '../services/auth.service.js'
 
 import { createToken } from '../middlewares/jwt.js'

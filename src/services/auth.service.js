@@ -83,25 +83,19 @@ export const userRegisterService = async (userInformation) => {
     throw new Error(`Error en el registro del usuario: ${error.message}`)
   }
 }
-
 export async function userLoginService (email, password) {
   try {
-    // Busca la información del usuario junto con sus credenciales en una sola consulta
-    const userSearch = await prisma.user.findFirst({
+    // Busca la información del usuario junto con su rol y contraseña
+    const userSearch = await prisma.usuarios.findFirst({
       where: { email },
       select: {
-        id: true,
-        email: true,
-        name: true,
-        last_name: true,
+        id_users: true, // ID del usuario
+        email: true, // Email del usuario
+        name: true, // Nombre del usuario
+        password: true, // Contraseña del usuario
         role: {
           select: {
-            name: true
-          }
-        },
-        credentials: {
-          select: {
-            password: true
+            name: true // Nombre del rol (relación con Roles)
           }
         }
       }
@@ -113,7 +107,7 @@ export async function userLoginService (email, password) {
     }
 
     // Verifica la contraseña del usuario
-    const passwordValidation = await bcrypt.compare(password, userSearch.credentials.password)
+    const passwordValidation = await bcrypt.compare(password, userSearch.password)
 
     if (!passwordValidation) {
       throw new Error('Usuario o contraseña incorrectos.') // Mensaje genérico por seguridad
@@ -121,9 +115,8 @@ export async function userLoginService (email, password) {
 
     // Transforma los datos para devolver solo lo necesario
     const transformedUserSearch = {
-      id: userSearch.id,
+      id: userSearch.id_users,
       name: userSearch.name,
-      lastName: userSearch.last_name,
       role: userSearch.role?.name // Extrae solo el nombre del rol
     }
 
