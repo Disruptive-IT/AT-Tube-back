@@ -104,8 +104,8 @@ export const getAllDepartmentController = async (req, res) => {
 export const getAllCityController = async (req, res) => {
   try {
     const city = req.body.id_department
-    const deparments = await getAllCityService(city)
-    res.status(200).json({ deparments })
+    const cities = await getAllCityService(city)
+    res.status(200).json({ cities })
   } catch (error) {
     console.error('Error al llamar las ciudades', error)
     return res.status(500).json({ message: 'Internal server error.', error })

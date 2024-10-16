@@ -171,8 +171,10 @@ export const getAllCountriesService = async () => {
 
 // *Servicio para traer todos los paises
 export const getAllDepartmenService = async (req) => {
+  const city = req
+  if (!city) { throw new Error('No hay departamento seleccionado.') }
   try {
-    const department = await prisma.department.findMany({ where: { id_country: req } })
+    const department = await prisma.department.findMany({ where: { id_country: city } })
     if (!department) { throw new Error('No hay departamentos en la base de datos.') }
     return department
   } catch (error) {
@@ -183,10 +185,12 @@ export const getAllDepartmenService = async (req) => {
 
 // *Servicio para traer todos los paises
 export const getAllCityService = async (req) => {
+  const department = req
+  if (!department) { throw new Error('No hay departamento seleccionado.') }
   try {
-    const department = await prisma.city.findMany({ where: { id_department: req } })
-    if (!department) { throw new Error('No hay departamentos en la base de datos.') }
-    return department
+    const cities = await prisma.city.findMany({ where: { id_department: department } })
+    if (!cities) { throw new Error('No hay departamentos en la base de datos.') }
+    return cities
   } catch (error) {
     console.error('Error al buscar paises:', error)
     throw error

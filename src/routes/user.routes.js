@@ -16,7 +16,7 @@ router.get('/allClients', getAllClientsController)
 router.post('/newuseradmin', createNewUserController)
 router.delete('/deleteUser', deleteUserController)
 router.get('/getCountries', getallCountriesController)
-router.get('/getDepartments', getAllDepartmentController)
-router.get('/getCities', getAllCityController)
+router.post('/getDepartments', getAllDepartmentController)
+router.post('/getCities', getAllCityController)
 
 export default router
