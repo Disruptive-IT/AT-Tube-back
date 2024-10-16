@@ -11,18 +11,20 @@ async function main () {
       document_type: 2,
       document: '987654321',
       name: 'Carlos Hernández',
+      id_country: 1,
       id_department: 5,
       id_city: 330,
       address: '123 Calle Falsa',
       phone: '3201234567',
       email: 'carloshernandez@example.com',
       password: hashedPassword,
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
       document: '123456789',
       name: 'Laura Pérez',
+      id_country: 1,
       id_department: 5,
       id_city: 330,
       address: '456 Avenida Siempre Viva',
@@ -35,66 +37,72 @@ async function main () {
       document_type: 2,
       document: '987654322',
       name: 'Juan Gómez',
+      id_country: 1,
       id_department: 5,
       id_city: 330,
       address: '789 Calle Luna',
       phone: '3208765432',
       email: 'juangomez@example.com',
       password: hashedPassword,
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
       document: '123456780',
       name: 'Ana Martínez',
+      id_country: 1,
       id_department: 5,
       id_city: 330,
       address: '101 Calle Sol',
       phone: '3218765432',
       email: 'anamartinez@example.com',
       password: hashedPassword,
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
       document: '987654323',
       name: 'Ricardo López',
+      id_country: 1,
       id_department: 5,
       id_city: 330,
       address: '202 Calle Estrella',
       phone: '3207654321',
       email: 'ricardolopez@example.com',
       password: hashedPassword,
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
       document: '123456781',
       name: 'Marta Sánchez',
+      id_country: 1,
       id_department: 5,
       id_city: 330,
       address: '303 Calle Marte',
       phone: '3217654321',
       email: 'martasanchez@example.com',
       password: hashedPassword,
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
       document: '987654324',
       name: 'Daniel Ruiz',
+      id_country: 1,
       id_department: 5,
       id_city: 330,
       address: '404 Calle Júpiter',
       phone: '3206543210',
       email: 'danielruiz@example.com',
       password: hashedPassword,
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
       document: '123456782',
       name: 'Lucía Ramírez',
+      id_country: 1,
       id_department: 5,
       id_city: 330,
       address: '505 Calle Venus',
@@ -107,6 +115,7 @@ async function main () {
       document_type: 2,
       document: '987654325',
       name: 'Jorge Torres',
+      id_country: 1,
       id_department: 5,
       id_city: 330,
       address: '606 Calle Saturno',
@@ -119,6 +128,7 @@ async function main () {
       document_type: 2,
       document: '123456783',
       name: 'María Ortiz',
+      id_country: 1,
       id_department: 5,
       id_city: 330,
       address: '707 Calle Urano',
@@ -131,6 +141,7 @@ async function main () {
       document_type: 2,
       document: '987654326',
       name: 'Roberto Vargas',
+      id_country: 1,
       id_department: 5,
       id_city: 330,
       address: '808 Calle Neptuno',
@@ -143,6 +154,7 @@ async function main () {
       document_type: 2,
       document: '123456784',
       name: 'Patricia Morales',
+      id_country: 1,
       id_department: 5,
       id_city: 330,
       address: '909 Calle Plutón',
@@ -155,6 +167,7 @@ async function main () {
       document_type: 2,
       document: '987654327',
       name: 'Fernando Gil',
+      id_country: 1,
       id_department: 5,
       id_city: 330,
       address: '1010 Calle Cometa',
@@ -167,6 +180,7 @@ async function main () {
       document_type: 2,
       document: '123456785',
       name: 'Sofía Castro',
+      id_country: 1,
       id_department: 5,
       id_city: 330,
       address: '1111 Calle Asteroide',
@@ -179,6 +193,7 @@ async function main () {
       document_type: 2,
       document: '987654328',
       name: 'Alejandro Díaz',
+      id_country: 1,
       id_department: 5,
       id_city: 330,
       address: '1212 Calle Estrella Fugaz',
@@ -191,6 +206,7 @@ async function main () {
       document_type: 2,
       document: '123456786',
       name: 'Isabel Fernández',
+      id_country: 1,
       id_department: 5,
       id_city: 330,
       address: '1313 Calle Eclipse',
@@ -203,6 +219,7 @@ async function main () {
       document_type: 2,
       document: '987654329',
       name: 'Luis García',
+      id_country: 1,
       id_department: 5,
       id_city: 330,
       address: '1414 Calle Meteorito',
@@ -215,6 +232,7 @@ async function main () {
       document_type: 2,
       document: '123456787',
       name: 'Gabriela Molina',
+      id_country: 1,
       id_department: 5,
       id_city: 330,
       address: '1515 Calle Nebulosa',
@@ -227,6 +245,7 @@ async function main () {
       document_type: 2,
       document: '987654330',
       name: 'Héctor Parra',
+      id_country: 1,
       id_department: 5,
       id_city: 330,
       address: '1616 Calle Supernova',
@@ -239,6 +258,7 @@ async function main () {
       document_type: 2,
       document: '123456788',
       name: 'Paula Reyes',
+      id_country: 1,
       id_department: 5,
       id_city: 330,
       address: '1717 Calle Vía Láctea',
@@ -257,40 +277,52 @@ async function main () {
     { id_document_type: 5, name: 'RUT', description: 'Registro Único Tributario' }
   ]
 
+  const Paises = [
+    { id_country: 1, name: 'COLOMBIA' },
+    { id_country: 2, name: 'VENEZUELA' },
+    { id_country: 3, name: 'PERÚ' },
+    { id_country: 4, name: 'ARGENTINA' },
+    { id_country: 5, name: 'ECUADOR' },
+    { id_country: 6, name: 'CHILE' },
+    { id_country: 7, name: 'URUGUAY' },
+    { id_country: 8, name: 'BOLIVIA' },
+    { id_country: 9, name: 'PARAGUAY' }
+  ]
+
   const departamentos = [
-    { id_department: 5, name: 'ANTIOQUIA' },
-    { id_department: 8, name: 'ATLÁNTICO' },
-    { id_department: 11, name: 'BOGOTÁ, D.C.' },
-    { id_department: 13, name: 'BOLÍVAR' },
-    { id_department: 15, name: 'BOYACÁ' },
-    { id_department: 17, name: 'CALDAS' },
-    { id_department: 18, name: 'CAQUETÁ' },
-    { id_department: 19, name: 'CAUCA' },
-    { id_department: 20, name: 'CESAR' },
-    { id_department: 23, name: 'CÓRDOBA' },
-    { id_department: 25, name: 'CUNDINAMARCA' },
-    { id_department: 27, name: 'CHOCÓ' },
-    { id_department: 41, name: 'HUILA' },
-    { id_department: 44, name: 'LA GUAJIRA' },
-    { id_department: 47, name: 'MAGDALENA' },
-    { id_department: 50, name: 'META' },
-    { id_department: 52, name: 'NARIÑO' },
-    { id_department: 54, name: 'NORTE DE SANTANDER' },
-    { id_department: 63, name: 'QUINDÍO' },
-    { id_department: 66, name: 'RISARALDA' },
-    { id_department: 68, name: 'SANTANDER' },
-    { id_department: 70, name: 'SUCRE' },
-    { id_department: 73, name: 'TOLIMA' },
-    { id_department: 76, name: 'VALLE DEL CAUCA' },
-    { id_department: 81, name: 'ARAUCA' },
-    { id_department: 85, name: 'CASANARE' },
-    { id_department: 86, name: 'PUTUMAYO' },
-    { id_department: 88, name: 'ARCHIPIÉLAGO DE SAN ANDRÉS, PROVIDENCIA Y SANTA CATALINA' },
-    { id_department: 91, name: 'AMAZONAS' },
-    { id_department: 94, name: 'GUAINÍA' },
-    { id_department: 95, name: 'GUAVIARE' },
-    { id_department: 97, name: 'VAUPÉS' },
-    { id_department: 99, name: 'VICHADA' }
+    { id_department: 5, name: 'ANTIOQUIA', id_country: 1 },
+    { id_department: 8, name: 'ATLÁNTICO', id_country: 1 },
+    { id_department: 11, name: 'BOGOTÁ, D.C.', id_country: 1 },
+    { id_department: 13, name: 'BOLÍVAR', id_country: 1 },
+    { id_department: 15, name: 'BOYACÁ', id_country: 1 },
+    { id_department: 17, name: 'CALDAS', id_country: 1 },
+    { id_department: 18, name: 'CAQUETÁ', id_country: 1 },
+    { id_department: 19, name: 'CAUCA', id_country: 1 },
+    { id_department: 20, name: 'CESAR', id_country: 1 },
+    { id_department: 23, name: 'CÓRDOBA', id_country: 1 },
+    { id_department: 25, name: 'CUNDINAMARCA', id_country: 1 },
+    { id_department: 27, name: 'CHOCÓ', id_country: 1 },
+    { id_department: 41, name: 'HUILA', id_country: 1 },
+    { id_department: 44, name: 'LA GUAJIRA', id_country: 1 },
+    { id_department: 47, name: 'MAGDALENA', id_country: 1 },
+    { id_department: 50, name: 'META', id_country: 1 },
+    { id_department: 52, name: 'NARIÑO', id_country: 1 },
+    { id_department: 54, name: 'NORTE DE SANTANDER', id_country: 1 },
+    { id_department: 63, name: 'QUINDÍO', id_country: 1 },
+    { id_department: 66, name: 'RISARALDA', id_country: 1 },
+    { id_department: 68, name: 'SANTANDER', id_country: 1 },
+    { id_department: 70, name: 'SUCRE', id_country: 1 },
+    { id_department: 73, name: 'TOLIMA', id_country: 1 },
+    { id_department: 76, name: 'VALLE DEL CAUCA', id_country: 1 },
+    { id_department: 81, name: 'ARAUCA', id_country: 1 },
+    { id_department: 85, name: 'CASANARE', id_country: 1 },
+    { id_department: 86, name: 'PUTUMAYO', id_country: 1 },
+    { id_department: 88, name: 'ARCHIPIÉLAGO DE SAN ANDRÉS, PROVIDENCIA Y SANTA CATALINA', id_country: 1 },
+    { id_department: 91, name: 'AMAZONAS', id_country: 1 },
+    { id_department: 94, name: 'GUAINÍA', id_country: 1 },
+    { id_department: 95, name: 'GUAVIARE', id_country: 1 },
+    { id_department: 97, name: 'VAUPÉS', id_country: 1 },
+    { id_department: 99, name: 'VICHADA', id_country: 1 }
   ]
 
   // ?listado de municipios
@@ -1411,11 +1443,20 @@ async function main () {
     }))
   })
 
+  // ? Insertar datos de tipos de documentos
+  await prisma.Country.createMany({
+    data: Paises.map((pais) => ({
+      id_country: pais.id_country,
+      name: pais.name
+    }))
+  })
+
   // ? Insertar departamentos en la base de datos
   await prisma.department.createMany({
     data: departamentos.map((departamento) => ({
       id_department: departamento.id_department,
-      name: departamento.name
+      name: departamento.name,
+      id_country: departamento.id_country
     }))
   })
 
@@ -1442,6 +1483,7 @@ async function main () {
       document: user.document,
       name: user.name,
       campo: user.campo,
+      id_country: user.id_country,
       id_department: user.id_department,
       id_city: user.id_city,
       address: user.address,

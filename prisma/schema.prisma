@@ -36,10 +36,21 @@ model City {
   Usuarios       Usuarios[]  // Relación inversa con Usuarios
 }
 
-model Department {
-  id_department Int   @id 
-  name          String
+model Country {  // Cambiar a mayúscula
+  id_country      Int       @id 
+  name            String
 
+  Department    Department[] 
+  Usuarios      Usuarios[]  // Relación inversa con Usuarios
+}
+
+
+model Department {
+  id_department  Int     @id 
+  name           String
+  id_country     Int      // Clave foránea a Country
+
+  Country        Country @relation(fields: [id_country], references: [id_country])  // Relación con Department
   Usuarios      Usuarios[]  // Relación inversa con Usuarios
   City          City[]  // Relación inversa con City
 }
@@ -50,6 +61,7 @@ model Usuarios {
   document_type   Int      // Clave foránea a DocumentType
   document        String
   name            String
+  id_country      Int      
   id_department   Int      // Clave foránea a Department
   id_city         Int      // Clave foránea a City
   address         String
@@ -61,6 +73,7 @@ model Usuarios {
   create_at       DateTime  @default(now())
   update_at       DateTime  @updatedAt
 
+  country         Country      @relation(fields: [id_country], references: [id_country]) //relation with country
   department      Department   @relation(fields: [id_department], references: [id_department])   // Relación con Department
   city            City         @relation(fields: [id_city], references: [id_city])   // Relación con City
   role            Roles        @relation(fields: [id_rol], references: [id_rol])        // Relación con Roles
