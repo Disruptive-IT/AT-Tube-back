@@ -30,7 +30,7 @@ export const userRegisterService = async (userInformation) => {
     });
 
     // Verifica si ya existe un usuario con el correo o documento en una sola consulta
-    const existingUser = await prisma.user.findFirst({
+    const existingUser = await prisma.usuarios.findFirst({
       where: {
         OR: [
           { email },
@@ -53,7 +53,7 @@ export const userRegisterService = async (userInformation) => {
     const hashPassword = await bcrypt.hash(password, 10)
 
     // Crear el nuevo usuario
-    const newUser = await prisma.user.create({
+    const newUser = await prisma.usuarios.create({
       data: {
         document_types: { connect: { id: documentTypeId } },
         documentNumber,
