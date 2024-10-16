@@ -20,10 +20,14 @@ export const userRegisterService = async (userInformation) => {
       status
     } = userInformation
 
-    // Verifica si falta información requerida
-    if (!email || !documentNumber || !name || !password || !documentTypeId || !roleId) {
-      throw new Error('Faltan campos requeridos para el registro del usuario.')
-    }
+    // Verifica los campos requeridos
+    const requiredFields = ['email', 'documentNumber', 'name', 'password', 'documentTypeId', 'roleId', 'status', 'city', 'departament', 'adress', 'phone', 'documentTypeId', ];
+    
+    requiredFields.forEach((field) => {
+      if (!eval(field)) {
+        throw new Error(`El campo "${field}" es requerido para el registro del usuario.`);
+      }
+    });
 
     // Verifica si ya existe un usuario con el correo o documento en una sola consulta
     const existingUser = await prisma.user.findFirst({
