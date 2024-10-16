@@ -12,7 +12,7 @@ export const userRegisterService = async (userInformation) => {
       name,
       departament,
       city,
-      adress,
+      address,
       phone,
       email,
       password,
@@ -21,7 +21,7 @@ export const userRegisterService = async (userInformation) => {
     } = userInformation
 
     // Verifica los campos requeridos
-    const requiredFields = ['email', 'document', 'name', 'password', 'documentTypeId', 'roleId', 'status', 'city', 'departament', 'adress', 'phone', 'documentTypeId', ];
+    const requiredFields = ['email', 'document', 'name', 'password', 'documentTypeId', 'roleId', 'status', 'city', 'departament', 'address', 'phone', 'documentTypeId', ];
     
     requiredFields.forEach((field) => {
       if (!eval(field)) {
@@ -60,7 +60,7 @@ export const userRegisterService = async (userInformation) => {
         name,
         departament,
         city,
-        adress,
+        address,
         phone,
         email,
         role: { connect: { id: roleId } },
@@ -74,7 +74,7 @@ export const userRegisterService = async (userInformation) => {
         name: true,
         departament: true,
         city: true,
-        adress: true,
+        address: true,
         email: true,
         role: true
       }
