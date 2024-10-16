@@ -10,6 +10,7 @@ export const userRegisterService = async (userInformation) => {
       documentTypeId,
       document,
       name,
+      country,
       departament,
       city,
       address,
@@ -55,6 +56,7 @@ export const userRegisterService = async (userInformation) => {
         document_type: documentTypeId,
         document,
         name,
+        id_country: country,
         id_department: departament,
         id_city: city,
         address,
@@ -67,6 +69,7 @@ export const userRegisterService = async (userInformation) => {
       select: {
         id_users: true,
         name: true,
+        id_country: true,
         id_department: true,
         id_city: true,
         address: true,
