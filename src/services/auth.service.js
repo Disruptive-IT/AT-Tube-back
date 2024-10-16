@@ -30,7 +30,7 @@ export const userRegisterService = async (userInformation) => {
     });
 
     // Verifica si ya existe un usuario con el correo o documento
-    const existingUser = await prisma.usuarios.findFirst({
+    const existingUser = await prisma.Users.findFirst({
       where: {
         OR: [{ email }, { document }]
       }
@@ -50,7 +50,7 @@ export const userRegisterService = async (userInformation) => {
     const hashPassword = await bcrypt.hash(password, 10)
 
     // Crear el nuevo usuario
-    const newUser = await prisma.usuarios.create({
+    const newUser = await prisma.users.create({
       data: {
         document_type: documentTypeId,
         document,
@@ -86,7 +86,7 @@ export const userRegisterService = async (userInformation) => {
 export async function userLoginService(email, password) {
   try {
     // Busca la información del usuario junto con su rol y contraseña
-    const userSearch = await prisma.usuarios.findFirst({
+    const userSearch = await prisma.users.findFirst({
       where: { email },
       select: {
         id_users: true, // ID del usuario

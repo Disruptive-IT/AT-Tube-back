@@ -5,7 +5,7 @@ const prisma = new PrismaClient()
 
 export const getUserAccountService = async (userId) => {
   try {
-    const userAccountInfo = await prisma.usuarios.findFirst({ where: { id_rol: userId } })
+    const userAccountInfo = await prisma.users.findFirst({ where: { id_rol: userId } })
     if (!userAccountInfo) { throw new Error('Usuario no encontrado.') }
     return userAccountInfo
   } catch (error) {
@@ -17,7 +17,7 @@ export const getUserAccountService = async (userId) => {
 export const createNewUserService = async (data) => {
   try {
     const hashedPassword = await bcrypt.hash(data.password, 10) // ?hash de contrasena generica
-    const user = await prisma.usuarios.create({
+    const user = await prisma.users.create({
       data: {
         documentType: { connect: { id_document_type: data.documentType } },
         document: data.document,
@@ -42,10 +42,10 @@ export const createNewUserService = async (data) => {
   }
 }
 
-// *Servicio que me trae todos los usuarios con el rol Admin
+// *Servicio que me trae todos los users con el rol Admin
 export const getAllUsersService = async () => {
   try {
-    const users = await prisma.usuarios.findMany({
+    const users = await prisma.users.findMany({
       where: { id_rol: 1 },
       select: {
         id_users: true,
@@ -88,10 +88,10 @@ export const getAllUsersService = async () => {
   }
 }
 
-// *Servicio que me trae todos los usuarios con el rol Client
+// *Servicio que me trae todos los users con el rol Client
 export const getAllClientsService = async () => {
   try {
-    const users = await prisma.usuarios.findMany({
+    const users = await prisma.users.findMany({
       where: { id_rol: 2 },
       select: {
         id_users: true,
@@ -134,10 +134,10 @@ export const getAllClientsService = async () => {
   }
 }
 
-// *servicio que me permite elimianr usuarios del sistema
+// *servicio que me permite elimianr users del sistema
 export const DeleteUser = async (userId) => {
   try {
-    const userDelete = await prisma.Usuarios.delete({ where: { id_users: userId } })
+    const userDelete = await prisma.users.delete({ where: { id_users: userId } })
     if (!userDelete) { throw new Error('Usuario no encontrado.') }
     return userDelete
   } catch (error) {

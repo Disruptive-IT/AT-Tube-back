@@ -1476,8 +1476,8 @@ async function main () {
     }))
   })
 
-  // ? Usuarios de prueba
-  await prisma.Usuarios.createMany({
+  // ? Users de prueba
+  await prisma.Users.createMany({
     data: usuarios.map((user) => ({
       document_type: user.document_type,
       document: user.document,

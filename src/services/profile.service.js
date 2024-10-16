@@ -7,7 +7,7 @@ const prisma = new PrismaClient()
 export const UpdatePasswordService = async (userId, newPassword) => {
   const hashedPassword = await bcrypt.hash(newPassword, 10) // ?hash de contrasena
   try {
-    const users = await prisma.usuarios.update({
+    const users = await prisma.users.update({
       where: { id_users: userId },
       data: { password: hashedPassword }
     })
@@ -25,7 +25,7 @@ export const UpdatePasswordService = async (userId, newPassword) => {
 // *Servicio de actualizacion de Perfil de usuario SIN la contrasena
 export const UpdateUserService = async (data) => {
   try {
-    const user = await prisma.usuarios.update({
+    const user = await prisma.users.update({
       where: { id_users: data.id },
       data: { 
         documentType: {connect: { id_document_type: data.documentType },},
@@ -53,7 +53,7 @@ export const UpdateUserService = async (data) => {
 export const UpdateStateUserService = async (data) => {
   const newStatus = !data.status ? true: false // ?valido que estado trae el usuario para cambiarlo automaticamente
   try {
-    const users = await prisma.usuarios.update({
+    const users = await prisma.users.update({
       where: { id_users: data.id },
       data: { status: newStatus }
     })
