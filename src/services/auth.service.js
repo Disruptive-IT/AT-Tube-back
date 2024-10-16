@@ -21,21 +21,18 @@ export const userRegisterService = async (userInformation) => {
     } = userInformation
 
     // Verifica los campos requeridos
-    const requiredFields = ['email', 'document', 'name', 'password', 'documentTypeId', 'roleId', 'status', 'city', 'departament', 'address', 'phone', 'documentTypeId', ];
-    
+    const requiredFields = ['email', 'document', 'name', 'password', 'documentTypeId', 'roleId', 'status', 'city', 'departament', 'address', 'phone', 'documentTypeId']
+
     requiredFields.forEach((field) => {
       if (!eval(field)) {
         throw new Error(`El campo "${field}" es requerido para el registro del usuario.`);
       }
     });
 
-    // Verifica si ya existe un usuario con el correo o documento en una sola consulta
+    // Verifica si ya existe un usuario con el correo o documento
     const existingUser = await prisma.usuarios.findFirst({
       where: {
-        OR: [
-          { email },
-          { document }
-        ]
+        OR: [{ email }, { document }]
       }
     })
 
@@ -55,25 +52,23 @@ export const userRegisterService = async (userInformation) => {
     // Crear el nuevo usuario
     const newUser = await prisma.usuarios.create({
       data: {
-        document_types: { connect: { id: documentTypeId } },
+        document_type: documentTypeId,
         document,
         name,
-        departament,
-        city,
+        id_department: departament,
+        id_city: city,
         address,
         phone,
         email,
-        role: { connect: { id: roleId } },
+        password: hashPassword,
+        id_rol: roleId,
         status,
-        credentials: {
-          create: { password: hashPassword } // Asegúrate de que tienes un modelo relacionado con credenciales
-        }
       },
       select: {
-        id: true,
+        id_users: true,
         name: true,
-        departament: true,
-        city: true,
+        id_department: true,
+        id_city: true,
         address: true,
         email: true,
         role: true
@@ -82,12 +77,13 @@ export const userRegisterService = async (userInformation) => {
 
     return newUser
   } catch (error) {
-    // Mejor manejo de errores con tipos de respuesta específicos
+    // Mejor manejo de errores
     console.error('Error creating new user: ', error.message)
     throw new Error(`Error en el registro del usuario: ${error.message}`)
   }
 }
-export async function userLoginService (email, password) {
+
+export async function userLoginService(email, password) {
   try {
     // Busca la información del usuario junto con su rol y contraseña
     const userSearch = await prisma.usuarios.findFirst({
