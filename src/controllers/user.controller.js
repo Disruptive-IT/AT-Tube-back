@@ -18,7 +18,7 @@ export const createNewUserController = async (req, res) => {
       return res.status(404).json({ message: 'El Email que ingresaste ya esta registrado, verifica y vuelve a intentarlo' });
     }
     console.error('Error al crear el usuario', error)
-    return res.status(500).json({ message: 'Internal server error.' })
+    return res.status(500).json({ message: 'Internal server error.', error: error })
   }
 }
 
