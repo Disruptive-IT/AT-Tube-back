@@ -8,7 +8,7 @@ export const userRegisterService = async (userInformation) => {
   try {
     const {
       documentTypeId,
-      documentNumber,
+      document,
       name,
       departament,
       city,
@@ -21,7 +21,7 @@ export const userRegisterService = async (userInformation) => {
     } = userInformation
 
     // Verifica los campos requeridos
-    const requiredFields = ['email', 'documentNumber', 'name', 'password', 'documentTypeId', 'roleId', 'status', 'city', 'departament', 'adress', 'phone', 'documentTypeId', ];
+    const requiredFields = ['email', 'document', 'name', 'password', 'documentTypeId', 'roleId', 'status', 'city', 'departament', 'adress', 'phone', 'documentTypeId', ];
     
     requiredFields.forEach((field) => {
       if (!eval(field)) {
@@ -34,7 +34,7 @@ export const userRegisterService = async (userInformation) => {
       where: {
         OR: [
           { email },
-          { documentNumber }
+          { document }
         ]
       }
     })
@@ -44,7 +44,7 @@ export const userRegisterService = async (userInformation) => {
       if (existingUser.email === email) {
         throw new Error('Ya hay un usuario registrado con ese correo electrónico.')
       }
-      if (existingUser.documentNumber === documentNumber) {
+      if (existingUser.document === document) {
         throw new Error('Ya hay un usuario registrado con ese número de documento.')
       }
     }
@@ -56,7 +56,7 @@ export const userRegisterService = async (userInformation) => {
     const newUser = await prisma.usuarios.create({
       data: {
         document_types: { connect: { id: documentTypeId } },
-        documentNumber,
+        document,
         name,
         departament,
         city,
