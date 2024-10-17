@@ -273,7 +273,7 @@ async function main () {
     { id_document_type: 1, name: 'CC', description: 'Cédula de Ciudadanía' },
     { id_document_type: 2, name: 'CE', description: 'Cédula de Extranjería' },
     { id_document_type: 3, name: 'NIT', description: 'Registro de Identificación Tributaria' },
-    { id_document_type: 4, name: 'TI', description: 'Tarjeta de Identidad' },
+    { id_document_type: 4, name: 'PP', description: 'Pasaporte' },
     { id_document_type: 5, name: 'RUT', description: 'Registro Único Tributario' }
   ]
 
