@@ -59,28 +59,32 @@ export const userLogout = (req, res) => {
 
 // Controlador para la recuperación de contraseña
 export const forgotPasswordController = async (req, res) => {
-  try {
-    const response = await forgotPassword(req, res)
+  const { email } = req.body
 
-    if (response.success) {
-      res.status(200).json({ message: 'Correo de recuperación enviado exitosamente.' })
-    } else {
-      res.status(500).json({ message: response.error })
-    }
+  if (!email) {
+    return res.status(400).send({ error: 'Email is required' })
+  }
+
+  try {
+    const response = await forgotPassword(email)
+    return res.status(200).json(response)
   } catch (error) {
-    console.error('Error en la recuperación de contraseña: ', error)
-    res.status(500).json({ message: 'Error interno del servidor.', error: error.message })
+    return res.status(500).send({ error: error.message })
   }
 }
 
-// Controlador para recuperar la contraseña
 export const recoverPasswordController = async (req, res) => {
+  const { confirmPassword, token } = req.body
+
+  if (!confirmPassword || !token) {
+    return res.status(400).send({ error: 'Password and token are required' })
+  }
+
   try {
-    await recoverPassword(req, res)
-    res.status(200).json({ message: 'Contraseña actualizada exitosamente.' })
+    const response = await recoverPassword(confirmPassword, token)
+    return res.status(200).json(response)
   } catch (error) {
-    console.error('Error al recuperar la contraseña: ', error)
-    res.status(500).json({ message: 'Error interno del servidor.', error: error.message })
+    return res.status(500).send({ error: error.message })
   }
 }
 

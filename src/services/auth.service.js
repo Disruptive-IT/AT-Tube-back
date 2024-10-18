@@ -147,41 +147,34 @@ export const logout = (req, res) => {
     res.status(500).json({ message: 'Error in server', err })
   }
 }
-const requestCount = {} // Contador de solicitudes por dirección IP
-const REQUEST_LIMIT = 5 // Limite de intentos
-const TIME_WINDOW = 15 * 60 * 1000 // Ventana de tiempo en milisegundos (15 minutos)
+// const requestCount = {} // Contador de solicitudes por dirección IP
+// const REQUEST_LIMIT = 5 // Limite de intentos
+// const TIME_WINDOW = 15 * 60 * 1000 // Ventana de tiempo en milisegundos (15 minutos)
 
-// Función para controlar la tasa de solicitudes
-const rateLimiter = (ip) => {
-  const currentTime = Date.now()
+// // Función para controlar la tasa de solicitudes
+// const rateLimiter = (ip) => {
+//   const currentTime = Date.now()
 
-  if (!requestCount[ip]) {
-    requestCount[ip] = { count: 1, firstRequestTime: currentTime }
-  } else {
-    requestCount[ip].count++
+//   if (!requestCount[ip]) {
+//     requestCount[ip] = { count: 1, firstRequestTime: currentTime }
+//   } else {
+//     requestCount[ip].count++
 
-    // Si ha pasado el tiempo de la ventana, reinicia el contador
-    if (currentTime - requestCount[ip].firstRequestTime > TIME_WINDOW) {
-      requestCount[ip] = { count: 1, firstRequestTime: currentTime }
-    }
-  }
+//     // Si ha pasado el tiempo de la ventana, reinicia el contador
+//     if (currentTime - requestCount[ip].firstRequestTime > TIME_WINDOW) {
+//       requestCount[ip] = { count: 1, firstRequestTime: currentTime }
+//     }
+//   }
 
-  return requestCount[ip].count <= REQUEST_LIMIT
-}
+//   return requestCount[ip].count <= REQUEST_LIMIT
+// }
 
-export const forgotPassword = async (req, res) => {
-  const { email } = req.body
-  const ip = req.ip // Obtén la dirección IP del usuario
-
-  // Verifica si se supera el límite de solicitudes
-  if (!rateLimiter(ip)) {
-    return res.status(429).send({ error: 'Demasiadas solicitudes, intenta de nuevo más tarde.' })
-  }
-
+export const forgotPassword = async (email) => {
   try {
+    // Buscar al usuario por email
     const user = await prisma.user.findUnique({ where: { email } })
     if (!user) {
-      return res.status(404).send({ error: 'El usuario no existe.' })
+      throw new Error('User not existed')
     }
 
     // Generar el token JWT con el ID del usuario
@@ -189,42 +182,42 @@ export const forgotPassword = async (req, res) => {
       expiresIn: '1d'
     })
 
+    // Llamar a la función sendRecoverEmail con el email y el token
     const mail = await sendRecoverEmail(email, token, user.id)
+
+    // Verificar si el correo fue enviado
     if (!mail.accepted || mail.accepted.length === 0) {
-      return res.status(500).send({ status: 'error', message: 'Error al enviar el correo de recuperación.' })
+      throw new Error('Error sending recovery email')
     }
 
-    return res.status(200).json({ success: true, message: 'Correo de recuperación enviado exitosamente.' })
+    return { success: true, message: 'Recovery email sent successfully' }
   } catch (error) {
-    console.error('Error:', error)
-    return res.status(500).send({ error: 'Error interno del servidor.' })
+    throw new Error(error.message)
   }
 }
 
-export const recoverPassword = async (req, res) => {
-  const { confirmPassword, token } = req.body
-
+export const recoverPassword = async (confirmPassword, token) => {
   try {
     // Verificar el token JWT
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
     if (!decoded || !decoded.userId) {
-      return res.json({ Status: 'error with token' })
+      throw new Error('Invalid or expired token')
     }
 
     // Generar hash de la nueva contraseña
-    const saltRounds = 10 // Número de rondas de hashing
+    const saltRounds = 10
     const hashedPassword = await bcrypt.hash(confirmPassword, saltRounds)
 
-    // Actualizar la contraseña en la base de datos con el ID del usuario decodificado
+    // Actualizar la contraseña en la base de datos
     await prisma.user.update({
       where: { id: decoded.userId },
       data: { password: hashedPassword }
     })
 
-    res.send({ Status: 'Success' })
+    return { status: 'Success' }
   } catch (error) {
-    res.status(500).send({ Status: 'Error', message: error.message })
+    throw new Error(error.message)
   }
 }
 
