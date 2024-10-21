@@ -10,7 +10,7 @@ export const updateUserPasswordController = async (req, res) => {
       return res.status(404).json({ message: 'Usuario no encontrado, Error al actualizar la contraseña.' })
     }
     console.error('Error al actualizar la contraseña', error)
-    return res.status(500).json({ message: 'Internal server error.', error: error.message })
+    return res.status(500).json({ message: error.message, error: error.message })
   }
 }
 

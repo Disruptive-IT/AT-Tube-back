@@ -7,17 +7,35 @@ const prisma = new PrismaClient()
 export const UpdatePasswordService = async (userId, newPassword) => {
   try {
     if (!userId) {
-      throw new Error('Debe proporcionar un ID de usuario.')
+      throw new Error('Debe proporcionar un ID de usuario.');
     }
     if (!newPassword) {
-      throw new Error('Debe proporcionar una nueva contraseña.')
+      throw new Error('Debe proporcionar una nueva contraseña.');
     }
-    const hashedPassword = await bcrypt.hash(newPassword, 10) // ?hash de contrasena
-    const users = await prisma.users.update({
+
+    // Obtener el usuario actual para acceder a la contraseña
+    const user = await prisma.users.findUnique({
+      where: { id_users: userId },
+      select: { password: true }, // Solo seleccionamos el campo de la contraseña
+    });
+
+    if (!user) {
+      throw new Error('ID proporcionado no existe.')
+    }
+
+    // Verificar si la nueva contraseña es igual a la actual
+    const isSamePassword = await bcrypt.compare(newPassword, user.password);
+    if (isSamePassword) {
+      throw new Error('La nueva contraseña no puede ser igual a la contraseña actual.')
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10); // Hash de la nueva contraseña
+    const updatedUser = await prisma.users.update({
       where: { id_users: userId },
       data: { password: hashedPassword }
     })
-    return users
+
+    return updatedUser
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') { // !Este es el error cuando el registro no existe
       throw new Error('ID proporcionado no existe.')
