@@ -5,8 +5,14 @@ const prisma = new PrismaClient()
 
 // *Servicio de Actualizacion de Contraseña
 export const UpdatePasswordService = async (userId, newPassword) => {
-  const hashedPassword = await bcrypt.hash(newPassword, 10) // ?hash de contrasena
   try {
+    if (!userId) {
+      throw new Error('Debe proporcionar un ID de usuario.')
+    }
+    if (!newPassword) {
+      throw new Error('Debe proporcionar una nueva contraseña.')
+    }
+    const hashedPassword = await bcrypt.hash(newPassword, 10) // ?hash de contrasena
     const users = await prisma.users.update({
       where: { id_users: userId },
       data: { password: hashedPassword }
@@ -25,6 +31,23 @@ export const UpdatePasswordService = async (userId, newPassword) => {
 // *Servicio de actualizacion de Perfil de usuario SIN la contrasena
 export const UpdateUserService = async (data) => {
   try {
+    const {
+      id,
+      documentType,
+      document,
+      name,
+      country,
+      department,
+      city,
+      address,
+      phone,
+    } = data
+    const requiredFields = ['id', 'documentType', 'document', 'name', 'country', 'department', 'city', 'address', 'phone'] // ?campos requeridos
+    requiredFields.forEach((field) => {
+      if (!data[field]) {
+        throw new Error(`El campo "${field}" es requerido para el registro del usuario.`)
+      }
+    })
     const user = await prisma.users.update({
       where: { id_users: data.id },
       data: {
@@ -51,11 +74,17 @@ export const UpdateUserService = async (data) => {
 
 // *Servicio de Actualizacion de Contraseña
 export const UpdateStateUserService = async (data) => {
-  const newStatus = !data.status // ?valido que estado trae el usuario para cambiarlo automaticamente
   try {
+    const {id,status,} = data
+    const requiredFields = ['id'] // ?campos requeridos
+    requiredFields.forEach((field) => {
+      if (!data[field]) {
+        throw new Error(`El campo "${field}" es requerido para el registro del usuario.`)
+      }
+    })
     const users = await prisma.users.update({
       where: { id_users: data.id },
-      data: { status: newStatus }
+      data: { status: { set: data.status } }
     })
     return users
   } catch (error) {
