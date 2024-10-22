@@ -33,21 +33,27 @@ export const userRegisterService = async (userInformation) => {
       }
     })
 
-    // Verifica si ya existe un usuario con el correo o documento
-    const existingUser = await prisma.Users.findFirst({
+    // Verifica si ya existe un usuario con el mismo correo
+    const existingEmailUser = await prisma.Users.findFirst({
+      where: { email }
+    })
+
+    if (existingEmailUser) {
+      throw new Error('Ya hay un usuario registrado con ese correo electrónico.')
+    }
+
+    // Verifica si ya existe un usuario con el mismo tipo de documento y número de documento
+    const existingDocumentUser = await prisma.Users.findFirst({
       where: {
-        OR: [{ email }, { document }]
+        AND: [
+          { document_type: documentTypeId }, // Tipo de documento
+          { document } // Número de documento
+        ]
       }
     })
 
-    if (existingUser) {
-      // Diferencia entre el tipo de duplicación
-      if (existingUser.email === email) {
-        throw new Error('Ya hay un usuario registrado con ese correo electrónico.')
-      }
-      if (existingUser.document === document) {
-        throw new Error('Ya hay un usuario registrado con ese número de documento.')
-      }
+    if (existingDocumentUser) {
+      throw new Error('Ya hay un usuario registrado con ese tipo y número de documento.')
     }
 
     // Hash de la contraseña
