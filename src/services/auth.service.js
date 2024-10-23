@@ -1,7 +1,9 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { sendRecoverEmail } from './mails.service.js'
+import { OAuth2Client } from 'google-auth-library'
 import { google } from 'googleapis'
+import { USER_REFRESH_ACCOUNT_TYPE } from 'google-auth-library/build/src/auth/refreshclient.js'
 
 import { PrismaClient } from '@prisma/client'
 
@@ -178,7 +180,7 @@ export const logout = (req, res) => {
 export const forgotPassword = async (email) => {
   try {
     // Buscar al usuario por email
-    const user = await prisma.user.findUnique({ where: { email } })
+    const user = await prisma.Users.findUnique({ where: { email } })
     if (!user) {
       throw new Error('User not existed')
     }
