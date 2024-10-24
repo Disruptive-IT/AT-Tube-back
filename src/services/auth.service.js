@@ -1,9 +1,7 @@
 import bcrypt from 'bcryptjs'
+import { google } from 'googleapis'
 import jwt from 'jsonwebtoken'
 import { sendRecoverEmail } from './mails.service.js'
-import { OAuth2Client } from 'google-auth-library'
-import { google } from 'googleapis'
-import { USER_REFRESH_ACCOUNT_TYPE } from 'google-auth-library/build/src/auth/refreshclient.js'
 
 import { PrismaClient } from '@prisma/client'
 
@@ -97,9 +95,9 @@ export const userRegisterService = async (userInformation) => {
   }
 }
 
-export async function userLoginService (email, password) {
+export async function userLoginService(email, password) {
   try {
-    // Busca la información del usuario junto con su rol y contraseña
+    // Busca la información del usuario por email, independientemente del estado
     const userSearch = await prisma.Users.findFirst({
       where: { email },
       select: {
@@ -107,6 +105,7 @@ export async function userLoginService (email, password) {
         email: true, // Email del usuario
         name: true, // Nombre del usuario
         password: true, // Contraseña del usuario
+        status: true, // Estado del usuario
         role: {
           select: {
             name: true // Nombre del rol (relación con Roles)
@@ -118,6 +117,11 @@ export async function userLoginService (email, password) {
     // Verifica si el usuario existe
     if (!userSearch) {
       throw new Error('Usuario o contraseña incorrectos.') // Mensaje genérico por seguridad
+    }
+
+    // Verifica si el usuario está inactivo
+    if (!userSearch.status) {
+      throw new Error('El usuario está inactivo.') // Mensaje específico para usuarios inactivos
     }
 
     // Verifica la contraseña del usuario
@@ -140,6 +144,9 @@ export async function userLoginService (email, password) {
     throw new Error(`Error en el inicio de sesión: ${error.message}`)
   }
 }
+
+
+
 
 export const logout = (req, res) => {
   try {
