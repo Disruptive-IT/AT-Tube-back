@@ -23,6 +23,10 @@ export const userRegister = async (req, res) => {
 export const userLogin = async (req, res) => {
   const { email, password } = req.body
 
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email y contraseña son obligatorios' })
+  }
+
   try {
     const user = await userLoginService(email, password)
 
