@@ -104,12 +104,16 @@ export async function userLoginService (email, password) {
         id_users: true, // ID del usuario
         email: true, // Email del usuario
         name: true, // Nombre del usuario
+        phone: true,
+        documentType: { select: { name: true, id_document_type: true } }, // Relación con DocumentType
+        document: true, // Número de documento
+        country: { select: { name: true, id_country: true } },
+        department: { select: { name: true, id_department: true } },
+        city: { select: { name: true, id_city: true } },
+        address: true,
+        avatar: true, // Avatar del usuario
         password: true, // Contraseña del usuario
-        role: {
-          select: {
-            name: true // Nombre del rol (relación con Roles)
-          }
-        }
+        role: { select: { name: true } }
       }
     })
 
@@ -129,6 +133,19 @@ export async function userLoginService (email, password) {
     const transformedUserSearch = {
       id: userSearch.id_users,
       name: userSearch.name,
+      email: userSearch.email,
+      phone: userSearch.phone,
+      documentTypeName: userSearch.documentType?.name,
+      documentType: userSearch.documentType?.id_document_type,
+      id_country: userSearch.country?.id_country,
+      country: userSearch.country?.name,
+      document: userSearch.document,
+      id_department: userSearch.department?.id_department,
+      department: userSearch.department?.name,
+      city: userSearch.city?.name,
+      id_city: userSearch.city?.id_city,
+      address: userSearch.address,
+      avatar: userSearch.avatar,
       role: userSearch.role?.name // Extrae solo el nombre del rol
     }
 
