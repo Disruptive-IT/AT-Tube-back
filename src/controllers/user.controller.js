@@ -1,5 +1,4 @@
 import {
-  getUserAccountService,
   getAllUsersService,
   getAllClientsService,
   createNewUserService,
@@ -8,8 +7,6 @@ import {
   getAllCityService,
   getAllDepartmenService
 } from '../services/user.service.js'
-
-
 
 // ?Controlador que se utiliza para un usuario nuevo
 export const createNewUserController = async (req, res) => {
@@ -22,18 +19,6 @@ export const createNewUserController = async (req, res) => {
     }
     console.error('Error al crear el usuario', error)
     return res.status(500).json({ message: 'Internal server error.', error: error })
-  }
-}
-
-// ?Controlador para traer un usuario es especifico
-export const getUserAccount = async (req, res) => {
-  try {
-    const useId = parseInt(req.params.id)
-    const userAccount = await getUserAccountService(useId)
-    res.status(200).json({ message: 'Usuario Encontrado.', user_account: userAccount })
-  } catch (error) {
-    console.error('Error buscando el usuario solicitado:', error)
-    return res.status(500).json({ message: 'Internal server error.' })
   }
 }
 

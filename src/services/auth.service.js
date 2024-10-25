@@ -146,18 +146,6 @@ export async function userLoginService(email, password) {
       id: userSearch.id_users,
       name: userSearch.name,
       email: userSearch.email,
-      phone: userSearch.phone,
-      documentTypeName: userSearch.documentType?.name,
-      documentType: userSearch.documentType?.id_document_type,
-      id_country: userSearch.country?.id_country,
-      country: userSearch.country?.name,
-      document: userSearch.document,
-      id_department: userSearch.department?.id_department,
-      department: userSearch.department?.name,
-      city: userSearch.city?.name,
-      id_city: userSearch.city?.id_city,
-      address: userSearch.address,
-      avatar: userSearch.avatar,
       role: userSearch.role?.name // Extrae solo el nombre del rol
     }
 

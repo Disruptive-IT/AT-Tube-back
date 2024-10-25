@@ -1,4 +1,9 @@
-import { UpdatePasswordService, UpdateUserService, UpdateStateUserService } from '../services/profile.service.js'
+import {
+  UpdatePasswordService,
+  UpdateUserService,
+  UpdateStateUserService,
+  getUserAccountService
+} from '../services/profile.service.js'
 
 // ?Controlador que se utiliza para cambiar contraseñas en los perfiles
 export const updateUserPasswordController = async (req, res) => {
@@ -39,5 +44,18 @@ export const updateUserStatusController = async (req, res) => {
     }
     console.error('Error al actualizar el Usuario', error)
     res.status(500).json({ message: 'Error interno del servidor.', error: error.message })
+  }
+}
+
+// ?Controlador para traer un usuario es especifico
+export const getUserAccountController = async (req, res) => {
+  try {
+    const userId = req.body.id
+    console.log(userId)
+    const userAccount = await getUserAccountService(userId)
+    res.status(200).json({ message: 'Usuario Encontrado.', user_account: userAccount })
+  } catch (error) {
+    console.error('Error buscando el usuario solicitado:', error)
+    return res.status(500).json({ message: 'Internal server error.' })
   }
 }
