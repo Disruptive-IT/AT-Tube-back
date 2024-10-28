@@ -3,17 +3,6 @@ import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
-export const getUserAccountService = async (userId) => {
-  try {
-    const userAccountInfo = await prisma.users.findFirst({ where: { id_rol: userId } })
-    if (!userAccountInfo) { throw new Error('Usuario no encontrado.') }
-    return userAccountInfo
-  } catch (error) {
-    console.error('Error al buscar al usuario: ', error)
-    throw error
-  }
-}
-
 export const createNewUserService = async (data) => {
   try {
     const hashedPassword = await bcrypt.hash(data.password, 10) // ?hash de contrasena generica

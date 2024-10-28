@@ -1,8 +1,8 @@
 import bcrypt from 'bcryptjs'
+import { google } from 'googleapis'
 import jwt from 'jsonwebtoken'
 import { sendRecoverEmail } from './mails.service.js'
 // import { OAuth2Client } from 'google-auth-library'
-import { google } from 'googleapis'
 // import { USER_REFRESH_ACCOUNT_TYPE } from 'google-auth-library/build/src/auth/refreshclient.js'
 
 import { PrismaClient } from '@prisma/client'
@@ -97,9 +97,9 @@ export const userRegisterService = async (userInformation) => {
   }
 }
 
-export async function userLoginService (email, password) {
+export async function userLoginService(email, password) {
   try {
-    // Busca la información del usuario junto con su rol y contraseña
+    // Busca la información del usuario por email, independientemente del estado
     const userSearch = await prisma.Users.findFirst({
       where: { email },
       select: {
@@ -115,13 +115,23 @@ export async function userLoginService (email, password) {
         address: true,
         avatar: true, // Avatar del usuario
         password: true, // Contraseña del usuario
-        role: { select: { name: true } }
+        status: true,
+        role: {
+          select: {
+            name: true // Nombre del rol (relación con Roles)
+          }
+        }
       }
     })
 
     // Verifica si el usuario existe
     if (!userSearch) {
       throw new Error('Usuario o contraseña incorrectos.') // Mensaje genérico por seguridad
+    }
+
+    // Verifica si el usuario está inactivo
+    if (!userSearch.status) {
+      throw new Error('El usuario está inactivo.') // Mensaje específico para usuarios inactivos
     }
 
     // Verifica la contraseña del usuario
@@ -136,18 +146,6 @@ export async function userLoginService (email, password) {
       id: userSearch.id_users,
       name: userSearch.name,
       email: userSearch.email,
-      phone: userSearch.phone,
-      documentTypeName: userSearch.documentType?.name,
-      documentType: userSearch.documentType?.id_document_type,
-      id_country: userSearch.country?.id_country,
-      country: userSearch.country?.name,
-      document: userSearch.document,
-      id_department: userSearch.department?.id_department,
-      department: userSearch.department?.name,
-      city: userSearch.city?.name,
-      id_city: userSearch.city?.id_city,
-      address: userSearch.address,
-      avatar: userSearch.avatar,
       role: userSearch.role?.name // Extrae solo el nombre del rol
     }
 
@@ -157,6 +155,9 @@ export async function userLoginService (email, password) {
     throw new Error(`Error en el inicio de sesión: ${error.message}`)
   }
 }
+
+
+
 
 export const logout = (req, res) => {
   try {

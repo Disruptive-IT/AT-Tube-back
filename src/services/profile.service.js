@@ -139,3 +139,56 @@ export const UpdateStateUserService = async (data) => {
     }
   }
 }
+
+// *Servicio para obtener informacion de perfil
+export const getUserAccountService = async (userId) => {
+  try {
+    const userAccountInfo = await prisma.users.findFirst({
+      where: { id_users: userId },
+      select: {
+        id_users: true, // ID del usuario
+        email: true, // Email del usuario
+        name: true, // Nombre del usuario
+        phone: true,
+        documentType: { select: { name: true, id_document_type: true } }, // Relación con DocumentType
+        document: true, // Número de documento
+        country: { select: { name: true, id_country: true } },
+        department: { select: { name: true, id_department: true } },
+        city: { select: { name: true, id_city: true } },
+        address: true,
+        avatar: true, // Avatar del usuario
+        password: true, // Contraseña del usuario
+        status: true,
+        role: {
+          select: {
+            name: true // Nombre del rol (relación con Roles)
+          }
+        }
+      }
+    })
+    if (!userAccountInfo) { throw new Error('Usuario no encontrado.') }
+    // Transforma los datos para devolver solo lo necesario
+    const transformedUserSearch = {
+      id: userAccountInfo.id_users,
+      name: userAccountInfo.name,
+      email: userAccountInfo.email,
+      phone: userAccountInfo.phone,
+      documentTypeName: userAccountInfo.documentType?.name,
+      documentType: userAccountInfo.documentType?.id_document_type,
+      id_country: userAccountInfo.country?.id_country,
+      country: userAccountInfo.country?.name,
+      document: userAccountInfo.document,
+      id_department: userAccountInfo.department?.id_department,
+      department: userAccountInfo.department?.name,
+      city: userAccountInfo.city?.name,
+      id_city: userAccountInfo.city?.id_city,
+      address: userAccountInfo.address,
+      avatar: userAccountInfo.avatar,
+      role: userAccountInfo.role?.name // Extrae solo el nombre del rol
+    }
+    return transformedUserSearch
+  } catch (error) {
+    console.error('Error al buscar al usuario: ', error)
+    throw error
+  }
+}
