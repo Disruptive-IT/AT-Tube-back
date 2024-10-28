@@ -1,7 +1,12 @@
 import jwt from 'jsonwebtoken'
 
-export function createToken (payload) {
+export function createToken (user) {
   const TOKEN_SECRET = process.env.JWT_SECRET
+
+  const payload = {
+    name: user.name,
+    role: user.role
+  }
 
   return new Promise((resolve, reject) => {
     jwt.sign(
@@ -21,16 +26,15 @@ export function createToken (payload) {
   })
 }
 
-export async function verifyToken ({ accessToken }) {
+export async function verifyToken (accessToken) {
   const TOKEN_SECRET = process.env.JWT_SECRET
   console.log('Un usuario mantiene su sesión:', accessToken)
-  // eslint-disable-next-line no-useless-catch
+
   try {
     await jwt.verify(accessToken, TOKEN_SECRET)
-
-    const decode = await jwt.decode(accessToken)
-    return decode
+    const decoded = await jwt.decode(accessToken)
+    return decoded
   } catch (error) {
-    throw error
+    throw new Error('Token no válido o expirado')
   }
 }
