@@ -1,6 +1,5 @@
 import bcrypt from 'bcryptjs'
 import { google } from 'googleapis'
-import jwt from 'jsonwebtoken'
 import { sendRecoverEmail } from './mails.service.js'
 // import { OAuth2Client } from 'google-auth-library'
 // import { USER_REFRESH_ACCOUNT_TYPE } from 'google-auth-library/build/src/auth/refreshclient.js'
@@ -8,6 +7,8 @@ import { sendRecoverEmail } from './mails.service.js'
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
+
+
 
 export const userRegisterService = async (userInformation) => {
   try {
@@ -97,7 +98,7 @@ export const userRegisterService = async (userInformation) => {
   }
 }
 
-export async function userLoginService(email, password) {
+export async function userLoginService (email, password) {
   try {
     // Busca la información del usuario por email, independientemente del estado
     const userSearch = await prisma.Users.findFirst({
@@ -155,9 +156,6 @@ export async function userLoginService(email, password) {
     throw new Error(`Error en el inicio de sesión: ${error.message}`)
   }
 }
-
-
-
 
 export const logout = (req, res) => {
   try {
