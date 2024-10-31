@@ -145,6 +145,7 @@ export async function userLoginService (email, password) {
     // Transforma los datos para devolver solo lo necesario
     const transformedUserSearch = {
       id: userSearch.id_users,
+      avatar: userSearch.avatar,
       name: userSearch.name,
       email: userSearch.email,
       role: userSearch.role?.name // Extrae solo el nombre del rol
