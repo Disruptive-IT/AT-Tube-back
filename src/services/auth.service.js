@@ -1,14 +1,11 @@
 import bcrypt from 'bcryptjs'
-import { google } from 'googleapis'
+// import { google } from 'googleapis'
+import jwt from 'jsonwebtoken'
+// import generateJWT from '../helpers/generateJWT.js'
 import { sendRecoverEmail } from './mails.service.js'
-// import { OAuth2Client } from 'google-auth-library'
-// import { USER_REFRESH_ACCOUNT_TYPE } from 'google-auth-library/build/src/auth/refreshclient.js'
-
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
-
-
 
 export const userRegisterService = async (userInformation) => {
   try {
@@ -221,85 +218,33 @@ export const forgotPassword = async (email) => {
   }
 }
 
+// Cambia la firma de recoverPassword para recibir los parámetros directamente
 export const recoverPassword = async (confirmPassword, token) => {
+  // Verificar si ambos campos están presentes en la solicitud
+  if (!confirmPassword || !token) {
+    return { Status: 'Error', message: 'El campo confirmPassword y token son obligatorios.' }
+  }
+
   try {
     // Verificar el token JWT
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
     if (!decoded || !decoded.userId) {
-      throw new Error('Invalid or expired token')
+      return { Status: 'Error', message: 'Token inválido o expirado.' }
     }
 
     // Generar hash de la nueva contraseña
-    const saltRounds = 10
+    const saltRounds = 10// Número de rondas de hashing
     const hashedPassword = await bcrypt.hash(confirmPassword, saltRounds)
 
-    // Actualizar la contraseña en la base de datos
-    await prisma.user.update({
+    // Actualizar la contraseña en la base de datos con el ID del usuario decodificado
+    await prisma.Users.update({
       where: { id: decoded.userId },
       data: { password: hashedPassword }
     })
 
-    return { status: 'Success' }
+    return { Status: 'Success', message: 'Contraseña actualizada correctamente' }
   } catch (error) {
     throw new Error(error.message)
-  }
-}
-
-const oauth2Client = new google.auth.OAuth2(
-  process.env.CLIENT_ID,
-  process.env.CLIENT_SECRET,
-  'http://localhost:3000/api/auth/google/callback'
-)
-
-const scopes = [
-  'https://www.googleapis.com/auth/userinfo.email',
-  'https://www.googleapis.com/auth/userinfo.profile'
-]
-
-const authorizationUrl = oauth2Client.generateAuthUrl({
-  access_type: 'offline',
-  scope: scopes,
-  include_granted_scopes: true,
-  prompt: 'consent'
-})
-
-export const googleauth = async (req, res) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:3000')
-  res.header('Referrer-Policy', 'no-referrer-when-downgrade')
-  res.redirect(authorizationUrl)
-}
-
-export const googleCallback = async (req, res) => {
-  const { code } = req.query
-
-  try {
-    // Obtener tokens de acceso usando el código de autenticación proporcionado
-    const { tokens } = await oauth2Client.getToken(code)
-
-    // Configurar el cliente con las credenciales
-    oauth2Client.setCredentials(tokens)
-
-    // Obtener información del usuario autenticado
-    const oauth2 = google.oauth2({
-      auth: oauth2Client,
-      version: 'v2'
-    })
-
-    const { data } = await oauth2.userinfo.get()
-
-    // Aquí puedes procesar la información del usuario
-    console.log('Datos del usuario:', data)
-
-    // Verificar si se obtuvo un token de acceso antes de la redirección
-    if (tokens.access_token) {
-      // Redirigir a una URL después de la autenticación
-      return res.redirect(`http://localhost:3000/home?token=${tokens.access_token}`)
-    } else {
-      throw new Error('No se obtuvo el token de acceso')
-    }
-  } catch (error) {
-    console.error('Error al autenticar con Google:', error)
-    res.status(500).json({ message: 'Error en la autenticación' })
   }
 }

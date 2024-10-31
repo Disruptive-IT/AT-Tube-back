@@ -8,14 +8,13 @@ import {
   getAllDepartmentController,
   getAllCityController
 } from '../controllers/user.controller.js'
-import { authorizeAdmin } from '../middlewares/autorizeAdmin.js'
 
 const router = express.Router()
 
-router.get('/allUsers', authorizeAdmin, getAllUsersController)
-router.get('/allClients', authorizeAdmin, getAllClientsController)
+router.get('/allUsers', getAllUsersController)
+router.get('/allClients', getAllClientsController)
 router.post('/newuseradmin', createNewUserController)
-router.delete('/deleteUser', authorizeAdmin, deleteUserController)
+router.delete('/deleteUser', deleteUserController)
 router.get('/getCountries', getallCountriesController)
 router.post('/getDepartments', getAllDepartmentController)
 router.post('/getCities', getAllCityController)

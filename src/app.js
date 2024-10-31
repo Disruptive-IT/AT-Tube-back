@@ -1,16 +1,34 @@
 import express from 'express'
 import cors from 'cors'
-
 import dotenv from 'dotenv'
+import passport from 'passport'
+import session from 'express-session'
+
+import './middlewares/authGoogle.js'
 
 import { CorsConfig } from './lib/cors.config.js'
 import routes from './routes/index.js'
 
-const app = express()
-app.use(express.json())
-app.use(cors())
-app.use('/api', routes)
-
+// Carga las variables de entorno
 dotenv.config()
+
+const app = express()
+
+// Configura el middleware de sesión antes de passport.initialize()
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'tuSecretoSeguro', // Asegúrate de definir SESSION_SECRET en tu archivo .env
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false } // Cambia a `true` si usas HTTPS
+}))
+
+// Middlewares
+app.use(express.json())
+app.use(cors(CorsConfig))
+app.use(passport.initialize())
+app.use(passport.session()) // Asegúrate de agregar esto para manejar sesiones con Passport
+
+// Rutas
+app.use('/api', routes)
 
 export default app
