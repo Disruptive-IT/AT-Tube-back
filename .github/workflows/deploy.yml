@@ -36,11 +36,11 @@ jobs:
         DATABASE_URL: ${{ secrets.DATABASE_URL }}
     - name: Copy environment variables file
       run: |
-        cp -r /home/env_variables/.env_lar-api /home/LAR/API/actions-runner/lar-api/lar-api/lar-api/.env
+        cp -r /home/env_variables/.env_nupak_api /home/Nupak/API/actions-runner/NUpak-back/lar-api/lar-api/.env
 
     - name: Stop the API (PM2)
       run: |
-        pm2 stop lar-api
+        pm2 stop nupak-api
 
     - name: Install dependencies (run npm install)
       run: |
@@ -48,7 +48,7 @@ jobs:
 
     - name: API go live
       run: |
-        pm2 restart lar-api
+        pm2 restart nupak-api
     #- run: npm run dev
     #- run: npm run build --if-present
     #- run: npm test
