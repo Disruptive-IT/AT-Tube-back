@@ -58,21 +58,20 @@ model Department {
 model Users {
   id_users        String       @id @default(uuid())
   avatar          String?
-  document_type   Int?          // Clave foránea a DocumentType
+  document_type   Int?      // Clave foránea a DocumentType
   document        String?
   name            String
-  id_country      Int?          
-  id_department   Int?          // Clave foránea a Department
-  id_city         Int?          // Clave foránea a City
+  id_country      Int?   
+  id_department   Int?      // Clave foránea a Department
+  id_city         Int?      // Clave foránea a City
   address         String?
   phone           String?
-  email           String       @unique
+  email           String    @unique
   password        String?
-  id_rol          Int          // Clave foránea a Roles
-  status          Boolean      @default(true)
-  create_at       DateTime     @default(now())
-  update_at       DateTime     @updatedAt
-  googleId        String?      @unique // Campo para almacenar el ID de Google, opcional y único
+  id_rol          Int    // Clave foránea a Roles
+  status          Boolean   @default(true)
+  create_at       DateTime  @default(now())
+  update_at       DateTime  @updatedAt
 
   country         Country?      @relation(fields: [id_country], references: [id_country]) //relación con Country
   department      Department?   @relation(fields: [id_department], references: [id_department]) // relación con Department

@@ -4,4 +4,4 @@ export const CorsConfig = {
   origin: allowOrigins,
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true
-};
+}
