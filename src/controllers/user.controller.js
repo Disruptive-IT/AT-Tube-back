@@ -12,13 +12,13 @@ import {
 export const createNewUserController = async (req, res) => {
   try {
     const userAccount = await createNewUserService(req.body)
-    res.status(200).json({ message: 'Administrador Creado correctamente', nuevoUsuario: userAccount})
+    res.status(200).json({ message: 'Administrador Creado correctamente', nuevoUsuario: userAccount })
   } catch (error) {
     if (error.message === 'Duplicate Email') {
-      return res.status(404).json({ message: 'El Email que ingresaste ya esta registrado, verifica y vuelve a intentarlo' });
+      return res.status(404).json({ message: 'El Email que ingresaste ya esta registrado, verifica y vuelve a intentarlo' })
     }
     console.error('Error al crear el usuario', error)
-    return res.status(500).json({ message: 'Internal server error.', error: error })
+    return res.status(500).json({ message: 'Internal server error.', error })
   }
 }
 

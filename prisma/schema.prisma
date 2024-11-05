@@ -79,6 +79,7 @@ model Users {
   role            Roles        @relation(fields: [id_rol], references: [id_rol]) // relación con Roles
   documentType    DocumentType? @relation(fields: [document_type], references: [id_document_type]) // relación con DocumentType
   Sales           Sales[]      // Relación inversa con Sales
+  Templates       Templates[] // Relación inversa con Templates
 }
 
 model Sales {
@@ -122,13 +123,13 @@ model ProductType {
 model Templates {
   id_template     String    @id @default(uuid())         // Usar UUID para claves primarias
   id_product_type String                                  // Clave foránea a ProductType
-
-  name            String
+  id_users        String
   design          Json
   status          Boolean
   create_at       DateTime  @default(now())
   update_at       DateTime  @updatedAt
-
+  
+  Users           Users       @relation(fields: [id_users], references: [id_users])
   productType     ProductType @relation(fields: [id_product_type], references: [id_product_type])  // Relación con ProductType
   SalesTemplate   SalesTemplate[]
 }

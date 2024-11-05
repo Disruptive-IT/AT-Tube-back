@@ -23,10 +23,10 @@ export const updateUserPasswordController = async (req, res) => {
 export const updateUserController = async (req, res) => {
   try {
     const userAccount = await UpdateUserService(req.body)
-    res.status(200).json({ message:`${userAccount.name} Actualizad@ exitosamente`, userAccount })
+    res.status(200).json({ message: `${userAccount.name} Actualizad@ exitosamente`, userAccount })
   } catch (error) {
     if (error.message === 'ID proporcionado no existe.') {
-      return res.status(404).json({ message: 'Usuario no encontrado, Error al actualizar.'})
+      return res.status(404).json({ message: 'Usuario no encontrado, Error al actualizar.' })
     }
     console.error('Error al actualizar el Usuario:', error)
     return res.status(500).json({ message: 'Internal server error.', error: error.message })
@@ -37,7 +37,7 @@ export const updateUserController = async (req, res) => {
 export const updateUserStatusController = async (req, res) => {
   try {
     const userAccount = await UpdateStateUserService(req.body)
-    res.status(200).json({ message: 'Estado Actualizado exitosamente', usuario:userAccount })
+    res.status(200).json({ message: 'Estado Actualizado exitosamente', usuario: userAccount })
   } catch (error) {
     if (error.message === 'ID proporcionado no existe.') {
       return res.status(404).json({ message: 'Usuario no encontrado, Error al actualizar estado.' })
