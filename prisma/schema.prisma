@@ -84,52 +84,60 @@ model Users {
 
 model Sales {
   id_sales        String    @id @default(uuid())         // Usar UUID para claves primarias
-  id_usuario      String                                    // Clave foránea a Users
+  id_user         String                                 // Clave foránea a Users
 
-  total_price     BigInt
+  total_price     Int
   finalize_at     DateTime?
-  status          String
+  cotized_at      DateTime?
+  purchased_at    DateTime?
+  send_at         DateTime?
+  delivered_at    DateTime?
+  canceled_at     DateTime?
+  canceled_reason String?
+  status          Int
   create_at       DateTime  @default(now())
   update_at       DateTime  @updatedAt
 
-  usuario         Users  @relation(fields: [id_usuario], references: [id_users])  // Relación con Users
+  SalesStatus     SalesStatus @relation(fields:[status], references: [id_status])
+  usuario         Users  @relation(fields: [id_user], references: [id_users])  // Relación con Users
   SalesTemplate   SalesTemplate[]                 // Relación uno a muchos con SalesTemplate
+}
+
+model SalesStatus{
+  id_status       Int    @id          // Usar UUID para claves primarias
+  name            String
+  description     String
+
+  Sales           Sales[]      // Relación uno a muchos con Sales
 }
 
 model SalesTemplate {
   id_sales        String     // Campo que hace referencia a Sales
   id_template     String     // Campo que hace referencia a Templates
-  amount          Int
+  box_amount      Int
+  box_price       Int
+  bottle_amount   Int
+  bottle_price    Int
+  decorator_type  String?
+  decorator_price Int?
+  Sales           Sales      @relation(fields: [id_sales], references: [id_sales])  // Relación con Sales
   create_at       DateTime   @default(now())
-
-  sales           Sales      @relation(fields: [id_sales], references: [id_sales])  // Relación con Sales
   template        Templates  @relation(fields: [id_template], references: [id_template])  // Relación con Templates
 
   @@id([id_sales, id_template])  // Llave compuesta (id_sales + id_template)
 }
 
-model ProductType {
-  id_product_type String    @id @default(uuid())         // Usar UUID para claves primarias
-  name            String
-  height          BigInt
-  price           BigInt
-  description     String
-  status          Boolean
-  create_at       DateTime  @default(now())
 
-  Templates       Templates[]                           // Relación inversa: un tipo de producto puede tener varias plantillas
-}
 
 model Templates {
   id_template     String    @id @default(uuid())         // Usar UUID para claves primarias
-  id_product_type String                                  // Clave foránea a ProductType
   id_users        String
   design          Json
+  decorato        String?
   status          Boolean
   create_at       DateTime  @default(now())
   update_at       DateTime  @updatedAt
   
   Users           Users       @relation(fields: [id_users], references: [id_users])
-  productType     ProductType @relation(fields: [id_product_type], references: [id_product_type])  // Relación con ProductType
   SalesTemplate   SalesTemplate[]
 }

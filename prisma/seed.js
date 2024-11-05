@@ -1454,6 +1454,24 @@ async function main () {
     { id_rol: 2, name: 'Client' }
   ]
 
+  const salesStatus = [
+    { id_status: 1, name: 'Cotización', description: 'hola' },
+    { id_status: 2, name: 'Producción', description: 'fds' },
+    { id_status: 3, name: 'Para Pagar', description: 'sdf' },
+    { id_status: 4, name: 'Enviado', description: 'sdf' },
+    { id_status: 5, name: 'Entregado', description: 'sdf' },
+    { id_status: 6, name: 'Cancelado', description: 'sdf' }
+  ]
+
+  // ? Insertar datos de tipos de documentos
+  await prisma.salesStatus.createMany({
+    data: salesStatus.map((status) => ({
+      id_status: status.id_status,
+      name: status.name,
+      description: status.description
+    }))
+  })
+
   // ? Insertar datos de tipos de documentos
   await prisma.documentType.createMany({
     data: tiposDeDocumentos.map((tipo) => ({
