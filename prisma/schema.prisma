@@ -86,7 +86,7 @@ model Sales {
   id_sales        String    @id @default(uuid())         // Usar UUID para claves primarias
   id_user         String                                 // Clave foránea a Users
 
-  total_price     Int
+  total_price     Int?
   finalize_at     DateTime?
   cotized_at      DateTime?
   purchased_at    DateTime?
