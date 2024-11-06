@@ -6,7 +6,6 @@ export const getUserPurchasesService = async (idUser) => {
   if (!idUser) {
     throw new Error('Debe proporcionar un ID de usuario.')
   }
-
   try {
     const purchases = await prisma.sales.findMany({
       where: { id_user: idUser },
@@ -79,6 +78,24 @@ export const getUserPurchasesService = async (idUser) => {
     return formattedPurchases
   } catch (error) {
     console.error('Error al obtener las compras con productos:', error)
+    throw error
+  }
+}
+
+// *Service to create Templates
+export const createTemplatesService = async (req) => {
+  const { id_users, design, decorator } = req
+  try {
+    const newTemplate = await prisma.templates.create({
+      data: {
+        id_users,
+        design,
+        decorator,
+      }
+    })
+    return newTemplate
+  } catch (error) {
+    console.error('Error al crear el diseno:', error)
     throw error
   }
 }

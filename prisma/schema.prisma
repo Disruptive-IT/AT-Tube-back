@@ -133,8 +133,8 @@ model Templates {
   id_template     String    @id @default(uuid())         // Usar UUID para claves primarias
   id_users        String
   design          Json
-  decorato        String?
-  status          Boolean
+  decorator       String?
+  status          Boolean   @default(true)
   create_at       DateTime  @default(now())
   update_at       DateTime  @updatedAt
   
