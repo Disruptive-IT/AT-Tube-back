@@ -94,20 +94,3 @@ export const recoverPasswordController = async (req, res) => {
   }
 }
 
-// export const googleAuthController = (req, res) => {
-//   try {
-//     googleauth(req, res)
-//   } catch (error) {
-//     console.error('Error en la autenticación con Google: ', error)
-//     res.status(500).json({ message: 'Error en la autenticación con Google.', error: error.message })
-//   }
-// }
-
-// export const googleCallbackController = async (req, res) => {
-//   try {
-//     await googlecall(req, res)
-//   } catch (error) {
-//     console.error('Error en el callback de Google: ', error)
-//     res.status(500).json({ message: 'Error en el callback de Google.', error: error.message })
-//   }
-// }
