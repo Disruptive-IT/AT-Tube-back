@@ -1,4 +1,4 @@
-import { createPurchaseService, createTemplatesService, getUserPurchasesService } from '../services/sales.service.js'
+import { createPurchaseService, createTemplatesService, getUserPurchasesService, updatePurchaseToPayService } from '../services/sales.service.js'
 
 // ?Controller to get all purchases orders for a especific user
 export const getUserPurchasesController = async (req, res) => {
@@ -51,11 +51,11 @@ export const createPurchaseController = async (req, res) => {
   }
 }
 
-export const updatePurchaseToPay = async (req, res) => {
-  const data=req.body
+export const updatePurchaseToPayController = async (req, res) => {
+  const data = req.body
   try {
-    const newSale = await createPurchaseService(data)
-    res.status(201).json({ message: 'Compra Generada exitosamente', newSale })
+    const newSale = await updatePurchaseToPayService(data)
+    res.status(201).json({ message: 'La cotización se realizó con éxito, ahora puedes proceder con el pago.', newSale })
   } catch (error) {
     console.error(error)
     switch (error.name) {
