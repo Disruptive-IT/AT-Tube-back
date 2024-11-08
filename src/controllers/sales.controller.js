@@ -1,4 +1,4 @@
-import { createPurchaseService, createTemplatesService, getUserPurchasesService } from '../services/sales.service.js'
+import { createPurchaseService, createTemplatesService, getUserPurchasesService, updatePurchaseToPayService } from '../services/sales.service.js'
 
 // ?Controller to get all purchases orders for a especific user
 export const getUserPurchasesController = async (req, res) => {
@@ -26,24 +26,66 @@ export const createTemplateController = async (req, res) => {
 }
 
 // ?Controller to create a new purchase order
+// ?Controller to create a new purchase order
 export const createPurchaseController = async (req, res) => {
   const salesData = req.body
-
   try {
-    // Llama al servicio para crear la venta
     const newSale = await createPurchaseService(salesData)
-
     res.status(201).json({ message: 'Compra Generada exitosamente', newSale })
   } catch (error) {
     console.error(error)
-    if (error.message.includes('Faltan campos obligatorios')) {
-      res.status(400).json({ error: error.message })
-    } else if (error.message.includes('no existe')) {
-      res.status(404).json({ error: error.message })
-    } else if (error.message.includes('no pertenece al usuario')) {
-      res.status(403).json({ error: error.message })
-    } else {
-      res.status(500).json({ error: 'Error interno del servidor' })
+
+    switch (error.name) {
+      case 'MissingFieldsError':
+      case 'InvalidTotalPriceError':
+        return res.status(400).json({ error: error.message })
+      case 'NotFoundError':
+        return res.status(404).json({ error: error.message })
+      case 'ForbiddenError':
+        return res.status(403).json({ error: error.message })
+      case 'InternalError':
+        return res.status(500).json({ error: error.message })
+      default:
+        return res.status(500).json({ error: 'Error interno del servidor' })
     }
   }
+}
+
+export const updatePurchaseToPayController = async (req, res) => {
+  const data = req.body
+  try {
+    const newSale = await updatePurchaseToPayService(data)
+    res.status(201).json({ message: 'La cotización se realizó con éxito, ahora puedes proceder con el pago.', newSale })
+  } catch (error) {
+    console.error(error)
+    switch (error.name) {
+      case 'MissingFieldsError':
+      case 'InvalidTotalPriceError':
+        return res.status(400).json({ error: error.message })
+      case 'NotFoundError':
+        return res.status(404).json({ error: error.message })
+      case 'ForbiddenError':
+        return res.status(403).json({ error: error.message })
+      case 'InternalError':
+        return res.status(500).json({ error: error.message })
+      default:
+        return res.status(500).json({ error: 'Error interno del servidor' })
+    }
+  }
+}
+
+export const updatePurchaseToProduction = async (req, res) => {
+  const purchaseData = req.body
+}
+
+export const updatePurchaseToShipped = async (req, res) => {
+  const purchaseData = req.body
+}
+
+export const updatePurchaseToDelivered = async (req, res) => {
+  const purchaseData = req.body
+}
+
+export const updatePurchaseToCanceled = async (req, res) => {
+  const purchaseData = req.body
 }
