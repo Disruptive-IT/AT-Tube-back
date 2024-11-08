@@ -213,6 +213,12 @@ export const createPurchaseService = async (salesData) => {
     throw error
   }
 
+  if (status > 2) {
+    const error = new Error('el estado de la compra no puede ser enviado, entregado o cancelado')
+    error.name = 'ForbiddenError'
+    throw error
+  }
+
   // Validar que si el estado es 1, total_price debe ser null o vacío
   if (status >= 2 && status <= 6 && (total_price === null || total_price === '')) {
     const error = new Error('Si el estado de la compra no es cotización, el precio total debe de estar incluido.')
@@ -260,12 +266,7 @@ export const createPurchaseService = async (salesData) => {
         id_user,
         total_price,
         status,
-        cotized_at,
         purchased_at,
-        send_at,
-        delivered_at,
-        canceled_at,
-        canceled_reason,
         SalesTemplate: {
           create: salesTemplates.map(template => ({
             id_template: template.id_template,

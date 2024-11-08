@@ -83,24 +83,27 @@ model Users {
 }
 
 model Sales {
-  id_sales        String    @id @default(uuid())         // Usar UUID para claves primarias
-  id_user         String                                 // Clave foránea a Users
+  id_sales           String    @id @default(uuid())         // Usar UUID para claves primarias
+  id_user            String                                 // Clave foránea a Users
 
-  total_price     Int?
-  finalize_at     DateTime?
-  cotized_at      DateTime?
-  purchased_at    DateTime?
-  send_at         DateTime?
-  delivered_at    DateTime?
-  canceled_at     DateTime?
-  canceled_reason String?
-  status          Int
-  create_at       DateTime  @default(now())
-  update_at       DateTime  @updatedAt
+  total_price        Int?
+  finalize_at        DateTime?
+  cotized_at         DateTime?
+  purchased_at       DateTime?
+  send_at            DateTime?
+  delivered_at       DateTime?
+  canceled_at        DateTime?
+  canceled_reason    String?
+  status             Int
+  id_orden_pago      String?
+  id_pago_reslizado  String?
 
-  SalesStatus     SalesStatus @relation(fields:[status], references: [id_status])
-  usuario         Users  @relation(fields: [id_user], references: [id_users])  // Relación con Users
-  SalesTemplate   SalesTemplate[]                 // Relación uno a muchos con SalesTemplate
+  create_at          DateTime  @default(now())
+  update_at          DateTime  @updatedAt
+
+  SalesStatus        SalesStatus @relation(fields:[status], references: [id_status])
+  usuario            Users  @relation(fields: [id_user], references: [id_users])  // Relación con Users
+  SalesTemplate      SalesTemplate[]                 // Relación uno a muchos con SalesTemplate
 }
 
 model SalesStatus{

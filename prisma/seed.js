@@ -1455,12 +1455,12 @@ async function main () {
   ]
 
   const salesStatus = [
-    { id_status: 1, name: 'Cotización', description: 'hola' },
-    { id_status: 2, name: 'Producción', description: 'fds' },
-    { id_status: 3, name: 'Para Pagar', description: 'sdf' },
-    { id_status: 4, name: 'Enviado', description: 'sdf' },
-    { id_status: 5, name: 'Entregado', description: 'sdf' },
-    { id_status: 6, name: 'Cancelado', description: 'sdf' }
+    { id_status: 1, name: 'Cotización', descriptionClient: 'hola', descriptionAdmin: 'da' },
+    { id_status: 2, name: 'Para Pagar', descriptionClient: 'fds', descriptionAdmin: 'da' },
+    { id_status: 3, name: 'Producción', descriptionClient: 'sdf', descriptionAdmin: 'da' },
+    { id_status: 4, name: 'Enviado', descriptionClient: 'sdf', descriptionAdmin: 'da' },
+    { id_status: 5, name: 'Entregado', descriptionClient: 'sdf', descriptionAdmin: 'da' },
+    { id_status: 6, name: 'Cancelado', descriptionClient: 'sdf', descriptionAdmin: 'da' }
   ]
 
   // ? Insertar datos de tipos de documentos
