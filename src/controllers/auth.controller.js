@@ -80,6 +80,7 @@ export const requestPasswordReset = async (req, res) => {
   }
 
   const resetToken = jwt.sign({ user_id: user.id_users }, secretKey, { expiresIn: '10m' })
+  // const resetLink = `http://localhost:3000/reset-password/${resetToken}`
   console.log(`El usuario ID ${user.id_users} (${user.email}) creó el token de restauración de contraseña con éxito.`)
 
   // Enviar correo electrónico con el token
