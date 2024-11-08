@@ -86,7 +86,25 @@ export const getUserPurchasesService = async (idUser) => {
 // *Service to create Templates
 export const createTemplatesService = async (req) => {
   const { id_users, design, decorator } = req
+
+  // Validación de campos obligatorios
+  if (!id_users) {
+    throw new Error("El campo 'id_users' es obligatorio.")
+  }
+  if (!design) {
+    throw new Error("El campo 'design' es obligatorio.")
+  }
+
   try {
+    // Validar que el usuario exista
+    const existingUser = await prisma.users.findUnique({
+      where: { id_users }
+    })
+    if (!existingUser) {
+      throw new Error('El usuario especificado no existe.')
+    }
+
+    // Crear la nueva plantilla
     const newTemplate = await prisma.templates.create({
       data: {
         id_users,
@@ -96,7 +114,7 @@ export const createTemplatesService = async (req) => {
     })
     return newTemplate
   } catch (error) {
-    console.error('Error al crear el diseno:', error)
+    console.error('Error al crear el diseño:', error)
     throw error
   }
 }
@@ -154,7 +172,7 @@ const validateTemplateBelongsToUser = async (id_user, id_template) => {
 }
 
 /**
- * Crea una venta (Sales) junto con los detalles de los templates (SalesTemplate).
+ * ?Crea una venta (Sales) junto con los detalles de los templates (SalesTemplate).
  * @param {Object} salesData - Datos de la venta a crear.
  * @returns {Object} - Objeto con la venta creada.
  */
@@ -172,33 +190,66 @@ export const createPurchaseService = async (salesData) => {
     salesTemplates
   } = salesData
 
-  // Validar campos obligatorios
-  if (!id_user || !total_price || !status || !salesTemplates || salesTemplates.length === 0) {
-    throw new Error('Faltan campos obligatorios: id_user, total_price, status y salesTemplates son necesarios.')
+  // Lista de campos obligatorios para validar
+  const requiredFields = [
+    { field: 'id_user', value: id_user },
+    { field: 'status', value: status },
+    { field: 'salesTemplates', value: salesTemplates }
+  ]
+
+  // Verificar si algún campo requerido está ausente o inválido
+  for (const { field, value } of requiredFields) {
+    if (!value || (field === 'salesTemplates' && (!Array.isArray(value) || value.length === 0))) {
+      const error = new Error(`Faltan campos obligatorios: ${field} es necesario.`)
+      error.name = 'MissingFieldsError'
+      throw error
+    }
   }
 
-  // ?Validar que el usuario exista
+  // Validar que si el estado es 1, total_price debe ser null o vacío
+  if (status === 1 && total_price != null && total_price !== '') {
+    const error = new Error('Si el estado de la compra es cotización, el campo precio total debe estar vacío.')
+    error.name = 'InvalidTotalPriceError'
+    throw error
+  }
+
+  // Validar que si el estado es 1, total_price debe ser null o vacío
+  if (status >= 2 && status <= 6 && (total_price === null || total_price === '')) {
+    const error = new Error('Si el estado de la compra no es cotización, el precio total debe de estar incluido.')
+    error.name = 'InvalidTotalPriceError'
+    throw error
+  }
+
+  // Validar que el usuario exista
   const userExists = await validateUserExists(id_user)
   if (!userExists) {
-    throw new Error(`El usuario con id ${id_user} no existe.`)
+    const error = new Error(`El usuario con id ${id_user} no existe.`)
+    error.name = 'NotFoundError'
+    throw error
   }
 
-  // ?Validar que el estado de la venta exista
+  // Validar que el estado de la venta exista
   const statusExists = await validateSalesStatusExists(status)
   if (!statusExists) {
-    throw new Error(`El estado con id ${status} no existe.`)
+    const error = new Error(`El estado con id ${status} no existe.`)
+    error.name = 'NotFoundError'
+    throw error
   }
 
-  // ?Validar que todos los templates existan y que pertenezcan al usuario
+  // Validar que todos los templates existan y que pertenezcan al usuario
   for (const template of salesTemplates) {
     const templateExists = await validateTemplateExists(template.id_template)
     if (!templateExists) {
-      throw new Error(`El template con id ${template.id_template} no existe.`)
+      const error = new Error(`El template con id ${template.id_template} no existe.`)
+      error.name = 'NotFoundError'
+      throw error
     }
 
     const templateBelongsToUser = await validateTemplateBelongsToUser(id_user, template.id_template)
     if (!templateBelongsToUser) {
-      throw new Error(`El template con id ${template.id_template} no pertenece al usuario con id ${id_user}.`)
+      const error = new Error(`El template con id ${template.id_template} no pertenece al usuario con id ${id_user}.`)
+      error.name = 'ForbiddenError'
+      throw error
     }
   }
 
@@ -232,6 +283,38 @@ export const createPurchaseService = async (salesData) => {
     return sale
   } catch (error) {
     console.error('Error creando la venta:', error)
-    throw new Error('Error al crear la venta')
+    const customError = new Error('Error al crear la venta')
+    customError.name = 'InternalError'
+    throw customError
+  }
+}
+
+/**
+ * ?Crea una venta (Sales) junto con los detalles de los templates (SalesTemplate).
+ * @param {Object} salesData - Datos de la venta a crear.
+ * @returns {Object} - Objeto con la venta creada.
+ */
+export const updatePurchaseToPayService = async (data) => {
+  const { id_sales, status, total_price, decorator_price } = data
+  const updates = {}
+  if (status !== undefined) updates.status = status
+  if (total_price !== undefined) updates.total_price = total_price
+  if (decorator_price !== undefined) updates.decorator_price = decorator_price
+
+  try {
+    const updatedSale = await prisma.sales.update({
+      where: { id_sales },
+      data: updates,
+      include: {
+        sales_template: true // Incluye la relación de sales_template si es necesario
+      }
+    })
+
+    return updatedSale
+  } catch (error) {
+    console.error('Error creando la venta:', error)
+    const customError = new Error('Error al crear la venta')
+    customError.name = 'InternalError'
+    throw customError
   }
 }
