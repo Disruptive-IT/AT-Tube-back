@@ -1,48 +1,50 @@
 import nodemailer from 'nodemailer'
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+const emailContentDir = path.resolve(__dirname, '../../public/email/')
+
+export const sendResetPasswordMail = async (user, resetToken) => {
+  try {
+    const { email } = user
+
+    // Configuración de transporte SMTP
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.EMAIL_PORT, 10),
+      secure: process.env.SMTP_PORT === '465', // Si el puerto es 465, usa conexión segura
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
+      }
+    })
+
+    const filePath = path.join(emailContentDir, 'reset-password-email.html')
+    let htmlContent = fs.readFileSync(filePath, 'utf8')
+
+    const resetpasswordurl = process.env.FRONTEND_URL
+    const resetLink = `${resetpasswordurl}/reset-password/?token=${resetToken}`
+
+    // Reemplazo de la plantilla con el enlace de restablecimiento
+    htmlContent = htmlContent.replace('{{resetLink}}', resetLink)
+
+    const mailOptions = {
+      to: email,
+      from: `NuPak <${process.env.EMAIL_USER}>`,
+      subject: 'Restablecer contraseña - NuPak',
+      html: htmlContent
+    }
+
+    // Enviar correo y manejar errores
+    await transporter.sendMail(mailOptions)
+    console.log('Reset link sent to user email.')
+    return 'Reset link sent to user email.'
+  } catch (error) {
+    console.error('Error sending user request password email:', error)
+    throw new Error(`Error sending email: ${error.message}`)
   }
-})
-
-export async function sendRecoverEmail (email, token, id) {
-  return await transporter.sendMail({
-    from: process.env.SMTP_USER,
-    to: email,
-    subject: 'Recuperacion de contraseña - NuPack',
-    html: RecoverPassEmail(token, id)
-  })
-}
-
-function RecoverPassEmail (token, id) {
-  return `
-      <!DOCTYPE html>
-      <html lang="es">
-      <style>
-          html{
-              background-color: white;
-          }
-          body{
-              max-width: 600px;
-              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-              margin: auto;
-              background-color: rgb(229, 255, 246);
-              padding: 40px;
-              border-radius: 4px;
-              margin-top: 10px;
-          }
-      </style>
-      <body>
-          <h1>!Sigue los pasos para recuperar tu contraseña!</h1>
-          <p>Hemos enviado este correo para poder ayudarte a restablecer tu contraseña para tu cuenta en NuPack.</p>
-          <p>Por favor, sigue las instrucciones en el correo electrónico para restablecer tu contraseña.</p>
-          <p>Cambia la contraseña de tu cuenta: <a href="http://localhost:5173/recoverPassword?token=${token}" target="_blank" rel="noopener noreferrer">haciendo click aquí</a>.
-      </body>
-      </html>
-      `
 }

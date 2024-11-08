@@ -5,8 +5,8 @@ import {
   userRegister,
   userLogin,
   userLogout,
-  forgotPasswordController,
-  recoverPasswordController
+  requestPasswordReset,
+  resetPassword
 } from '../controllers/auth.controller.js'
 
 const router = Router()
@@ -15,8 +15,8 @@ const router = Router()
 router.post('/register', userRegister)
 router.post('/login', userLogin)
 router.post('/logout', userLogout)
-router.post('/forgot-password', forgotPasswordController)
-router.post('/recover-password', recoverPasswordController)
+router.post('/forgot-password', requestPasswordReset)
+router.post('/reset-password/:token', resetPassword)
 
 // Rutas de autenticación con Google
 router.get('/google',
