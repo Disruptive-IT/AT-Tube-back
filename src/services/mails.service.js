@@ -27,7 +27,7 @@ export const sendResetPasswordMail = async (user, resetToken) => {
     let htmlContent = fs.readFileSync(filePath, 'utf8')
 
     const resetpasswordurl = process.env.FRONTEND_URL
-    const resetLink = `${resetpasswordurl}/api/auth/reset-password/?token=${resetToken}`
+    const resetLink = `${resetpasswordurl}/auth/restorePassword/?token=${resetToken}`
 
     // Reemplazo de la plantilla con el enlace de restablecimiento
     htmlContent = htmlContent.replace('{{resetLink}}', resetLink)

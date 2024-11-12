@@ -18,7 +18,7 @@ async function (accessToken, refreshToken, profile, cb) {
   try {
     // Buscar al usuario en la base de datos por `googleId`
     let user = await prisma.users.findUnique({
-      where: { googleId: profile.id }
+      where: { email: profile.emails[0].value }
     })
 
     // Si el usuario no existe, lo creamos
