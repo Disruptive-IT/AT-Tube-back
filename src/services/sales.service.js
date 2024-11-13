@@ -296,28 +296,43 @@ export const createPurchaseService = async (salesData) => {
  * @returns {Object} - Objeto con la venta creada.
  */
 export const updatePurchaseToPayService = async (data) => {
-  const { id_sales, status, total_price, decorator_price } = data
-  const updates = {}
-  if (status !== undefined) updates.status = status
-  if (total_price !== undefined) updates.total_price = total_price
-  if (decorator_price !== undefined) updates.decorator_price = decorator_price
+  const { id_sales, total_price, decorator_price } = data
 
   try {
     const updatedSale = await prisma.sales.update({
       where: { id_sales },
-      data: updates,
-      include: {
-        sales_template: true // Incluye la relación de sales_template si es necesario
+      data: {
+        total_price: (total_price + decorator_price),
+        status: 2,
+        cotized_at: new Date(),
+        SalesTemplate: {
+          updateMany: {
+            where: { id_sales },
+            data: {
+              decorator_price
+            }
+          }
+        }
       }
     })
 
     return updatedSale
   } catch (error) {
-    console.error('Error creando la venta:', error)
-    const customError = new Error('Error al crear la venta')
+    console.error('Error al cotizar la etiqueta de la compra', error)
+    const customError = new Error('Error al cotizar la venta')
     customError.name = 'InternalError'
     throw customError
   }
+}
+
+const formatCurrency = (amount, text) => {
+  if (amount === null || amount === undefined) {
+    return text
+  }
+  return new Intl.NumberFormat('es-ES', {
+    style: 'currency',
+    currency: 'COD'
+  }).format(amount)
 }
 
 // ?controller to get all Purchases, firts: data getted since 5months ago, if props are not null the periode will be change
@@ -372,23 +387,82 @@ export const getAllPurchasesService = async (year) => {
               }
             }
           }
+        },
+        usuario: { // Relación con Users
+          select: {
+            id_users: true,
+            avatar: true,
+            document_type: true,
+            document: true,
+            name: true,
+            id_country: true,
+            id_department: true,
+            id_city: true,
+            address: true,
+            phone: true,
+            email: true,
+            id_rol: true,
+            status: true,
+            create_at: true,
+            update_at: true,
+            country: {
+              select: {
+                id_country: true,
+                name: true // Puedes agregar más campos de Country si los necesitas
+              }
+            },
+            department: {
+              select: {
+                id_department: true,
+                name: true // Puedes agregar más campos de Department si los necesitas
+              }
+            },
+            city: {
+              select: {
+                id_city: true,
+                name: true // Puedes agregar más campos de City si los necesitas
+              }
+            },
+            role: {
+              select: {
+                id_rol: true,
+                name: true // Puedes agregar más campos de Role si los necesitas
+              }
+            },
+            documentType: {
+              select: {
+                id_document_type: true,
+                name: true // Puedes agregar más campos de DocumentType si los necesitas
+              }
+            }
+          }
         }
       }
     })
+    const formatDate = (date) => date ? date.toISOString().split('T')[0] : null
 
     const formattedPurchases = purchases.map(purchase => ({
+      avatar: purchase.usuario.avatar,
+      name: purchase.usuario.name,
+      phone: purchase.usuario.phone,
+      email: purchase.usuario.email,
+      document: purchase.usuario.document,
+      idTipe: purchase.usuario.documentType.name,
+      country: purchase.usuario.country.name,
+      address: (purchase.usuario.department.name + '-' + purchase.usuario.city.name + '-' + purchase.usuario.address),
       id: purchase.id_sales,
+      total_price: formatCurrency(purchase.total_price, 'Falta cotizar etiqueta'),
       totalPrice: purchase.total_price,
       status: purchase.SalesStatus.id_status,
       strStatus: purchase.SalesStatus.name,
-      finalizeAt: purchase.finalize_at,
-      canceledAt: purchase.canceled_at,
+      finalizeAt: formatDate(purchase.finalize_at),
+      canceledAt: formatDate(purchase.canceled_at),
       canceledReason: purchase.canceled_reason,
-      cotizedAt: purchase.cotized_at,
-      deliveredAt: purchase.delivered_at,
-      purchasedAt: purchase.purchased_at,
-      sendAt: purchase.send_at,
-      createAt: purchase.create_at,
+      cotizedAt: formatDate(purchase.cotized_at),
+      deliveredAt: formatDate(purchase.delivered_at) || 'No se ha entregado el pedido',
+      purchasedAt: formatDate(purchase.purchased_at) || 'No se ha realizado el pago',
+      shippingAt: formatDate(purchase.send_at) || 'No se ha realizado el envio',
+      createAt: formatDate(purchase.create_at),
       // Mapeo de las plantillas
       salesTemplates: purchase.SalesTemplate.map(template => ({
         idSales: template.id_sales,
@@ -428,5 +502,14 @@ export const getYearsPurchasesService = async () => {
   } catch (error) {
     console.error('Error al obtener las compras con productos:', error)
     throw error
+  }
+}
+
+// ?Cotize template service
+export const cotizeTemplateService = async () => {
+  try {
+    
+  } catch (error) {
+    
   }
 }

@@ -4,7 +4,8 @@ import {
   createTemplateController,
   getAllPurchasesController,
   getUserPurchasesController,
-  getYearsPurchasesController
+  getYearsPurchasesController,
+  updatePurchaseToPayController
 } from '../controllers/sales.controller.js'
 
 const router = express.Router()
@@ -14,6 +15,6 @@ router.post('/getAllPurchases', getAllPurchasesController) // ?get all purchases
 router.get('/getYears', getYearsPurchasesController)
 router.post('/newTemplate', createTemplateController) // ?Create new template
 router.post('/newPurchase', createPurchaseController) // ?Create new purchase
-router.post('/updatePurchaseToPay', createPurchaseController) // ?Update the quote so the user can pay
+router.post('/updatePurchaseToPay', updatePurchaseToPayController) // ?Update the quote so the user can pay
 
 export default router
