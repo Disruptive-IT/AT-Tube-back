@@ -1,4 +1,4 @@
-import { createPurchaseService, createTemplatesService, getAllPurchasesService, getUserPurchasesService, updatePurchaseToPayService } from '../services/sales.service.js'
+import { createPurchaseService, createTemplatesService, getAllPurchasesService, getUserPurchasesService, getYearsPurchasesService, updatePurchaseToPayService } from '../services/sales.service.js'
 
 // ?Controller to get all purchases orders for a especific user
 export const getUserPurchasesController = async (req, res) => {
@@ -16,10 +16,22 @@ export const getUserPurchasesController = async (req, res) => {
 
 export const getAllPurchasesController = async (req, res) => {
   try {
-    const currentDate =req.body.currentDate
-    const sinceDate=req.body.sinceDate
-    const Purchases = await getAllPurchasesService(currentDate, sinceDate)
+    const year = parseInt(req.body.year)
+    const Purchases = await getAllPurchasesService(year)
     res.status(200).json({ message: 'Compras Traidas con exito', purchases: Purchases })
+  } catch (error) {
+    if (error.message === 'ID proporcionado no existe.') {
+      return res.status(404).json({ message: 'Usuario no encontrado, Error al actualizar la contraseña.' })
+    }
+    console.error('can`t get purchases', error)
+    return res.status(500).json({ message: error.message, error: error.message })
+  }
+}
+
+export const getYearsPurchasesController = async (req, res) => {
+  try {
+    const years = await getYearsPurchasesService()
+    res.status(200).json({ years })
   } catch (error) {
     if (error.message === 'ID proporcionado no existe.') {
       return res.status(404).json({ message: 'Usuario no encontrado, Error al actualizar la contraseña.' })

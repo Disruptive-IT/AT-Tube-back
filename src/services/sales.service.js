@@ -321,19 +321,17 @@ export const updatePurchaseToPayService = async (data) => {
 }
 
 // ?controller to get all Purchases, firts: data getted since 5months ago, if props are not null the periode will be change
-export const getAllPurchasesService = async (sinceDate, toDate) => {
-  const currentDate = new Date()
-  const backDate = new Date()
-  backDate.setMonth(backDate.getMonth() - 8)
-  if (sinceDate || toDate) {
-    console.log(sinceDate, toDate)
-  }
+export const getAllPurchasesService = async (year) => {
+  const currentYear = new Date().getFullYear()
+  const startOfYear = new Date((year || currentYear), 0, 1) // ?1 de enero
+  const endOfYear = new Date((year || currentYear), 11, 31, 23, 59, 59) // ?31 de diciembre
+
   try {
     const purchases = await prisma.sales.findMany({
       where: {
         create_at: {
-          gte: backDate,
-          lte: currentDate
+          gte: startOfYear,
+          lte: endOfYear
         }
       },
       orderBy: {
@@ -406,6 +404,27 @@ export const getAllPurchasesService = async (sinceDate, toDate) => {
     }))
 
     return formattedPurchases
+  } catch (error) {
+    console.error('Error al obtener las compras con productos:', error)
+    throw error
+  }
+}
+
+export const getYearsPurchasesService = async () => {
+  try {
+    const yearsWithSales = await prisma.sales.findMany({
+      select: {
+        create_at: true
+      },
+      orderBy: {
+        create_at: 'desc'
+      }
+    })
+
+    // Extrae los años de las fechas y elimina duplicados
+    const years = Array.from(new Set(yearsWithSales.map(sale => sale.create_at.getFullYear())))
+
+    return years
   } catch (error) {
     console.error('Error al obtener las compras con productos:', error)
     throw error
