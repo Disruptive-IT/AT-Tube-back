@@ -34,13 +34,8 @@ router.get(
       { expiresIn: '1h' }
     )
 
-    res.cookie('authToken', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // Solo en HTTPS en producción
-      maxAge: 3600000 // 1 hora
-    })
-
-    res.redirect(process.env.URL_WEBAPP)
+    // Redirige al frontend con el token como un parámetro de consulta
+    res.redirect(`${process.env.URL_WEBAPP}?token=${token}`)
   }
 )
 
