@@ -325,14 +325,18 @@ export const updatePurchaseToPayService = async (data) => {
   }
 }
 
-const formatCurrency = (amount, text) => {
-  if (amount === null || amount === undefined) {
-    return text
+// Función para formatear como moneda (puedes reutilizarla siempre que lo necesites)
+const formatCurrency = (value) => {
+  if (typeof value === 'number' && !isNaN(value)) {
+    return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(value)
   }
-  return new Intl.NumberFormat('es-ES', {
-    style: 'currency',
-    currency: 'COD'
-  }).format(amount)
+  return value
+}
+
+const getPriceWithIva = (price) => {
+  const ivaAmount = price * 0.19
+  const totalPlusIva = price + ivaAmount
+  return formatCurrency(totalPlusIva)
 }
 
 // ?controller to get all Purchases, firts: data getted since 5months ago, if props are not null the periode will be change
@@ -366,8 +370,8 @@ export const getAllPurchasesService = async (year) => {
         SalesStatus: {
           select: {
             id_status: true,
-            name: true,
-            description: true
+            name: true
+            // description: true
           }
         },
         SalesTemplate: {
@@ -452,7 +456,8 @@ export const getAllPurchasesService = async (year) => {
       address: (purchase.usuario.department.name + '-' + purchase.usuario.city.name + '-' + purchase.usuario.address),
       id: purchase.id_sales,
       total_price: formatCurrency(purchase.total_price, 'Falta cotizar etiqueta'),
-      totalPrice: purchase.total_price,
+      ivaPrice: formatCurrency(purchase.total_price * 0.19),
+      totalPlusIva: getPriceWithIva(purchase.total_price),
       status: purchase.SalesStatus.id_status,
       strStatus: purchase.SalesStatus.name,
       finalizeAt: formatDate(purchase.finalize_at),
@@ -468,12 +473,13 @@ export const getAllPurchasesService = async (year) => {
         idSales: template.id_sales,
         idTemplate: template.id_template,
         boxAmount: template.box_amount,
-        boxPrice: template.box_price,
+        boxPrice: formatCurrency(template.box_price),
         bottleAmount: template.bottle_amount,
-        bottlePrice: template.bottle_price,
+        bottlePrice: formatCurrency(template.bottle_price),
         decoratorType: template.decorator_type,
-        decoratorPrice: template.decorator_price,
-        desing: template.template.design
+        decoratorPrice: formatCurrency(template.decorator_price),
+        desing: template.template.design,
+        totalBoxPrices: formatCurrency(template.box_price * template.box_amount)
       }))
     }))
 
