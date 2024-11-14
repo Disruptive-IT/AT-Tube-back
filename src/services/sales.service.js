@@ -177,16 +177,14 @@ const validateTemplateBelongsToUser = async (id_user, id_template) => {
  * @returns {Object} - Objeto con la venta creada.
  */
 export const createPurchaseService = async (salesData) => {
+  // !Vaidaciones pendientes: que el usuario sea cliente,
+  // !que no si el estado no es para produccion no haya fecha de pagado
+
   const {
     id_user,
     total_price,
     status,
-    cotized_at,
     purchased_at,
-    send_at,
-    delivered_at,
-    canceled_at,
-    canceled_reason,
     salesTemplates
   } = salesData
 
