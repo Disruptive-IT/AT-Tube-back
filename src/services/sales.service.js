@@ -182,12 +182,12 @@ export const createPurchaseService = async (salesData) => {
 
   const {
     id_user,
-    total_price,
     status,
-    purchased_at,
     salesTemplates
   } = salesData
 
+  let purchased_at = null
+  let total_price = null
   // Lista de campos obligatorios para validar
   const requiredFields = [
     { field: 'id_user', value: id_user },
@@ -211,17 +211,15 @@ export const createPurchaseService = async (salesData) => {
     throw error
   }
 
-  if (status > 2) {
-    const error = new Error('el estado de la compra no puede ser enviado, entregado o cancelado')
+  if (status === 2 || status === 4 || status === 5 || status === 6) {
+    const error = new Error('el estado de la compra no puede ser para pagar, enviado, entregado o cancelado')
     error.name = 'ForbiddenError'
     throw error
   }
 
   // Validar que si el estado es 1, total_price debe ser null o vacío
-  if (status >= 2 && status <= 6 && (total_price === null || total_price === '')) {
-    const error = new Error('Si el estado de la compra no es cotización, el precio total debe de estar incluido.')
-    error.name = 'InvalidTotalPriceError'
-    throw error
+  if (status === 3) {
+    total_price = ((salesTemplates[0].box_price * salesTemplates[0].box_amount) + salesTemplates[0].decorator_price)
   }
 
   // Validar que el usuario exista
@@ -230,6 +228,10 @@ export const createPurchaseService = async (salesData) => {
     const error = new Error(`El usuario con id ${id_user} no existe.`)
     error.name = 'NotFoundError'
     throw error
+  }
+
+  if (status === 3) {
+    purchased_at = new Date()
   }
 
   // Validar que el estado de la venta exista
@@ -294,8 +296,8 @@ export const createPurchaseService = async (salesData) => {
  * @returns {Object} - Objeto con la venta creada.
  */
 export const updatePurchaseToPayService = async (data) => {
-  const { id_sales, total_price, decorator_price } = data
-
+  // ?el problema viene de aqui al momento de actualizar el precio total 
+  const { id_sales, total_price, decorator_price } = data 
   try {
     const updatedSale = await prisma.sales.update({
       where: { id_sales },
@@ -453,8 +455,8 @@ export const getAllPurchasesService = async (year) => {
       country: purchase.usuario.country.name,
       address: (purchase.usuario.department.name + '-' + purchase.usuario.city.name + '-' + purchase.usuario.address),
       id: purchase.id_sales,
-      total_price: formatCurrency(purchase.total_price, 'Falta cotizar etiqueta'),
-      ivaPrice: formatCurrency(purchase.total_price * 0.19),
+      total_price: formatCurrency(purchase.total_price),
+      ivaPrice: formatCurrency((purchase.total_price * 0.19)),
       totalPlusIva: getPriceWithIva(purchase.total_price),
       status: purchase.SalesStatus.id_status,
       strStatus: purchase.SalesStatus.name,
@@ -477,7 +479,8 @@ export const getAllPurchasesService = async (year) => {
         decoratorType: template.decorator_type,
         decoratorPrice: formatCurrency(template.decorator_price),
         desing: template.template.design,
-        totalBoxPrices: formatCurrency(template.box_price * template.box_amount)
+        totalBoxPrices: formatCurrency(template.box_price * template.box_amount),
+        totalBoxesPricesWithoutFormat: (template.box_price * template.box_amount)
       }))
     }))
 
