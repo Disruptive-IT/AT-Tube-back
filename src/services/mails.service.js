@@ -35,7 +35,7 @@ export const sendResetPasswordMail = async (user, resetToken) => {
     const mailOptions = {
       to: email,
       from: `NuPak <${process.env.EMAIL_USER}>`,
-      subject: 'Restablecer contraseña - NuPak',
+      subject: 'Restablecer contraseña - AT-Tube',
       html: htmlContent
     }
 
