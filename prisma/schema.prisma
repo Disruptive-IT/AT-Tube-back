@@ -107,11 +107,11 @@ model Sales {
 }
 
 model SalesStatus{
-  id_status       Int    @id          // Usar UUID para claves primarias
-  name            String
-  description     String
-
-  Sales           Sales[]      // Relación uno a muchos con Sales
+  id_status           Int    @id          // Usar UUID para claves primarias
+  name                String
+  descriptionClient   String
+  descriptionAdmin    String
+  Sales               Sales[]      // Relación uno a muchos con Sales
 }
 
 model SalesTemplate {

@@ -1468,7 +1468,8 @@ async function main () {
     data: salesStatus.map((status) => ({
       id_status: status.id_status,
       name: status.name,
-      description: status.description
+      descriptionClient: status.descriptionClient,
+      descriptionAdmin: status.descriptionAdmin
     }))
   })
 
