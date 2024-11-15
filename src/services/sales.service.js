@@ -171,6 +171,26 @@ const validateTemplateBelongsToUser = async (id_user, id_template) => {
   return template !== null
 }
 
+async function validateTemplates (status, salesTemplates) {
+  // Solo valida si el status es 1
+  if (status === 1) {
+    for (const template of salesTemplates) {
+      // Consulta en la tabla Templates para obtener el campo decorator
+      const templateData = await prisma.templates.findUnique({
+        where: { id_template: template.id_template },
+        select: { decorator: true }
+      })
+
+      if (!templateData || templateData.decorator === null) {
+        const error = new Error('Para poder generar una cotización el campo DECORADOR no puede venir nulo')
+        error.name = 'MissingFieldsError'
+        throw error
+      }
+    }
+  }
+  return true
+}
+
 /**
  * ?Crea una venta (Sales) junto con los detalles de los templates (SalesTemplate).
  * @param {Object} salesData - Datos de la venta a crear.
@@ -210,6 +230,8 @@ export const createPurchaseService = async (salesData) => {
     error.name = 'InvalidTotalPriceError'
     throw error
   }
+
+  await validateTemplates(status, salesTemplates)
 
   if (status === 2 || status === 4 || status === 5 || status === 6) {
     const error = new Error('el estado de la compra no puede ser para pagar, enviado, entregado o cancelado')
@@ -296,8 +318,8 @@ export const createPurchaseService = async (salesData) => {
  * @returns {Object} - Objeto con la venta creada.
  */
 export const updatePurchaseToPayService = async (data) => {
-  // ?el problema viene de aqui al momento de actualizar el precio total 
-  const { id_sales, total_price, decorator_price } = data 
+  // ?el problema viene de aqui al momento de actualizar el precio total
+  const { id_sales, total_price, decorator_price } = data
   try {
     const updatedSale = await prisma.sales.update({
       where: { id_sales },
@@ -387,6 +409,7 @@ export const getAllPurchasesService = async (year) => {
             template: {
               select: {
                 id_template: true,
+                decorator: true,
                 design: true
               }
             }
@@ -476,6 +499,7 @@ export const getAllPurchasesService = async (year) => {
         boxPrice: formatCurrency(template.box_price),
         bottleAmount: template.bottle_amount,
         bottlePrice: formatCurrency(template.bottle_price),
+        decorator: template.template.decorator,
         decoratorType: template.decorator_type,
         decoratorPrice: formatCurrency(template.decorator_price),
         desing: template.template.design,
@@ -515,8 +539,8 @@ export const getYearsPurchasesService = async () => {
 // ?Cotize template service
 export const cotizeTemplateService = async () => {
   try {
-    
+
   } catch (error) {
-    
+
   }
 }
