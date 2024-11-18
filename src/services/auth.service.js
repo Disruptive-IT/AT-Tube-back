@@ -1,8 +1,5 @@
 import bcrypt from 'bcryptjs'
-// import { google } from 'googleapis'
-import jwt from 'jsonwebtoken'
-// import generateJWT from '../helpers/generateJWT.js'
-import { sendRecoverEmail } from './mails.service.js'
+
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
@@ -167,84 +164,5 @@ export const logout = (req, res) => {
     res.status(200).json({ message: 'Successfully logged out' })
   } catch (err) {
     res.status(500).json({ message: 'Error in server', err })
-  }
-}
-// const requestCount = {} // Contador de solicitudes por dirección IP
-// const REQUEST_LIMIT = 5 // Limite de intentos
-// const TIME_WINDOW = 15 * 60 * 1000 // Ventana de tiempo en milisegundos (15 minutos)
-
-// // Función para controlar la tasa de solicitudes
-// const rateLimiter = (ip) => {
-//   const currentTime = Date.now()
-
-//   if (!requestCount[ip]) {
-//     requestCount[ip] = { count: 1, firstRequestTime: currentTime }
-//   } else {
-//     requestCount[ip].count++
-
-//     // Si ha pasado el tiempo de la ventana, reinicia el contador
-//     if (currentTime - requestCount[ip].firstRequestTime > TIME_WINDOW) {
-//       requestCount[ip] = { count: 1, firstRequestTime: currentTime }
-//     }
-//   }
-
-//   return requestCount[ip].count <= REQUEST_LIMIT
-// }
-
-export const forgotPassword = async (email) => {
-  try {
-    // Buscar al usuario por email
-    const user = await prisma.Users.findUnique({ where: { email } })
-    if (!user) {
-      throw new Error('User not existed')
-    }
-
-    // Generar el token JWT con el ID del usuario
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
-      expiresIn: '1d'
-    })
-
-    // Llamar a la función sendRecoverEmail con el email y el token
-    const mail = await sendRecoverEmail(email, token, user.id)
-
-    // Verificar si el correo fue enviado
-    if (!mail.accepted || mail.accepted.length === 0) {
-      throw new Error('Error sending recovery email')
-    }
-
-    return { success: true, message: 'Recovery email sent successfully' }
-  } catch (error) {
-    throw new Error(error.message)
-  }
-}
-
-// Cambia la firma de recoverPassword para recibir los parámetros directamente
-export const recoverPassword = async (confirmPassword, token) => {
-  // Verificar si ambos campos están presentes en la solicitud
-  if (!confirmPassword || !token) {
-    return { Status: 'Error', message: 'El campo confirmPassword y token son obligatorios.' }
-  }
-
-  try {
-    // Verificar el token JWT
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
-
-    if (!decoded || !decoded.userId) {
-      return { Status: 'Error', message: 'Token inválido o expirado.' }
-    }
-
-    // Generar hash de la nueva contraseña
-    const saltRounds = 10// Número de rondas de hashing
-    const hashedPassword = await bcrypt.hash(confirmPassword, saltRounds)
-
-    // Actualizar la contraseña en la base de datos con el ID del usuario decodificado
-    await prisma.Users.update({
-      where: { id: decoded.userId },
-      data: { password: hashedPassword }
-    })
-
-    return { Status: 'Success', message: 'Contraseña actualizada correctamente' }
-  } catch (error) {
-    throw new Error(error.message)
   }
 }

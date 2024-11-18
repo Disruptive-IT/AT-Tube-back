@@ -1,4 +1,4 @@
-const allowOrigins = ['http://localhost:5173/', '*']
+const allowOrigins = ['http://localhost:5173']
 
 export const CorsConfig = {
   origin: allowOrigins,

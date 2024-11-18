@@ -56,80 +56,91 @@ model Department {
 }
 
 model Users {
-  id_users        String   @id @default(uuid())
+  id_users        String       @id @default(uuid())
   avatar          String?
-  document_type   Int      // Clave foránea a DocumentType
-  document        String
+  document_type   Int?      // Clave foránea a DocumentType
+  document        String?
   name            String
-  id_country      Int      
-  id_department   Int      // Clave foránea a Department
-  id_city         Int      // Clave foránea a City
-  address         String
-  phone           String
+  id_country      Int?   
+  id_department   Int?      // Clave foránea a Department
+  id_city         Int?      // Clave foránea a City
+  address         String?
+  phone           String?
   email           String    @unique
-  password        String
+  password        String?
   id_rol          Int    // Clave foránea a Roles
   status          Boolean   @default(true)
   create_at       DateTime  @default(now())
   update_at       DateTime  @updatedAt
 
-  country         Country      @relation(fields: [id_country], references: [id_country]) //relation with country
-  department      Department   @relation(fields: [id_department], references: [id_department])   // Relación con Department
-  city            City         @relation(fields: [id_city], references: [id_city])   // Relación con City
-  role            Roles        @relation(fields: [id_rol], references: [id_rol])        // Relación con Roles
-  documentType    DocumentType @relation(fields: [document_type], references: [id_document_type])  // Relación con DocumentType
-  Sales           Sales[]   // Relación inversa con Sales
+  country         Country?      @relation(fields: [id_country], references: [id_country]) //relación con Country
+  department      Department?   @relation(fields: [id_department], references: [id_department]) // relación con Department
+  city            City?         @relation(fields: [id_city], references: [id_city]) // relación con City
+  role            Roles        @relation(fields: [id_rol], references: [id_rol]) // relación con Roles
+  documentType    DocumentType? @relation(fields: [document_type], references: [id_document_type]) // relación con DocumentType
+  Sales           Sales[]      // Relación inversa con Sales
+  Templates       Templates[] // Relación inversa con Templates
 }
 
-
 model Sales {
-  id_sales        String    @id @default(uuid())         // Usar UUID para claves primarias
-  id_usuario      String                                    // Clave foránea a Users
+  id_sales           String    @id @default(uuid())         // Usar UUID para claves primarias
+  id_user            String                                 // Clave foránea a Users
 
-  total_price     BigInt
-  finalize_at     DateTime?
-  status          String
-  create_at       DateTime  @default(now())
-  update_at       DateTime  @updatedAt
+  total_price        Int?
+  finalize_at        DateTime?
+  cotized_at         DateTime?
+  purchased_at       DateTime?
+  send_at            DateTime?
+  delivered_at       DateTime?
+  canceled_at        DateTime?
+  canceled_reason    String?
+  status             Int
+  id_orden_pago      String?
+  id_pago_reslizado  String?
 
-  usuario         Users  @relation(fields: [id_usuario], references: [id_users])  // Relación con Users
-  SalesTemplate   SalesTemplate[]                 // Relación uno a muchos con SalesTemplate
+  create_at          DateTime  @default(now())
+  update_at          DateTime  @updatedAt
+
+  SalesStatus        SalesStatus @relation(fields:[status], references: [id_status])
+  usuario            Users  @relation(fields: [id_user], references: [id_users])  // Relación con Users
+  SalesTemplate      SalesTemplate[]                 // Relación uno a muchos con SalesTemplate
+}
+
+model SalesStatus{
+  id_status           Int    @id          // Usar UUID para claves primarias
+  name                String
+  descriptionClient   String
+  descriptionAdmin    String
+  Sales               Sales[]      // Relación uno a muchos con Sales
 }
 
 model SalesTemplate {
   id_sales        String     // Campo que hace referencia a Sales
   id_template     String     // Campo que hace referencia a Templates
-  amount          Int
+  box_amount      Int
+  box_price       Int
+  bottle_amount   Int
+  bottle_price    Int
+  decorator_type  String?
+  decorator_price Int?
+  Sales           Sales      @relation(fields: [id_sales], references: [id_sales])  // Relación con Sales
   create_at       DateTime   @default(now())
-
-  sales           Sales      @relation(fields: [id_sales], references: [id_sales])  // Relación con Sales
   template        Templates  @relation(fields: [id_template], references: [id_template])  // Relación con Templates
 
   @@id([id_sales, id_template])  // Llave compuesta (id_sales + id_template)
 }
 
-model ProductType {
-  id_product_type String    @id @default(uuid())         // Usar UUID para claves primarias
-  name            String
-  height          BigInt
-  price           BigInt
-  description     String
-  status          Boolean
-  create_at       DateTime  @default(now())
 
-  Templates       Templates[]                           // Relación inversa: un tipo de producto puede tener varias plantillas
-}
 
 model Templates {
   id_template     String    @id @default(uuid())         // Usar UUID para claves primarias
-  id_product_type String                                  // Clave foránea a ProductType
-
-  name            String
+  id_users        String
   design          Json
-  status          Boolean
+  decorator       String?
+  status          Boolean   @default(true)
   create_at       DateTime  @default(now())
   update_at       DateTime  @updatedAt
-
-  productType     ProductType @relation(fields: [id_product_type], references: [id_product_type])  // Relación con ProductType
+  
+  Users           Users       @relation(fields: [id_users], references: [id_users])
   SalesTemplate   SalesTemplate[]
 }

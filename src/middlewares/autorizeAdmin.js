@@ -1,4 +1,16 @@
-import { verifyToken } from '../services/authService.js'
+import jwt from 'jsonwebtoken'
+
+export const verifyToken = (token) => {
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(decoded)
+      }
+    })
+  })
+}
 
 export const authorizeAdmin = async (req, res, next) => {
   const authHeader = req.headers.authorization
@@ -12,7 +24,7 @@ export const authorizeAdmin = async (req, res, next) => {
   try {
     const decodedToken = await verifyToken(token)
 
-    if (decodedToken.role !== 'admin') {
+    if (decodedToken.role !== 'Admin') {
       return res.status(403).json({ message: 'No tienes permisos de administrador para acceder a este recurso.' })
     }
 

@@ -26,7 +26,7 @@ app.use(session({
 app.use(express.json())
 app.use(cors(CorsConfig))
 app.use(passport.initialize())
-app.use(passport.session()) // Asegúrate de agregar esto para manejar sesiones con Passport
+app.use(passport.session())
 
 // Rutas
 app.use('/api', routes)

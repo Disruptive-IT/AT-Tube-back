@@ -1,8 +1,14 @@
-import { userRegisterService, userLoginService, forgotPassword, recoverPassword } from '../services/auth.service.js'
+import { userRegisterService, userLoginService } from '../services/auth.service.js'
+import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcrypt'
 
+import jwt from 'jsonwebtoken'
 import { createToken } from '../middlewares/jwt.js'
+import { sendResetPasswordMail } from '../services/mails.service.js'
 
-// const prisma = new PrismaClient()
+const secretKey = process.env.JWT_SECRET
+
+const prisma = new PrismaClient()
 
 export const userRegister = async (req, res) => {
   try {
@@ -62,52 +68,62 @@ export const userLogout = (req, res) => {
 }
 
 // Controlador para la recuperación de contraseña
-export const forgotPasswordController = async (req, res) => {
+export const requestPasswordReset = async (req, res) => {
   const { email } = req.body
 
-  if (!email) {
-    return res.status(400).send({ error: 'Email is required' })
+  const user = await prisma.Users.findUnique({
+    where: { email }
+  })
+
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' })
+  }
+
+  const resetToken = jwt.sign({ user_id: user.id_users }, secretKey, { expiresIn: '10m' })
+  // const resetLink = `http://localhost:3000/reset-password/${resetToken}`
+  console.log(`El usuario ID ${user.id_users} (${user.email}) creó el token de restauración de contraseña con éxito.`)
+
+  // Enviar correo electrónico con el token
+  const sendMail = await sendResetPasswordMail(user, resetToken)
+  res.status(200).json({ message: sendMail })
+}
+
+export const resetPassword = async (req, res) => {
+  const { token } = req.params
+  const { newPassword, confirmPassword } = req.body
+
+  if (newPassword !== confirmPassword) {
+    return res.status(400).json({ message: 'Passwords do not match.' })
   }
 
   try {
-    const response = await forgotPassword(email)
-    return res.status(200).json(response)
-  } catch (error) {
-    return res.status(500).send({ error: error.message })
+    // Verifica si el token es válido
+    const decoded = jwt.verify(token, secretKey)
+    console.log('Token decodificado:', decoded) // Verifica que el token se decodifique correctamente
+
+    const userId = decoded.user_id
+    console.log('ID del usuario:', userId) // Verifica que el ID del usuario sea correcto
+
+    // Verifica si el usuario existe con el userId extraído del token
+    const user = await prisma.Users.findUnique({
+      where: { id_users: userId }
+    })
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' })
+    }
+
+    // Hashea la nueva contraseña
+    const hashedPassword = await bcrypt.hash(newPassword, 10)
+
+    // Actualiza la contraseña del usuario
+    await prisma.Users.update({
+      where: { id_users: userId },
+      data: { password: hashedPassword }
+    })
+
+    res.status(200).json({ message: 'Password has been reset successfully.' })
+  } catch (err) {
+    res.status(400).json({ message: 'Password reset token is invalid or has expired.', error: err.message })
   }
 }
-
-export const recoverPasswordController = async (req, res) => {
-  console.log('Contenido de req.body:', req.body)
-
-  const { confirmPassword, token } = req.body
-
-  if (!confirmPassword || !token) {
-    return res.status(400).send({ error: 'Password and token are required' })
-  }
-
-  try {
-    const response = await recoverPassword(confirmPassword, token)
-    return res.status(200).json(response)
-  } catch (error) {
-    return res.status(500).send({ error: error.message })
-  }
-}
-
-// export const googleAuthController = (req, res) => {
-//   try {
-//     googleauth(req, res)
-//   } catch (error) {
-//     console.error('Error en la autenticación con Google: ', error)
-//     res.status(500).json({ message: 'Error en la autenticación con Google.', error: error.message })
-//   }
-// }
-
-// export const googleCallbackController = async (req, res) => {
-//   try {
-//     await googlecall(req, res)
-//   } catch (error) {
-//     console.error('Error en el callback de Google: ', error)
-//     res.status(500).json({ message: 'Error en el callback de Google.', error: error.message })
-//   }
-// }

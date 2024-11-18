@@ -10,15 +10,16 @@ async function main () {
     {
       document_type: 2,
       document: '987654321',
-      name: 'Carlos Hernández',
+      name: 'Daniel Salazar.',
       id_country: 1,
       id_department: 5,
       id_city: 330,
       address: '123 Calle Falsa',
       phone: '3201234567',
-      email: 'carloshernandez@example.com',
+      email: 'jdps1006@gmail.com',
       password: hashedPassword,
-      id_rol: 2
+      avatar: 'https://i.pinimg.com/564x/57/3a/46/573a46c7818f8cca76e394ac5af72542.jpg',
+      id_rol: 1
     },
     {
       document_type: 2,
@@ -31,6 +32,7 @@ async function main () {
       phone: '3212345678',
       email: 'lauraperez@example.com',
       password: hashedPassword,
+      avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
       id_rol: 1
     },
     {
@@ -44,6 +46,7 @@ async function main () {
       phone: '3208765432',
       email: 'juangomez@example.com',
       password: hashedPassword,
+      avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
       id_rol: 2
     },
     {
@@ -57,6 +60,7 @@ async function main () {
       phone: '3218765432',
       email: 'anamartinez@example.com',
       password: hashedPassword,
+      avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
       id_rol: 2
     },
     {
@@ -70,6 +74,7 @@ async function main () {
       phone: '3207654321',
       email: 'ricardolopez@example.com',
       password: hashedPassword,
+      avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
       id_rol: 2
     },
     {
@@ -83,6 +88,7 @@ async function main () {
       phone: '3217654321',
       email: 'martasanchez@example.com',
       password: hashedPassword,
+      avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
       id_rol: 2
     },
     {
@@ -96,6 +102,7 @@ async function main () {
       phone: '3206543210',
       email: 'danielruiz@example.com',
       password: hashedPassword,
+      avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
       id_rol: 2
     },
     {
@@ -109,6 +116,7 @@ async function main () {
       phone: '3216543210',
       email: 'luciaramirez@example.com',
       password: hashedPassword,
+      avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
       id_rol: 1
     },
     {
@@ -122,6 +130,7 @@ async function main () {
       phone: '3205432109',
       email: 'jorgetorres@example.com',
       password: hashedPassword,
+      avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
       id_rol: 1
     },
     {
@@ -135,6 +144,7 @@ async function main () {
       phone: '3215432109',
       email: 'mariaortiz@example.com',
       password: hashedPassword,
+      avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
       id_rol: 1
     },
     {
@@ -148,6 +158,7 @@ async function main () {
       phone: '3204321098',
       email: 'robertovargas@example.com',
       password: hashedPassword,
+      avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
       id_rol: 1
     },
     {
@@ -161,6 +172,7 @@ async function main () {
       phone: '3214321098',
       email: 'patriciamorales@example.com',
       password: hashedPassword,
+      avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
       id_rol: 1
     },
     {
@@ -174,6 +186,7 @@ async function main () {
       phone: '3203210987',
       email: 'fernandogil@example.com',
       password: hashedPassword,
+      avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
       id_rol: 1
     },
     {
@@ -187,6 +200,7 @@ async function main () {
       phone: '3213210987',
       email: 'sofiacastro@example.com',
       password: hashedPassword,
+      avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
       id_rol: 1
     },
     {
@@ -200,6 +214,7 @@ async function main () {
       phone: '3202109876',
       email: 'alejandrodiaz@example.com',
       password: hashedPassword,
+      avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
       id_rol: 1
     },
     {
@@ -213,6 +228,7 @@ async function main () {
       phone: '3212109876',
       email: 'isabelfernandez@example.com',
       password: hashedPassword,
+      avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
       id_rol: 1
     },
     {
@@ -226,6 +242,7 @@ async function main () {
       phone: '3201098765',
       email: 'luisgarcia@example.com',
       password: hashedPassword,
+      avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
       id_rol: 1
     },
     {
@@ -239,6 +256,7 @@ async function main () {
       phone: '3211098765',
       email: 'gabrielamolina@example.com',
       password: hashedPassword,
+      avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
       id_rol: 1
     },
     {
@@ -252,6 +270,7 @@ async function main () {
       phone: '3200987654',
       email: 'hectorparra@example.com',
       password: hashedPassword,
+      avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
       id_rol: 1
     },
     {
@@ -265,6 +284,7 @@ async function main () {
       phone: '3210987654',
       email: 'paulareyes@example.com',
       password: hashedPassword,
+      avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
       id_rol: 1
     }
   ]
@@ -1434,6 +1454,25 @@ async function main () {
     { id_rol: 2, name: 'Client' }
   ]
 
+  const salesStatus = [
+    { id_status: 1, name: 'Cotización', descriptionClient: 'hola', descriptionAdmin: 'da' },
+    { id_status: 2, name: 'Para Pagar', descriptionClient: 'fds', descriptionAdmin: 'da' },
+    { id_status: 3, name: 'Producción', descriptionClient: 'sdf', descriptionAdmin: 'da' },
+    { id_status: 4, name: 'Enviado', descriptionClient: 'sdf', descriptionAdmin: 'da' },
+    { id_status: 5, name: 'Entregado', descriptionClient: 'sdf', descriptionAdmin: 'da' },
+    { id_status: 6, name: 'Cancelado', descriptionClient: 'sdf', descriptionAdmin: 'da' }
+  ]
+
+  // ? Insertar datos de tipos de documentos
+  await prisma.salesStatus.createMany({
+    data: salesStatus.map((status) => ({
+      id_status: status.id_status,
+      name: status.name,
+      descriptionClient: status.descriptionClient,
+      descriptionAdmin: status.descriptionAdmin
+    }))
+  })
+
   // ? Insertar datos de tipos de documentos
   await prisma.documentType.createMany({
     data: tiposDeDocumentos.map((tipo) => ({
@@ -1482,6 +1521,7 @@ async function main () {
       document_type: user.document_type,
       document: user.document,
       name: user.name,
+      avatar: user.avatar,
       campo: user.campo,
       id_country: user.id_country,
       id_department: user.id_department,
