@@ -59,7 +59,6 @@ CREATE TABLE `Users` (
     `password` VARCHAR(191) NULL,
     `id_rol` INTEGER NOT NULL,
     `status` BOOLEAN NOT NULL DEFAULT true,
-    `googleId` VARCHAR(191) NULL,
     `create_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `update_at` DATETIME(3) NOT NULL,
 
@@ -80,6 +79,8 @@ CREATE TABLE `Sales` (
     `canceled_at` DATETIME(3) NULL,
     `canceled_reason` VARCHAR(191) NULL,
     `status` INTEGER NOT NULL,
+    `id_orden_pago` VARCHAR(191) NULL,
+    `id_pago_reslizado` VARCHAR(191) NULL,
     `create_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `update_at` DATETIME(3) NOT NULL,
 
@@ -90,7 +91,8 @@ CREATE TABLE `Sales` (
 CREATE TABLE `SalesStatus` (
     `id_status` INTEGER NOT NULL,
     `name` VARCHAR(191) NOT NULL,
-    `description` VARCHAR(191) NOT NULL,
+    `descriptionClient` VARCHAR(191) NOT NULL,
+    `descriptionAdmin` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`id_status`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
