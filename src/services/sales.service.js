@@ -502,7 +502,7 @@ export const getAllPurchasesService = async (year) => {
         decorator: template.template.decorator,
         decoratorType: template.decorator_type,
         decoratorPrice: formatCurrency(template.decorator_price),
-        desing: template.template.design,
+        design: template.template.design,
         totalBoxPrices: formatCurrency(template.box_price * template.box_amount),
         totalBoxesPricesWithoutFormat: (template.box_price * template.box_amount)
       }))
