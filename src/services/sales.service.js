@@ -172,20 +172,23 @@ const validateTemplateBelongsToUser = async (id_user, id_template) => {
 }
 
 async function validateTemplates (status, salesTemplates) {
-  // Solo valida si el status es 1
+  // ?Solo valida si el status es 1
   if (status === 1) {
-    for (const template of salesTemplates) {
-      // Consulta en la tabla Templates para obtener el campo decorator
-      const templateData = await prisma.templates.findUnique({
-        where: { id_template: template.id_template },
-        select: { decorator: true }
-      })
+    const templateData = await prisma.templates.findUnique({
+      where: { id_template: salesTemplates[0].id_template },
+      select: { decorator: true }
+    })
 
-      if (!templateData || templateData.decorator === null) {
-        const error = new Error('Para poder generar una cotización el campo DECORADOR no puede venir nulo')
-        error.name = 'MissingFieldsError'
-        throw error
-      }
+    if (!templateData || templateData.decorator === null) {
+      const error = new Error('Para poder generar una cotización el campo DECORADOR no puede venir nulo')
+      error.name = 'MissingFieldsError'
+      throw error
+    }
+
+    if (salesTemplates[0].decorator_price !== null) {
+      const error = new Error('Para poder generar una cotización el campo PRECIO DEL DECORADOR no puede con datos')
+      error.name = 'MissingFieldsError'
+      throw error
     }
   }
   return true
@@ -319,7 +322,7 @@ export const createPurchaseService = async (salesData) => {
  */
 export const updatePurchaseToPayService = async (data) => {
   // ?el problema viene de aqui al momento de actualizar el precio total
-  const { id_sales, total_price, decorator_price } = data
+  const { id_sales, total_price, decorator_price, email } = data
   try {
     const updatedSale = await prisma.sales.update({
       where: { id_sales },
@@ -337,6 +340,7 @@ export const updatePurchaseToPayService = async (data) => {
         }
       }
     })
+    console.log(email)
 
     return updatedSale
   } catch (error) {
@@ -536,11 +540,25 @@ export const getYearsPurchasesService = async () => {
   }
 }
 
-// ?Cotize template service
-export const cotizeTemplateService = async () => {
+// ?Cancel Purchase
+export const updateToCancelPurchaseService = async (data) => {
+  const { id_sales, canceled_reason, email } = data
   try {
+    const updatedSale = await prisma.sales.update({
+      where: { id_sales },
+      data: {
+        status: 6,
+        canceled_at: new Date(),
+        canceled_reason
+      }
+    })
+    console.log(email);
 
+    return updatedSale
   } catch (error) {
-
+    console.error('Error al cotizar la etiqueta de la compra', error)
+    const customError = new Error('Error al cotizar la venta')
+    customError.name = 'InternalError'
+    throw customError
   }
 }

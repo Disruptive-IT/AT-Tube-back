@@ -1,4 +1,4 @@
-import { createPurchaseService, createTemplatesService, getAllPurchasesService, getUserPurchasesService, getYearsPurchasesService, updatePurchaseToPayService } from '../services/sales.service.js'
+import { createPurchaseService, createTemplatesService, getAllPurchasesService, getUserPurchasesService, getYearsPurchasesService, updatePurchaseToPayService, updateToCancelPurchaseService } from '../services/sales.service.js'
 
 // ?Controller to get all purchases orders for a especific user
 export const getUserPurchasesController = async (req, res) => {
@@ -112,6 +112,18 @@ export const updatePurchaseToDelivered = async (req, res) => {
   const purchaseData = req.body
 }
 
-export const updatePurchaseToCanceled = async (req, res) => {
-  const purchaseData = req.body
+export const updateToCancelPurchaseController = async (req, res) => {
+  const data = req.body
+  try {
+    const cancel = await updateToCancelPurchaseService(data)
+    res.status(201).json({ message: 'La cotización se cancelo con éxito', motivo: cancel.canceled_reason })
+  } catch (error) {
+    console.error(error)
+    switch (error.name) {
+      case 'InternalError':
+        return res.status(500).json({ error: error.message })
+      default:
+        return res.status(500).json({ error: 'Error interno del servidor' })
+    }
+  }
 }
