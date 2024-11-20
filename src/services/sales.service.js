@@ -315,42 +315,6 @@ export const createPurchaseService = async (salesData) => {
   }
 }
 
-/**
- * ?Crea una venta (Sales) junto con los detalles de los templates (SalesTemplate).
- * @param {Object} salesData - Datos de la venta a crear.
- * @returns {Object} - Objeto con la venta creada.
- */
-export const updatePurchaseToPayService = async (data) => {
-  // ?el problema viene de aqui al momento de actualizar el precio total
-  const { id_sales, total_price, decorator_price, email } = data
-  try {
-    const updatedSale = await prisma.sales.update({
-      where: { id_sales },
-      data: {
-        total_price: (total_price + decorator_price),
-        status: 2,
-        cotized_at: new Date(),
-        SalesTemplate: {
-          updateMany: {
-            where: { id_sales },
-            data: {
-              decorator_price
-            }
-          }
-        }
-      }
-    })
-    console.log(email)
-
-    return updatedSale
-  } catch (error) {
-    console.error('Error al cotizar la etiqueta de la compra', error)
-    const customError = new Error('Error al cotizar la venta')
-    customError.name = 'InternalError'
-    throw customError
-  }
-}
-
 // Función para formatear como moneda (puedes reutilizarla siempre que lo necesites)
 const formatCurrency = (value) => {
   if (typeof value === 'number' && !isNaN(value)) {
@@ -540,8 +504,94 @@ export const getYearsPurchasesService = async () => {
   }
 }
 
+/**
+ * ?Crea una venta (Sales) junto con los detalles de los templates (SalesTemplate).
+ * @param {Object} salesData - Datos de la venta a crear.
+ * @returns {Object} - Objeto con la venta creada.
+ */
+export const updatePurchaseToPayService = async (data) => {
+  // ?el problema viene de aqui al momento de actualizar el precio total
+  const { id_sales, total_price, decorator_price, email } = data
+  try {
+    const updatedSale = await prisma.sales.update({
+      where: { id_sales },
+      data: {
+        total_price: (total_price + decorator_price),
+        status: 2,
+        cotized_at: new Date(),
+        SalesTemplate: {
+          updateMany: {
+            where: { id_sales },
+            data: {
+              decorator_price
+            }
+          }
+        }
+      }
+    })
+    console.log(email)
+
+    return updatedSale
+  } catch (error) {
+    console.error('Error al cotizar la etiqueta de la compra', error)
+    const customError = new Error('Error al cotizar la venta')
+    customError.name = 'InternalError'
+    throw customError
+  }
+}
+
+export const updatePurchaseToShippedService = async (data) => {
+  console.log(data)
+  const { id_sales, email } = data
+  try {
+    const updatedSale = await prisma.sales.update({
+      where: { id_sales },
+      data: {
+        status: 4,
+        send_at: new Date()
+      }
+    })
+    console.log(email)
+
+    return updatedSale
+  } catch (error) {
+    console.error('Error al caambiar el estado de a venta a enviado', error)
+    const customError = new Error('Error al caambiar el estado de a venta a enviado', error)
+    customError.name = 'InternalError'
+    throw customError
+  }
+}
+
+export const updatePurchaseToDeliveredService = async (data) => {
+  const { id_sales, email } = data
+  console.log(email)
+  if (!id_sales) {
+    const customError = new Error('El ID de la venta es obligatorio.')
+    customError.name = 'MissingFieldsError'
+    throw customError
+  }
+
+  try {
+    const updatedSale = await prisma.sales.update({
+      where: { id_sales },
+      data: {
+        status: 5,
+        delivered_at: new Date()
+      }
+    })
+    console.log(email)
+
+    return updatedSale
+  } catch (error) {
+    console.error('Error al caambiar el estado de a venta a entregado', error)
+    const customError = new Error('Error al cambiar el estado de a venta a entregado')
+    customError.name = 'InternalError'
+    throw customError
+  }
+}
+
 // ?Cancel Purchase
-export const updateToCancelPurchaseService = async (data) => {
+export const updatePurchaseToCancelService = async (data) => {
   const { id_sales, canceled_reason, email } = data
   try {
     const updatedSale = await prisma.sales.update({
@@ -552,12 +602,12 @@ export const updateToCancelPurchaseService = async (data) => {
         canceled_reason
       }
     })
-    console.log(email);
+    console.log(email)
 
     return updatedSale
   } catch (error) {
-    console.error('Error al cotizar la etiqueta de la compra', error)
-    const customError = new Error('Error al cotizar la venta')
+    console.error('Error al cancelar la compra', error)
+    const customError = new Error('Error al cancelar la compra', error)
     customError.name = 'InternalError'
     throw customError
   }

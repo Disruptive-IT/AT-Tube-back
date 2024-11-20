@@ -6,6 +6,7 @@ import {
   getUserPurchasesController,
   getYearsPurchasesController,
   updatePurchaseToPayController,
+  updateStatusPurchaseController,
   updateToCancelPurchaseController
 } from '../controllers/sales.controller.js'
 
@@ -18,7 +19,6 @@ router.post('/newTemplate', createTemplateController) // ?Create new template
 router.post('/newPurchase', createPurchaseController) // ?Create new purchase
 router.post('/updatePurchaseToPay', updatePurchaseToPayController) // ?Update the quote so the user can pay
 router.post('/updatePurchaseToCancel', updateToCancelPurchaseController) // ?Update the quote so the user can pay
-
-
+router.post('/updateStatusPurchase', updateStatusPurchaseController) // ?Update purchase to delivered, shipping and cancel
 
 export default router
