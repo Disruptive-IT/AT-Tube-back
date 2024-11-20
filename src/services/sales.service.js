@@ -172,20 +172,23 @@ const validateTemplateBelongsToUser = async (id_user, id_template) => {
 }
 
 async function validateTemplates (status, salesTemplates) {
-  // Solo valida si el status es 1
+  // ?Solo valida si el status es 1
   if (status === 1) {
-    for (const template of salesTemplates) {
-      // Consulta en la tabla Templates para obtener el campo decorator
-      const templateData = await prisma.templates.findUnique({
-        where: { id_template: template.id_template },
-        select: { decorator: true }
-      })
+    const templateData = await prisma.templates.findUnique({
+      where: { id_template: salesTemplates[0].id_template },
+      select: { decorator: true }
+    })
 
-      if (!templateData || templateData.decorator === null) {
-        const error = new Error('Para poder generar una cotización el campo DECORADOR no puede venir nulo')
-        error.name = 'MissingFieldsError'
-        throw error
-      }
+    if (!templateData || templateData.decorator === null) {
+      const error = new Error('Para poder generar una cotización el campo DECORADOR no puede venir nulo')
+      error.name = 'MissingFieldsError'
+      throw error
+    }
+
+    if (salesTemplates[0].decorator_price !== null) {
+      const error = new Error('Para poder generar una cotización el campo PRECIO DEL DECORADOR no puede con datos')
+      error.name = 'MissingFieldsError'
+      throw error
     }
   }
   return true
@@ -307,41 +310,6 @@ export const createPurchaseService = async (salesData) => {
   } catch (error) {
     console.error('Error creando la venta:', error)
     const customError = new Error('Error al crear la venta')
-    customError.name = 'InternalError'
-    throw customError
-  }
-}
-
-/**
- * ?Crea una venta (Sales) junto con los detalles de los templates (SalesTemplate).
- * @param {Object} salesData - Datos de la venta a crear.
- * @returns {Object} - Objeto con la venta creada.
- */
-export const updatePurchaseToPayService = async (data) => {
-  // ?el problema viene de aqui al momento de actualizar el precio total
-  const { id_sales, total_price, decorator_price } = data
-  try {
-    const updatedSale = await prisma.sales.update({
-      where: { id_sales },
-      data: {
-        total_price: (total_price + decorator_price),
-        status: 2,
-        cotized_at: new Date(),
-        SalesTemplate: {
-          updateMany: {
-            where: { id_sales },
-            data: {
-              decorator_price
-            }
-          }
-        }
-      }
-    })
-
-    return updatedSale
-  } catch (error) {
-    console.error('Error al cotizar la etiqueta de la compra', error)
-    const customError = new Error('Error al cotizar la venta')
     customError.name = 'InternalError'
     throw customError
   }
@@ -484,12 +452,12 @@ export const getAllPurchasesService = async (year) => {
       status: purchase.SalesStatus.id_status,
       strStatus: purchase.SalesStatus.name,
       finalizeAt: formatDate(purchase.finalize_at),
-      canceledAt: formatDate(purchase.canceled_at),
+      canceledAt: formatDate(purchase.canceled_at) || 'No se ha cancelado la compra',
       canceledReason: purchase.canceled_reason,
-      cotizedAt: formatDate(purchase.cotized_at),
+      cotizedAt: formatDate(purchase.cotized_at) || 'No se ha generado la cotización',
       deliveredAt: formatDate(purchase.delivered_at) || 'No se ha entregado el pedido',
       purchasedAt: formatDate(purchase.purchased_at) || 'No se ha realizado el pago',
-      shippingAt: formatDate(purchase.send_at) || 'No se ha realizado el envio',
+      shippingAt: formatDate(purchase.send_at) || 'No se ha realizado el envío',
       createAt: formatDate(purchase.create_at),
       // Mapeo de las plantillas
       salesTemplates: purchase.SalesTemplate.map(template => ({
@@ -502,7 +470,7 @@ export const getAllPurchasesService = async (year) => {
         decorator: template.template.decorator,
         decoratorType: template.decorator_type,
         decoratorPrice: formatCurrency(template.decorator_price),
-        desing: template.template.design,
+        design: template.template.design,
         totalBoxPrices: formatCurrency(template.box_price * template.box_amount),
         totalBoxesPricesWithoutFormat: (template.box_price * template.box_amount)
       }))
@@ -536,11 +504,111 @@ export const getYearsPurchasesService = async () => {
   }
 }
 
-// ?Cotize template service
-export const cotizeTemplateService = async () => {
+/**
+ * ?Crea una venta (Sales) junto con los detalles de los templates (SalesTemplate).
+ * @param {Object} salesData - Datos de la venta a crear.
+ * @returns {Object} - Objeto con la venta creada.
+ */
+export const updatePurchaseToPayService = async (data) => {
+  // ?el problema viene de aqui al momento de actualizar el precio total
+  const { id_sales, total_price, decorator_price, email } = data
   try {
+    const updatedSale = await prisma.sales.update({
+      where: { id_sales },
+      data: {
+        total_price: (total_price + decorator_price),
+        status: 2,
+        cotized_at: new Date(),
+        SalesTemplate: {
+          updateMany: {
+            where: { id_sales },
+            data: {
+              decorator_price
+            }
+          }
+        }
+      }
+    })
+    console.log(email)
 
+    return updatedSale
   } catch (error) {
+    console.error('Error al cotizar la etiqueta de la compra', error)
+    const customError = new Error('Error al cotizar la venta')
+    customError.name = 'InternalError'
+    throw customError
+  }
+}
 
+export const updatePurchaseToShippedService = async (data) => {
+  console.log(data)
+  const { id_sales, email } = data
+  try {
+    const updatedSale = await prisma.sales.update({
+      where: { id_sales },
+      data: {
+        status: 4,
+        send_at: new Date()
+      }
+    })
+    console.log(email)
+
+    return updatedSale
+  } catch (error) {
+    console.error('Error al caambiar el estado de a venta a enviado', error)
+    const customError = new Error('Error al caambiar el estado de a venta a enviado', error)
+    customError.name = 'InternalError'
+    throw customError
+  }
+}
+
+export const updatePurchaseToDeliveredService = async (data) => {
+  const { id_sales, email } = data
+  console.log(email)
+  if (!id_sales) {
+    const customError = new Error('El ID de la venta es obligatorio.')
+    customError.name = 'MissingFieldsError'
+    throw customError
+  }
+
+  try {
+    const updatedSale = await prisma.sales.update({
+      where: { id_sales },
+      data: {
+        status: 5,
+        delivered_at: new Date()
+      }
+    })
+    console.log(email)
+
+    return updatedSale
+  } catch (error) {
+    console.error('Error al caambiar el estado de a venta a entregado', error)
+    const customError = new Error('Error al cambiar el estado de a venta a entregado')
+    customError.name = 'InternalError'
+    throw customError
+  }
+}
+
+// ?Cancel Purchase
+export const updatePurchaseToCancelService = async (data) => {
+  const { id_sales, canceled_reason, email } = data
+  try {
+    const updatedSale = await prisma.sales.update({
+      where: { id_sales },
+      data: {
+        status: 6,
+        canceled_at: new Date(),
+        canceled_reason
+      }
+    })
+    console.log(email)
+
+    return updatedSale
+  } catch (error) {
+    console.error('Error al cancelar la compra', error)
+    const customError = new Error('Error al cancelar la compra', error)
+    customError.name = 'InternalError'
+    throw customError
   }
 }

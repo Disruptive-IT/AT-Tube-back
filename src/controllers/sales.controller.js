@@ -1,4 +1,14 @@
-import { createPurchaseService, createTemplatesService, getAllPurchasesService, getUserPurchasesService, getYearsPurchasesService, updatePurchaseToPayService } from '../services/sales.service.js'
+import {
+  createPurchaseService,
+  createTemplatesService,
+  getAllPurchasesService,
+  getUserPurchasesService,
+  getYearsPurchasesService,
+  updatePurchaseToCancelService,
+  updatePurchaseToDeliveredService,
+  updatePurchaseToPayService,
+  updatePurchaseToShippedService
+} from '../services/sales.service.js'
 
 // ?Controller to get all purchases orders for a especific user
 export const getUserPurchasesController = async (req, res) => {
@@ -63,6 +73,7 @@ export const createPurchaseController = async (req, res) => {
 
     switch (error.name) {
       case 'MissingFieldsError':
+        return res.status(400).json({ error: error.message })
       case 'InvalidTotalPriceError':
         return res.status(400).json({ error: error.message })
       case 'NotFoundError':
@@ -85,13 +96,6 @@ export const updatePurchaseToPayController = async (req, res) => {
   } catch (error) {
     console.error(error)
     switch (error.name) {
-      case 'MissingFieldsError':
-      case 'InvalidTotalPriceError':
-        return res.status(400).json({ error: error.message })
-      case 'NotFoundError':
-        return res.status(404).json({ error: error.message })
-      case 'ForbiddenError':
-        return res.status(403).json({ error: error.message })
       case 'InternalError':
         return res.status(500).json({ error: error.message })
       default:
@@ -100,18 +104,83 @@ export const updatePurchaseToPayController = async (req, res) => {
   }
 }
 
-export const updatePurchaseToProduction = async (req, res) => {
-  const purchaseData = req.body
+export const updateStatusPurchaseController = async (req, res) => {
+  const status = req.body.option
+  const data = req.body
+
+  try {
+    let result
+
+    switch (status) {
+      case '4':
+        result = await updatePurchaseToShippedService(data)
+        return res.status(200).json({ message: 'La compra cambió de estado a entregado.', data: result })
+      case '5':
+        result = await updatePurchaseToDeliveredService(data)
+        return res.status(200).json({ message: 'La compra cambió de estado a entregado.', data: result })
+      case '6':
+        result = await updatePurchaseToCancelService(data)
+        return res.status(200).json({ message: 'La compra cambió de estado a cancelada.', data: result })
+      default:
+        return res.status(400).json({ message: 'Estado no válido.' })
+    }
+  } catch (error) {
+    console.error('Error actualizando el estado de la compra:', error)
+    switch (error.name) {
+      case 'MissingFieldsError':
+        return res.status(400).json({ error: error.message })
+      case 'InternalError':
+        return res.status(500).json({ error: error.message })
+      default:
+        return res.status(500).json({ error: 'Error interno del servidor' })
+    }
+  }
 }
 
 export const updatePurchaseToShipped = async (req, res) => {
-  const purchaseData = req.body
+  const data = req.body
+  try {
+    const deivered = await updatePurchaseToDeliveredService(data)
+    res.status(201).json({ message: 'La compra Cambio de estado a entregado', deivered })
+  } catch (error) {
+    console.error(error)
+    switch (error.name) {
+      case 'InternalError':
+        return res.status(500).json({ error: error.message })
+      default:
+        return res.status(500).json({ error: 'Error interno del servidor' })
+    }
+  }
 }
 
-export const updatePurchaseToDelivered = async (req, res) => {
-  const purchaseData = req.body
+export const updatePurchaseToDeliveredController = async (req, res) => {
+  const data = req.body
+  try {
+    const deivered = await updatePurchaseToDeliveredService(data)
+    res.status(201).json({ message: 'La compra Cambio de estado a entregado', deivered })
+  } catch (error) {
+    console.error(error)
+    switch (error.name) {
+      case 'InternalError':
+        return res.status(500).json({ error: error.message })
+      default:
+        return res.status(500).json({ error: 'Error interno del servidor' })
+    }
+  }
 }
 
-export const updatePurchaseToCanceled = async (req, res) => {
-  const purchaseData = req.body
+export const updateToCancelPurchaseController = async (req, res) => {
+  const data = req.body
+  try {
+    const cancel = await updatePurchaseToCancelService(data)
+    res.status(201).json({ message: 'La cotización se cancelo con éxito', motivo: cancel.canceled_reason })
+  } catch (error) {
+    console.error(error)
+    switch (error.name) {
+      case 'InternalError':
+        return res.status(500).json({ error: error.message })
+      default:
+        return res.status(500).json({ error: 'Error interno del servidor' })
+    }
+  }
 }
