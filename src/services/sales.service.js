@@ -452,12 +452,12 @@ export const getAllPurchasesService = async (year) => {
       status: purchase.SalesStatus.id_status,
       strStatus: purchase.SalesStatus.name,
       finalizeAt: formatDate(purchase.finalize_at),
-      canceledAt: formatDate(purchase.canceled_at),
+      canceledAt: formatDate(purchase.canceled_at) || 'No se ha cancelado la compra',
       canceledReason: purchase.canceled_reason,
-      cotizedAt: formatDate(purchase.cotized_at),
+      cotizedAt: formatDate(purchase.cotized_at) || 'No se ha generado la cotización',
       deliveredAt: formatDate(purchase.delivered_at) || 'No se ha entregado el pedido',
       purchasedAt: formatDate(purchase.purchased_at) || 'No se ha realizado el pago',
-      shippingAt: formatDate(purchase.send_at) || 'No se ha realizado el envio',
+      shippingAt: formatDate(purchase.send_at) || 'No se ha realizado el envío',
       createAt: formatDate(purchase.create_at),
       // Mapeo de las plantillas
       salesTemplates: purchase.SalesTemplate.map(template => ({
