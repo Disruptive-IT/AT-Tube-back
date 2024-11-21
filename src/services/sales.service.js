@@ -10,6 +10,9 @@ export const getUserPurchasesService = async (idUser) => {
   try {
     const purchases = await prisma.sales.findMany({
       where: { id_user: idUser },
+      orderBy: {
+        create_at: 'desc'
+      },
       select: {
         id_sales: true,
         total_price: true,
@@ -24,8 +27,8 @@ export const getUserPurchasesService = async (idUser) => {
         SalesStatus: {
           select: {
             id_status: true,
-            name: true,
-            description: true
+            name: true
+            // description: true
           }
         },
         SalesTemplate: {
@@ -41,38 +44,102 @@ export const getUserPurchasesService = async (idUser) => {
             template: {
               select: {
                 id_template: true,
+                decorator: true,
                 design: true
+              }
+            }
+          }
+        },
+        usuario: { // Relación con Users
+          select: {
+            id_users: true,
+            avatar: true,
+            document_type: true,
+            document: true,
+            name: true,
+            id_country: true,
+            id_department: true,
+            id_city: true,
+            address: true,
+            phone: true,
+            email: true,
+            id_rol: true,
+            status: true,
+            create_at: true,
+            update_at: true,
+            country: {
+              select: {
+                id_country: true,
+                name: true // Puedes agregar más campos de Country si los necesitas
+              }
+            },
+            department: {
+              select: {
+                id_department: true,
+                name: true // Puedes agregar más campos de Department si los necesitas
+              }
+            },
+            city: {
+              select: {
+                id_city: true,
+                name: true // Puedes agregar más campos de City si los necesitas
+              }
+            },
+            role: {
+              select: {
+                id_rol: true,
+                name: true // Puedes agregar más campos de Role si los necesitas
+              }
+            },
+            documentType: {
+              select: {
+                id_document_type: true,
+                name: true // Puedes agregar más campos de DocumentType si los necesitas
               }
             }
           }
         }
       }
     })
+    const formatDate = (date) => date ? date.toISOString().split('T')[0] : null
 
     const formattedPurchases = purchases.map(purchase => ({
+      avatar: purchase.usuario.avatar,
+      name: purchase.usuario.name,
+      phone: purchase.usuario.phone,
+      email: purchase.usuario.email,
+      document: purchase.usuario.document,
+      idTipe: purchase.usuario.documentType.name,
+      country: purchase.usuario.country.name,
+      address: (purchase.usuario.department.name + '-' + purchase.usuario.city.name + '-' + purchase.usuario.address),
       id: purchase.id_sales,
-      totalPrice: purchase.total_price,
+      total_price: formatCurrency(purchase.total_price) || 'No se ha cotizado',
+      ivaPrice: formatCurrency((purchase.total_price * 0.19)),
+      totalPlusIva: getPriceWithIva(purchase.total_price),
       status: purchase.SalesStatus.id_status,
       strStatus: purchase.SalesStatus.name,
-      finalizeAt: purchase.finalize_at,
-      canceledAt: purchase.canceled_at,
+      finalizeAt: formatDate(purchase.finalize_at),
+      canceledAt: formatDate(purchase.canceled_at) || 'No se ha cancelado la compra',
       canceledReason: purchase.canceled_reason,
-      cotizedAt: purchase.cotized_at,
-      deliveredAt: purchase.delivered_at,
-      purchasedAt: purchase.purchased_at,
-      sendAt: purchase.send_at,
-      createAt: purchase.create_at,
+      cotizedAt: formatDate(purchase.cotized_at) || 'No se ha generado la cotización',
+      deliveredAt: formatDate(purchase.delivered_at) || 'No se ha entregado el pedido',
+      purchasedAt: formatDate(purchase.purchased_at) || 'No se ha realizado el pago',
+      shippingAt: formatDate(purchase.send_at) || 'No se ha realizado el envío',
+      createAt: formatDate(purchase.create_at),
       // Mapeo de las plantillas
       salesTemplates: purchase.SalesTemplate.map(template => ({
         idSales: template.id_sales,
         idTemplate: template.id_template,
         boxAmount: template.box_amount,
-        boxPrice: template.box_price,
+        boxPrice: formatCurrency(template.box_price),
         bottleAmount: template.bottle_amount,
-        bottlePrice: template.bottle_price,
+        bottlePrice: formatCurrency(template.bottle_price),
+        decorator: template.template.decorator,
         decoratorType: template.decorator_type,
-        decoratorPrice: template.decorator_price,
-        desing: template.template.design
+        decoratorPrice: formatCurrency(template.decorator_price),
+        design: template.template.design,
+        totalBoxPrices: formatCurrency(template.box_price * template.box_amount),
+        totalBoxesPricesWithoutFormat: (template.box_price * template.box_amount)
       }))
     }))
 
