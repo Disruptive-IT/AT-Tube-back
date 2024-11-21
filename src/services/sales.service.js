@@ -446,7 +446,7 @@ export const getAllPurchasesService = async (year) => {
       country: purchase.usuario.country.name,
       address: (purchase.usuario.department.name + '-' + purchase.usuario.city.name + '-' + purchase.usuario.address),
       id: purchase.id_sales,
-      total_price: formatCurrency(purchase.total_price),
+      total_price: formatCurrency(purchase.total_price) || 'No se ha cotizado',
       ivaPrice: formatCurrency((purchase.total_price * 0.19)),
       totalPlusIva: getPriceWithIva(purchase.total_price),
       status: purchase.SalesStatus.id_status,
@@ -530,7 +530,6 @@ export const updatePurchaseToPayService = async (data) => {
       }
     })
     console.log(email)
-
     return updatedSale
   } catch (error) {
     console.error('Error al cotizar la etiqueta de la compra', error)
@@ -539,10 +538,33 @@ export const updatePurchaseToPayService = async (data) => {
     throw customError
   }
 }
+async function validateSaleExists (id_sales) {
+  // Verifica si existe el registro en la base de datos
+  if (!id_sales) {
+    const customError = new Error('El ID de la venta es obligatorio')
+    customError.name = 'InternalError'
+    throw customError
+  }
+  const sale = await prisma.sales.findUnique({
+    where: { id_sales },
+    select: { id_sales: true } // Solo selecciona el campo necesario
+  })
 
+  if (!sale) {
+    const customError = new Error(`La venta con el ID ${id_sales} no existe en la base de datos.`)
+    customError.name = 'InternalError'
+    throw customError
+  }
+  return true // Retorna true si el registro existe
+}
 export const updatePurchaseToShippedService = async (data) => {
-  console.log(data)
-  const { id_sales, email } = data
+  const { id_sales, email, oldStatus } = data
+  validateSaleExists(id_sales)
+  if (oldStatus > 4) {
+    const customError = new Error('Si la venta fue entregada o cancelada, su estado no puede volver a ser enviado.')
+    customError.name = 'InternalError'
+    throw customError
+  }
   try {
     const updatedSale = await prisma.sales.update({
       where: { id_sales },
@@ -552,7 +574,6 @@ export const updatePurchaseToShippedService = async (data) => {
       }
     })
     console.log(email)
-
     return updatedSale
   } catch (error) {
     console.error('Error al caambiar el estado de a venta a enviado', error)
@@ -563,11 +584,11 @@ export const updatePurchaseToShippedService = async (data) => {
 }
 
 export const updatePurchaseToDeliveredService = async (data) => {
-  const { id_sales, email } = data
-  console.log(email)
-  if (!id_sales) {
-    const customError = new Error('El ID de la venta es obligatorio.')
-    customError.name = 'MissingFieldsError'
+  const { id_sales, email, oldStatus } = data
+  validateSaleExists(id_sales)
+  if (oldStatus > 5) {
+    const customError = new Error('Si la venta fue cancelada, su estado no puede volver a ser enviado.')
+    customError.name = 'InternalError'
     throw customError
   }
 
@@ -580,7 +601,6 @@ export const updatePurchaseToDeliveredService = async (data) => {
       }
     })
     console.log(email)
-
     return updatedSale
   } catch (error) {
     console.error('Error al caambiar el estado de a venta a entregado', error)
@@ -593,6 +613,12 @@ export const updatePurchaseToDeliveredService = async (data) => {
 // ?Cancel Purchase
 export const updatePurchaseToCancelService = async (data) => {
   const { id_sales, canceled_reason, email } = data
+  validateSaleExists(id_sales)
+  if (canceled_reason === '' || canceled_reason === null) {
+    const customError = new Error('La causa de la cancelación es obligatoria')
+    customError.name = 'InternalError'
+    throw customError
+  }
   try {
     const updatedSale = await prisma.sales.update({
       where: { id_sales },
@@ -603,7 +629,6 @@ export const updatePurchaseToCancelService = async (data) => {
       }
     })
     console.log(email)
-
     return updatedSale
   } catch (error) {
     console.error('Error al cancelar la compra', error)
