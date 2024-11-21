@@ -107,11 +107,18 @@ export const updatePurchaseToPayController = async (req, res) => {
 export const updateStatusPurchaseController = async (req, res) => {
   const status = req.body.option
   const data = req.body
-
   try {
     let result
-
     switch (status) {
+      case '1':
+        res.status(400).json({ error: 'La venta no puede ser cambiada a estado de cotizacion por este medio.' })
+        return
+      case '2':
+        res.status(400).json({ error: 'La venta no puede ser cambiada a estado de para pagar por este medio, tienes que cotizar el decorador en la parte superior del apartado de estados.' })
+        return
+      case '3':
+        res.status(400).json({ error: 'La venta no puede ser cambiada a estado de Produccion por este medio, el usuario debe realizar el pago.' })
+        return
       case '4':
         result = await updatePurchaseToShippedService(data)
         return res.status(200).json({ message: 'La compra cambió de estado a entregado.', data: result })
