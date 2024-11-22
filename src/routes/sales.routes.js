@@ -9,7 +9,7 @@ import {
   updateStatusPurchaseController,
   updateToCancelPurchaseController
 } from '../controllers/sales.controller.js'
-
+import { authorizeClient } from '../middlewares/AutorizeClient.js'
 const router = express.Router()
 
 router.post('/getUserPurchases', getUserPurchasesController) // ?get all purchases of the especific customer

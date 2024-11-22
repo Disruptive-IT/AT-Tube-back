@@ -11,6 +11,9 @@ export const getUserPurchasesService = async (idUser) => {
   try {
     const purchases = await prisma.sales.findMany({
       where: { id_user: idUser },
+      orderBy: {
+        create_at: 'desc'
+      },
       select: {
         id_sales: true,
         total_price: true,
@@ -25,8 +28,8 @@ export const getUserPurchasesService = async (idUser) => {
         SalesStatus: {
           select: {
             id_status: true,
-            name: true,
-            description: true
+            name: true
+            // description: true
           }
         },
         SalesTemplate: {
@@ -42,38 +45,102 @@ export const getUserPurchasesService = async (idUser) => {
             template: {
               select: {
                 id_template: true,
+                decorator: true,
                 design: true
+              }
+            }
+          }
+        },
+        usuario: { // Relación con Users
+          select: {
+            id_users: true,
+            avatar: true,
+            document_type: true,
+            document: true,
+            name: true,
+            id_country: true,
+            id_department: true,
+            id_city: true,
+            address: true,
+            phone: true,
+            email: true,
+            id_rol: true,
+            status: true,
+            create_at: true,
+            update_at: true,
+            country: {
+              select: {
+                id_country: true,
+                name: true // Puedes agregar más campos de Country si los necesitas
+              }
+            },
+            department: {
+              select: {
+                id_department: true,
+                name: true // Puedes agregar más campos de Department si los necesitas
+              }
+            },
+            city: {
+              select: {
+                id_city: true,
+                name: true // Puedes agregar más campos de City si los necesitas
+              }
+            },
+            role: {
+              select: {
+                id_rol: true,
+                name: true // Puedes agregar más campos de Role si los necesitas
+              }
+            },
+            documentType: {
+              select: {
+                id_document_type: true,
+                name: true // Puedes agregar más campos de DocumentType si los necesitas
               }
             }
           }
         }
       }
     })
+    const formatDate = (date) => date ? date.toISOString().split('T')[0] : null
 
     const formattedPurchases = purchases.map(purchase => ({
+      avatar: purchase.usuario.avatar,
+      name: purchase.usuario.name,
+      phone: purchase.usuario.phone,
+      email: purchase.usuario.email,
+      document: purchase.usuario.document,
+      idTipe: purchase.usuario.documentType.name,
+      country: purchase.usuario.country.name,
+      address: (purchase.usuario.department.name + '-' + purchase.usuario.city.name + '-' + purchase.usuario.address),
       id: purchase.id_sales,
-      totalPrice: purchase.total_price,
+      total_price: formatCurrency(purchase.total_price) || 'No se ha cotizado',
+      ivaPrice: formatCurrency((purchase.total_price * 0.19)),
+      totalPlusIva: getPriceWithIva(purchase.total_price),
       status: purchase.SalesStatus.id_status,
       strStatus: purchase.SalesStatus.name,
-      finalizeAt: purchase.finalize_at,
-      canceledAt: purchase.canceled_at,
+      finalizeAt: formatDate(purchase.finalize_at),
+      canceledAt: formatDate(purchase.canceled_at) || 'No se ha cancelado la compra',
       canceledReason: purchase.canceled_reason,
-      cotizedAt: purchase.cotized_at,
-      deliveredAt: purchase.delivered_at,
-      purchasedAt: purchase.purchased_at,
-      sendAt: purchase.send_at,
-      createAt: purchase.create_at,
+      cotizedAt: formatDate(purchase.cotized_at) || 'No se ha generado la cotización',
+      deliveredAt: formatDate(purchase.delivered_at) || 'No se ha entregado el pedido',
+      purchasedAt: formatDate(purchase.purchased_at) || 'No se ha realizado el pago',
+      shippingAt: formatDate(purchase.send_at) || 'No se ha realizado el envío',
+      createAt: formatDate(purchase.create_at),
       // Mapeo de las plantillas
       salesTemplates: purchase.SalesTemplate.map(template => ({
         idSales: template.id_sales,
         idTemplate: template.id_template,
         boxAmount: template.box_amount,
-        boxPrice: template.box_price,
+        boxPrice: formatCurrency(template.box_price),
         bottleAmount: template.bottle_amount,
-        bottlePrice: template.bottle_price,
+        bottlePrice: formatCurrency(template.bottle_price),
+        decorator: template.template.decorator,
         decoratorType: template.decorator_type,
-        decoratorPrice: template.decorator_price,
-        desing: template.template.design
+        decoratorPrice: formatCurrency(template.decorator_price),
+        design: template.template.design,
+        totalBoxPrices: formatCurrency(template.box_price * template.box_amount),
+        totalBoxesPricesWithoutFormat: (template.box_price * template.box_amount)
       }))
     }))
 
@@ -195,6 +262,24 @@ async function validateTemplates (status, salesTemplates) {
   return true
 }
 
+export async function generateUniqueCode () {
+  // Buscar la última venta registrada
+  const lastSale = await prisma.sales.findFirst({
+    orderBy: {
+      id_sales: 'desc' // Ordenar por el ID más reciente
+    }
+  })
+
+  // Obtener el nuevo número consecutivo
+  const newId = lastSale ? lastSale.id + 1 : 1
+
+  // Formatear el código único (por ejemplo, 'SALE-2024-0001')
+  const year = new Date().getFullYear()
+  const formattedId = `SALE-${year}-${newId.toString().padStart(4, '0')}`
+
+  return formattedId
+}
+
 /**
  * ?Crea una venta (Sales) junto con los detalles de los templates (SalesTemplate).
  * @param {Object} salesData - Datos de la venta a crear.
@@ -285,6 +370,7 @@ export const createPurchaseService = async (salesData) => {
     }
   }
 
+  // const id_sales = await generateUniqueCode()
   try {
     // Crear la venta en la base de datos
     const sale = await prisma.sales.create({
@@ -452,7 +538,7 @@ export const getAllPurchasesService = async (year) => {
       country: purchase.usuario.country.name,
       address: (purchase.usuario.department.name + '-' + purchase.usuario.city.name + '-' + purchase.usuario.address),
       id: purchase.id_sales,
-      total_price: formatCurrency(purchase.total_price),
+      total_price: formatCurrency(purchase.total_price) || 'No se ha cotizado',
       ivaPrice: formatCurrency((purchase.total_price * 0.19)),
       totalPlusIva: getPriceWithIva(purchase.total_price),
       status: purchase.SalesStatus.id_status,
@@ -536,15 +622,6 @@ export const updatePurchaseToPayService = async (data) => {
       }
     })
     console.log(email)
-    try {
-      await changeStatusEmail(id_sales, 2) // Llama con el ID de la venta y el nuevo estado (2)
-      console.log(`Correo enviado a ${email} notificando el cambio de estado.`)
-    } catch (emailError) {
-      console.error(
-        `Error al enviar el correo de notificación para la venta ${id_sales}:`,
-        emailError
-      )
-    }
 
     return updatedSale
   } catch (error) {
@@ -554,10 +631,33 @@ export const updatePurchaseToPayService = async (data) => {
     throw customError
   }
 }
+async function validateSaleExists (id_sales) {
+  // Verifica si existe el registro en la base de datos
+  if (!id_sales) {
+    const customError = new Error('El ID de la venta es obligatorio')
+    customError.name = 'InternalError'
+    throw customError
+  }
+  const sale = await prisma.sales.findUnique({
+    where: { id_sales },
+    select: { id_sales: true } // Solo selecciona el campo necesario
+  })
 
+  if (!sale) {
+    const customError = new Error(`La venta con el ID ${id_sales} no existe en la base de datos.`)
+    customError.name = 'InternalError'
+    throw customError
+  }
+  return true // Retorna true si el registro existe
+}
 export const updatePurchaseToShippedService = async (data) => {
-  console.log(data)
-  const { id_sales, email } = data
+  const { id_sales, email, oldStatus } = data
+  validateSaleExists(id_sales)
+  if (oldStatus > 4) {
+    const customError = new Error('Si la venta fue entregada o cancelada, su estado no puede volver a ser enviado.')
+    customError.name = 'InternalError'
+    throw customError
+  }
   try {
     const updatedSale = await prisma.sales.update({
       where: { id_sales },
@@ -567,7 +667,6 @@ export const updatePurchaseToShippedService = async (data) => {
       }
     })
     console.log(email)
-
     return updatedSale
   } catch (error) {
     console.error('Error al caambiar el estado de a venta a enviado', error)
@@ -578,11 +677,11 @@ export const updatePurchaseToShippedService = async (data) => {
 }
 
 export const updatePurchaseToDeliveredService = async (data) => {
-  const { id_sales, email } = data
-  console.log(email)
-  if (!id_sales) {
-    const customError = new Error('El ID de la venta es obligatorio.')
-    customError.name = 'MissingFieldsError'
+  const { id_sales, email, oldStatus } = data
+  validateSaleExists(id_sales)
+  if (oldStatus > 5) {
+    const customError = new Error('Si la venta fue cancelada, su estado no puede volver a ser enviado.')
+    customError.name = 'InternalError'
     throw customError
   }
 
@@ -595,7 +694,6 @@ export const updatePurchaseToDeliveredService = async (data) => {
       }
     })
     console.log(email)
-
     return updatedSale
   } catch (error) {
     console.error('Error al caambiar el estado de a venta a entregado', error)
@@ -608,6 +706,12 @@ export const updatePurchaseToDeliveredService = async (data) => {
 // ?Cancel Purchase
 export const updatePurchaseToCancelService = async (data) => {
   const { id_sales, canceled_reason, email } = data
+  validateSaleExists(id_sales)
+  if (canceled_reason === '' || canceled_reason === null) {
+    const customError = new Error('La causa de la cancelación es obligatoria')
+    customError.name = 'InternalError'
+    throw customError
+  }
   try {
     const updatedSale = await prisma.sales.update({
       where: { id_sales },
@@ -618,7 +722,6 @@ export const updatePurchaseToCancelService = async (data) => {
       }
     })
     console.log(email)
-
     return updatedSale
   } catch (error) {
     console.error('Error al cancelar la compra', error)
