@@ -261,6 +261,24 @@ async function validateTemplates (status, salesTemplates) {
   return true
 }
 
+export async function generateUniqueCode () {
+  // Buscar la última venta registrada
+  const lastSale = await prisma.sales.findFirst({
+    orderBy: {
+      id_sales: 'desc' // Ordenar por el ID más reciente
+    }
+  })
+
+  // Obtener el nuevo número consecutivo
+  const newId = lastSale ? lastSale.id + 1 : 1
+
+  // Formatear el código único (por ejemplo, 'SALE-2024-0001')
+  const year = new Date().getFullYear()
+  const formattedId = `SALE-${year}-${newId.toString().padStart(4, '0')}`
+
+  return formattedId
+}
+
 /**
  * ?Crea una venta (Sales) junto con los detalles de los templates (SalesTemplate).
  * @param {Object} salesData - Datos de la venta a crear.
@@ -351,6 +369,7 @@ export const createPurchaseService = async (salesData) => {
     }
   }
 
+  // const id_sales = await generateUniqueCode()
   try {
     // Crear la venta en la base de datos
     const sale = await prisma.sales.create({

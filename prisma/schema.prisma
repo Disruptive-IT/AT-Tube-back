@@ -83,7 +83,7 @@ model Users {
 }
 
 model Sales {
-  id_sales           String    @id @default(uuid())         // Usar UUID para claves primarias
+  id_sales           String    @id @default(cuid())         // Usar UUID para claves primarias
   id_user            String                                 // Clave foránea a Users
 
   total_price        Int?
