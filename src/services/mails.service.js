@@ -52,9 +52,9 @@ export const sendResetPasswordMail = async (user, resetToken) => {
 }
 export const sendAdminPurchaseNotification = async (saleDetails) => {
   try {
-    // Buscar el administrador en la base de datos
-    const admin = await prisma.Users.findFirst({
-      where: { role_id: 1 } // Filtra por el rol de administrador
+    // Obtener el administrador (usuario con rol de administrador)
+    const admin = await prisma.users.findFirst({
+      where: { id_rol: 1 } // Rol de administrador
     })
 
     if (!admin) {
@@ -62,18 +62,39 @@ export const sendAdminPurchaseNotification = async (saleDetails) => {
       return 'No admin found to send notification.'
     }
 
+    // Detalles del administrador
     const { email, name } = admin
 
+    // Detalles de la venta
+    const sale = await prisma.sales.findUnique({
+      where: { id_sales: saleDetails.id },
+      include: {
+        usuario: true // Relación con el usuario
+      }
+    })
+
+    if (!sale) {
+      console.log(`No se encontró una venta con el ID: ${saleDetails.id}`)
+      return 'Sale not found.'
+    }
+
+    // Detalles adicionales de la venta
+    const saleDate = sale.create_at
+      ? new Date(sale.create_at).toLocaleDateString('es-ES')
+      : 'Fecha no disponible'
+    const saleTotal = sale.total_price || 0
+
+    // Ruta al archivo HTML del correo
     const filePath = path.join(emailContentDir, 'purchase-notify-email.html')
     let htmlContent = fs.readFileSync(filePath, 'utf8')
 
-    // Reemplazos en la plantilla de email
+    // Reemplazar los campos en la plantilla del email
     htmlContent = htmlContent
-      .replace('{{userName}}', name)
-      .replace('{{purchaseId}}', saleDetails.id)
-      .replace('{{saleDate}}', saleDetails.date)
-      .replace('{{saleTotal}}', saleDetails.total)
+      .replace('{{purchaseId}}', sale.id_sales) // ID de la venta
+      .replace('{{saleDate}}', saleDate) // Fecha de la compra
+      .replace('{{saleTotal}}', saleTotal.toString()) // Total de la compra
 
+    // Configuración del correo
     const mailOptions = {
       to: email,
       from: `AT-Tube <${process.env.EMAIL_USER}>`,
@@ -81,14 +102,16 @@ export const sendAdminPurchaseNotification = async (saleDetails) => {
       html: htmlContent
     }
 
+    // Enviar el correo
     await transporter.sendMail(mailOptions)
-    console.log('Purchase notification sent to admin email.')
+    console.log('Notificación de compra enviada al administrador.')
     return 'Purchase notification sent successfully.'
   } catch (error) {
-    console.error('Error sending admin purchase notification email:', error)
+    console.error('Error enviando notificación de compra al administrador:', error)
     throw new Error(`Error sending email: ${error.message}`)
   }
 }
+
 export const changeStatusEmail = async (saleId, newStatus) => {
   try {
     // Actualizar el estado de la venta y obtener los datos necesarios

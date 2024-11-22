@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */
+import { changeStatusEmail, sendAdminPurchaseNotification } from './mails.service.js'
 import { PrismaClient, Prisma } from '@prisma/client' // Importa Prisma y PrismaClient
 const prisma = new PrismaClient()
 
@@ -305,6 +306,11 @@ export const createPurchaseService = async (salesData) => {
         }
       }
     })
+    await sendAdminPurchaseNotification({
+      id: sale.id_sales,
+      date: sale.purchased_at || 'Fecha no disponible',
+      total: sale.total_price || 0
+    })
 
     return sale
   } catch (error) {
@@ -530,6 +536,15 @@ export const updatePurchaseToPayService = async (data) => {
       }
     })
     console.log(email)
+    try {
+      await changeStatusEmail(id_sales, 2) // Llama con el ID de la venta y el nuevo estado (2)
+      console.log(`Correo enviado a ${email} notificando el cambio de estado.`)
+    } catch (emailError) {
+      console.error(
+        `Error al enviar el correo de notificación para la venta ${id_sales}:`,
+        emailError
+      )
+    }
 
     return updatedSale
   } catch (error) {
