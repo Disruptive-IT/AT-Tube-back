@@ -33,7 +33,7 @@ async function main () {
       email: 'lauraperez@example.com',
       password: hashedPassword,
       avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
@@ -117,7 +117,7 @@ async function main () {
       email: 'luciaramirez@example.com',
       password: hashedPassword,
       avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
@@ -131,7 +131,7 @@ async function main () {
       email: 'jorgetorres@example.com',
       password: hashedPassword,
       avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
@@ -145,7 +145,7 @@ async function main () {
       email: 'mariaortiz@example.com',
       password: hashedPassword,
       avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
@@ -159,7 +159,7 @@ async function main () {
       email: 'robertovargas@example.com',
       password: hashedPassword,
       avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
@@ -173,7 +173,7 @@ async function main () {
       email: 'patriciamorales@example.com',
       password: hashedPassword,
       avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
@@ -187,7 +187,7 @@ async function main () {
       email: 'fernandogil@example.com',
       password: hashedPassword,
       avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
@@ -201,7 +201,7 @@ async function main () {
       email: 'sofiacastro@example.com',
       password: hashedPassword,
       avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
@@ -215,7 +215,7 @@ async function main () {
       email: 'alejandrodiaz@example.com',
       password: hashedPassword,
       avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
@@ -229,7 +229,7 @@ async function main () {
       email: 'isabelfernandez@example.com',
       password: hashedPassword,
       avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
@@ -243,7 +243,7 @@ async function main () {
       email: 'luisgarcia@example.com',
       password: hashedPassword,
       avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
@@ -257,7 +257,7 @@ async function main () {
       email: 'gabrielamolina@example.com',
       password: hashedPassword,
       avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
@@ -271,7 +271,7 @@ async function main () {
       email: 'hectorparra@example.com',
       password: hashedPassword,
       avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
@@ -285,7 +285,7 @@ async function main () {
       email: 'paulareyes@example.com',
       password: hashedPassword,
       avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
-      id_rol: 1
+      id_rol: 2
     }
   ]
 

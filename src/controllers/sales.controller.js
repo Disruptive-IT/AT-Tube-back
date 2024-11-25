@@ -3,6 +3,7 @@ import {
   createTemplatesService,
   getAllPurchasesService,
   getUserPurchasesService,
+  getUserTemplatesService,
   getYearsPurchasesService,
   updatePurchaseToCancelService,
   updatePurchaseToDeliveredService,
@@ -55,11 +56,32 @@ export const getYearsPurchasesController = async (req, res) => {
 // ?Controller to create a new template
 export const createTemplateController = async (req, res) => {
   try {
-    const template = await createTemplatesService(req.body)
+    const template = await createTemplatesService(req.body.id_users)
     res.status(200).json({ message: 'Diseño creado exitosamente', template })
   } catch (error) {
     console.error('No se pudo crear el diseño', error)
     return res.status(500).json({ message: error.message, error: error.message })
+  }
+}
+
+// ?Controller to get all Templates from especific user
+export const getUserTemplateController = async(req, res) => {
+  const idUser = req.body.id_users
+  try {
+    const templates = await getUserTemplatesService(idUser)
+    res.status(200).json({ message: 'Diseños traidos exitosamente', templates })
+  } catch (error) {
+    console.error('Error al obtener los estados de la compra:', error)
+    switch (error.name) {
+      case 'MissingFieldsError':
+        return res.status(400).json({ error: error.message })
+      case 'InternalError':
+        return res.status(500).json({ error: error.message })
+      case 'NotFoundError':
+        return res.status(404).json({ error: error.message })
+      default:
+        return res.status(500).json({ error: 'Error interno del servidor' })
+    }
   }
 }
 
@@ -148,38 +170,6 @@ export const updateStatusPurchaseController = async (req, res) => {
     switch (error.name) {
       case 'MissingFieldsError':
         return res.status(400).json({ error: error.message })
-      case 'InternalError':
-        return res.status(500).json({ error: error.message })
-      default:
-        return res.status(500).json({ error: 'Error interno del servidor' })
-    }
-  }
-}
-
-export const updatePurchaseToShipped = async (req, res) => {
-  const data = req.body
-  try {
-    const deivered = await updatePurchaseToDeliveredService(data)
-    res.status(201).json({ message: 'La compra Cambio de estado a entregado', deivered })
-  } catch (error) {
-    console.error(error)
-    switch (error.name) {
-      case 'InternalError':
-        return res.status(500).json({ error: error.message })
-      default:
-        return res.status(500).json({ error: 'Error interno del servidor' })
-    }
-  }
-}
-
-export const updatePurchaseToDeliveredController = async (req, res) => {
-  const data = req.body
-  try {
-    const deivered = await updatePurchaseToDeliveredService(data)
-    res.status(201).json({ message: 'La compra Cambio de estado a entregado', deivered })
-  } catch (error) {
-    console.error(error)
-    switch (error.name) {
       case 'InternalError':
         return res.status(500).json({ error: error.message })
       default:
