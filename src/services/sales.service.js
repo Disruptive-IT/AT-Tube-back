@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import { changeStatusEmail, sendAdminPurchaseNotification } from './mails.service.js'
 import { PrismaClient, Prisma } from '@prisma/client' // Importa Prisma y PrismaClient
+import { validateTemplateExistsService, validateUserExistsService } from './validations.service.js'
 const prisma = new PrismaClient()
 
 // *Service to get all Purchases of especific user
@@ -154,7 +155,6 @@ export const getUserPurchasesService = async (idUser) => {
 // *Service to create Templates
 export const createTemplatesService = async (req) => {
   const { id_users, design, decorator } = req
-
   // Validación de campos obligatorios
   if (!id_users) {
     throw new Error("El campo 'id_users' es obligatorio.")
@@ -162,16 +162,8 @@ export const createTemplatesService = async (req) => {
   if (!design) {
     throw new Error("El campo 'design' es obligatorio.")
   }
-
   try {
-    // Validar que el usuario exista
-    const existingUser = await prisma.users.findUnique({
-      where: { id_users }
-    })
-    if (!existingUser) {
-      throw new Error('El usuario especificado no existe.')
-    }
-
+    await validateUserExistsService(id_users)
     // Crear la nueva plantilla
     const newTemplate = await prisma.templates.create({
       data: {
@@ -183,6 +175,36 @@ export const createTemplatesService = async (req) => {
     return newTemplate
   } catch (error) {
     console.error('Error al crear el diseño:', error)
+    throw error
+  }
+}
+
+// *Service to create Templates
+export const UpdateTemplatesService = async (req) => {
+  const {id_template, design, decorator } = req
+  // Validación de campos obligatorios
+  if (!design) {
+    throw new Error("El campo 'design' es obligatorio.")
+  }
+  if (!id_template) {
+    throw new Error("El campo 'design' es obligatorio.")
+  }
+
+  try {
+    await validateTemplateExistsService(id_template)
+    // Crear la nueva plantilla
+    const updatedTemplate = await prisma.templates.update({
+      where: {
+        id_template // Asegúrate de tener el ID del template que deseas actualizar
+      },
+      data: {
+        design,
+        decorator
+      }
+    })
+    return updatedTemplate
+  } catch (error) {
+    console.error('Error al actualizar el diseño:', error)
     throw error
   }
 }
@@ -200,7 +222,7 @@ const validateUserExists = async (id_user) => {
 }
 
 /**
- * Valida si el estado de la venta existe en la base de datos
+ * *Valida si el estado de la venta existe en la base de datos
  * @param {number} status - El ID del estado de la venta a validar.
  * @returns {boolean} - Devuelve `true` si el estado existe, de lo contrario `false`.
  */
@@ -212,7 +234,7 @@ const validateSalesStatusExists = async (status) => {
 }
 
 /**
- * Valida si el template existe en la base de datos
+ * *Valida si el template existe en la base de datos
  * @param {string} id_template - El ID del template a validar.
  * @returns {boolean} - Devuelve `true` si el template existe, de lo contrario `false`.
  */
@@ -224,7 +246,7 @@ const validateTemplateExists = async (id_template) => {
 }
 
 /**
- * Valida si el template pertenece al usuario
+ * *Valida si el template pertenece al usuario
  * @param {string} id_user - El ID del usuario que está realizando la venta.
  * @param {string} id_template - El ID del template a verificar.
  * @returns {boolean} - Devuelve `true` si el template pertenece al usuario, de lo contrario `false`.
