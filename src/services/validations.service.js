@@ -107,7 +107,7 @@ export const validateUserExists = async (id_user) => {
     error.name = 'NotFoundError'
     throw error
   }
-  return user !== null
+  return true
 }
 
 export async function validateSaleExists (id_sales) {

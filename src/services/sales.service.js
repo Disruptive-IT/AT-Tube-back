@@ -181,7 +181,7 @@ export const createTemplatesService = async (req) => {
 
 // *Service to create Templates
 export const UpdateTemplatesService = async (req) => {
-  const {id_template, design, decorator } = req
+  const { id_template, design, decorator } = req
   // Validación de campos obligatorios
   if (!design) {
     throw new Error("El campo 'design' es obligatorio.")
@@ -209,14 +209,19 @@ export const UpdateTemplatesService = async (req) => {
   }
 }
 
-export const getUserTemplatesService = async(id_users) => {
+export const getUserTemplatesService = async (id_users) => {
   try {
-    if (!id_users) {
-      const error = new Error('debes proporcionar un id de usuario')
-      error.name = 'NotFoundError'
+    // Verificamos que el usuario existe
+    const user = await prisma.users.findUnique({
+      where: { id_users }
+    })
+
+    // Si no encontramos al usuario, lanzamos un error 'NotFoundError'
+    if (!user) {
+      const error = new Error(`El usuario con id ${id_users} no existe.`)
+      error.name = 'NotFoundError' // Error para usuario no encontrado
       throw error
     }
-    await validateUserExists(id_users)
     const templates = await prisma.templates.findMany({
       where: { id_users },
       select: {
@@ -231,7 +236,7 @@ export const getUserTemplatesService = async(id_users) => {
   } catch (error) {
     console.error('Error al traer los diseños del usuario', error)
     const customError = new Error('Error al traer los diseños del usuario')
-    customError.name = 'InternalError'
+    customError.name = 'InternalError' // Error genérico para fallos internos
     throw customError
   }
 }

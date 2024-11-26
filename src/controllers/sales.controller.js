@@ -65,22 +65,27 @@ export const createTemplateController = async (req, res) => {
 }
 
 // ?Controller to get all Templates from especific user
-export const getUserTemplateController = async(req, res) => {
-  const idUser = req.body.id_users
+export const getUserTemplateController = async (req, res) => {
+  const idUsers = req.body.id_users // Usar destructuración para acceder a id_users directamente
+
+  if (!idUsers) {
+    return res.status(400).json({ error: 'Debe proporcionar un id de usuario' }) // Manejo si el id no se proporciona
+  }
+
   try {
-    const templates = await getUserTemplatesService(idUser)
-    res.status(200).json({ message: 'Diseños traidos exitosamente', templates })
+    const templates = await getUserTemplatesService(idUsers) // Llamada al servicio con el id_users
+    res.status(200).json({ message: 'Diseños traídos exitosamente', templates })
   } catch (error) {
-    console.error('Error al obtener los estados de la compra:', error)
+    console.error('Error al obtener los diseños del usuario:', error)
+
+    // Manejo de errores de acuerdo con el nombre del error lanzado
     switch (error.name) {
-      case 'MissingFieldsError':
-        return res.status(400).json({ error: error.message })
-      case 'InternalError':
-        return res.status(500).json({ error: error.message })
       case 'NotFoundError':
-        return res.status(404).json({ error: error.message })
+        return res.status(404).json({ error: error.message }) // Usuario no encontrado
+      case 'InternalError':
+        return res.status(500).json({ error: error.message }) // Error interno
       default:
-        return res.status(500).json({ error: 'Error interno del servidor' })
+        return res.status(500).json({ error: 'Error interno del servidor' }) // Fallback general
     }
   }
 }
