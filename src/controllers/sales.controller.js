@@ -56,7 +56,7 @@ export const getYearsPurchasesController = async (req, res) => {
 // ?Controller to create a new template
 export const createTemplateController = async (req, res) => {
   try {
-    const template = await createTemplatesService(req.body.id_users)
+    const template = await createTemplatesService(req.body)
     res.status(200).json({ message: 'Diseño creado exitosamente', template })
   } catch (error) {
     console.error('No se pudo crear el diseño', error)
