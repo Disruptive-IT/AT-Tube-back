@@ -25,6 +25,7 @@ app.use(session({
 // Middlewares
 app.use(express.json())
 app.use(cors(CorsConfig))
+app.use('/uploads', express.static('uploads'))
 app.use(passport.initialize())
 app.use(passport.session())
 
