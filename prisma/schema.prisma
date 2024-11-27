@@ -36,12 +36,44 @@ model City {
   Users       Users[]  // Relación inversa con Users
 }
 
-model Country {  // Cambiar a mayúscula
-  id_country      Int       @id 
-  name            String
+enum Currency {
+  COP
+  VES
+  PEN
+  ARS
+  USD
+  CLP
+  UYU
+  BOB
+  PYG
+  BRL
+  MXN
+  GTQ
+  HNL
+  NIO
+  CRC
+  CUP
+  DOP
+  HTG
+  JMD
+  TTD
+  GYD
+  SRD
+  BZD
+  BBD
+  XCD
+  BSD
+  CAD
+}
 
-  Department    Department[] 
-  Users      Users[]  // Relación inversa con Users
+
+model Country {
+  id_country      Int       @id
+  name            String
+  currency        Currency  
+  locale          String    // Código de configuración regional, e.g., "es-CO"
+  Department      Department[]
+  Users           Users[]
 }
 
 

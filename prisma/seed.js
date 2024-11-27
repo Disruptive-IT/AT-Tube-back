@@ -33,7 +33,7 @@ async function main () {
       email: 'lauraperez@example.com',
       password: hashedPassword,
       avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
@@ -117,7 +117,7 @@ async function main () {
       email: 'luciaramirez@example.com',
       password: hashedPassword,
       avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
@@ -131,7 +131,7 @@ async function main () {
       email: 'jorgetorres@example.com',
       password: hashedPassword,
       avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
@@ -145,7 +145,7 @@ async function main () {
       email: 'mariaortiz@example.com',
       password: hashedPassword,
       avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
@@ -159,7 +159,7 @@ async function main () {
       email: 'robertovargas@example.com',
       password: hashedPassword,
       avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
@@ -173,7 +173,7 @@ async function main () {
       email: 'patriciamorales@example.com',
       password: hashedPassword,
       avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
@@ -187,7 +187,7 @@ async function main () {
       email: 'fernandogil@example.com',
       password: hashedPassword,
       avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
@@ -201,7 +201,7 @@ async function main () {
       email: 'sofiacastro@example.com',
       password: hashedPassword,
       avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
@@ -215,7 +215,7 @@ async function main () {
       email: 'alejandrodiaz@example.com',
       password: hashedPassword,
       avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
@@ -229,7 +229,7 @@ async function main () {
       email: 'isabelfernandez@example.com',
       password: hashedPassword,
       avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
@@ -243,7 +243,7 @@ async function main () {
       email: 'luisgarcia@example.com',
       password: hashedPassword,
       avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
@@ -257,7 +257,7 @@ async function main () {
       email: 'gabrielamolina@example.com',
       password: hashedPassword,
       avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
@@ -271,7 +271,7 @@ async function main () {
       email: 'hectorparra@example.com',
       password: hashedPassword,
       avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
-      id_rol: 1
+      id_rol: 2
     },
     {
       document_type: 2,
@@ -285,7 +285,7 @@ async function main () {
       email: 'paulareyes@example.com',
       password: hashedPassword,
       avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
-      id_rol: 1
+      id_rol: 2
     }
   ]
 
@@ -298,15 +298,41 @@ async function main () {
   ]
 
   const Paises = [
-    { id_country: 1, name: 'COLOMBIA' },
-    { id_country: 2, name: 'VENEZUELA' },
-    { id_country: 3, name: 'PERÚ' },
-    { id_country: 4, name: 'ARGENTINA' },
-    { id_country: 5, name: 'ECUADOR' },
-    { id_country: 6, name: 'CHILE' },
-    { id_country: 7, name: 'URUGUAY' },
-    { id_country: 8, name: 'BOLIVIA' },
-    { id_country: 9, name: 'PARAGUAY' }
+    { id_country: 1, name: 'COLOMBIA', currency: 'COP', locale: 'es-CO' },
+    { id_country: 2, name: 'VENEZUELA', currency: 'VES', locale: 'es-VE' },
+    { id_country: 3, name: 'PERÚ', currency: 'PEN', locale: 'es-PE' },
+    { id_country: 4, name: 'ARGENTINA', currency: 'ARS', locale: 'es-AR' },
+    { id_country: 5, name: 'ECUADOR', currency: 'USD', locale: 'es-EC' },
+    { id_country: 6, name: 'CHILE', currency: 'CLP', locale: 'es-CL' },
+    { id_country: 7, name: 'URUGUAY', currency: 'UYU', locale: 'es-UY' },
+    { id_country: 8, name: 'BOLIVIA', currency: 'BOB', locale: 'es-BO' },
+    { id_country: 9, name: 'PARAGUAY', currency: 'PYG', locale: 'es-PY' },
+    { id_country: 10, name: 'BRASIL', currency: 'BRL', locale: 'pt-BR' },
+    { id_country: 11, name: 'MÉXICO', currency: 'MXN', locale: 'es-MX' },
+    { id_country: 12, name: 'GUATEMALA', currency: 'GTQ', locale: 'es-GT' },
+    { id_country: 13, name: 'EL SALVADOR', currency: 'USD', locale: 'es-SV' },
+    { id_country: 14, name: 'HONDURAS', currency: 'HNL', locale: 'es-HN' },
+    { id_country: 15, name: 'NICARAGUA', currency: 'NIO', locale: 'es-NI' },
+    { id_country: 16, name: 'COSTA RICA', currency: 'CRC', locale: 'es-CR' },
+    { id_country: 17, name: 'PANAMÁ', currency: 'USD', locale: 'es-PA' },
+    { id_country: 18, name: 'CUBA', currency: 'CUP', locale: 'es-CU' },
+    { id_country: 19, name: 'REPÚBLICA DOMINICANA', currency: 'DOP', locale: 'es-DO' },
+    { id_country: 20, name: 'PUERTO RICO', currency: 'USD', locale: 'es-PR' },
+    { id_country: 21, name: 'CANADÁ', currency: 'CAD', locale: 'en-CA' },
+    { id_country: 22, name: 'ESTADOS UNIDOS', currency: 'USD', locale: 'en-US' },
+    { id_country: 23, name: 'HAITÍ', currency: 'HTG', locale: 'fr-HT' },
+    { id_country: 24, name: 'JAMAICA', currency: 'JMD', locale: 'en-JM' },
+    { id_country: 25, name: 'TRINIDAD Y TOBAGO', currency: 'TTD', locale: 'en-TT' },
+    { id_country: 26, name: 'GUYANA', currency: 'GYD', locale: 'en-GY' },
+    { id_country: 27, name: 'SURINAM', currency: 'SRD', locale: 'nl-SR' },
+    { id_country: 28, name: 'BELICE', currency: 'BZD', locale: 'en-BZ' },
+    { id_country: 29, name: 'BARBADOS', currency: 'BBD', locale: 'en-BB' },
+    { id_country: 30, name: 'SAN VICENTE Y LAS GRANADINAS', currency: 'XCD', locale: 'en-VC' },
+    { id_country: 31, name: 'SANTA LUCÍA', currency: 'XCD', locale: 'en-LC' },
+    { id_country: 32, name: 'ANTIGUA Y BARBUDA', currency: 'XCD', locale: 'en-AG' },
+    { id_country: 33, name: 'DOMINICA', currency: 'XCD', locale: 'en-DM' },
+    { id_country: 34, name: 'GRENADA', currency: 'XCD', locale: 'en-GD' },
+    { id_country: 35, name: 'BAHAMAS', currency: 'BSD', locale: 'en-BS' }
   ]
 
   const departamentos = [
@@ -1486,7 +1512,9 @@ async function main () {
   await prisma.Country.createMany({
     data: Paises.map((pais) => ({
       id_country: pais.id_country,
-      name: pais.name
+      name: pais.name,
+      currency: pais.currency,
+      locale: pais.locale
     }))
   })
 

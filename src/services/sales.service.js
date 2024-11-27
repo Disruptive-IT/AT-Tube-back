@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import { changeStatusEmail, sendAdminPurchaseNotification } from './mails.service.js'
 import { PrismaClient, Prisma } from '@prisma/client' // Importa Prisma y PrismaClient
-import { validateTemplateExistsService, validateUserExistsService } from './validations.service.js'
+import { validateSaleExists, validateSalesStatusExists, validateTemplateExists, validateTemplateExistsService, validateTemplates, validateUserExists, validateUserExistsService } from './validations.service.js'
 const prisma = new PrismaClient()
 
 // *Service to get all Purchases of especific user
@@ -181,7 +181,7 @@ export const createTemplatesService = async (req) => {
 
 // *Service to create Templates
 export const UpdateTemplatesService = async (req) => {
-  const {id_template, design, decorator } = req
+  const { id_template, design, decorator } = req
   // Validación de campos obligatorios
   if (!design) {
     throw new Error("El campo 'design' es obligatorio.")
@@ -209,40 +209,36 @@ export const UpdateTemplatesService = async (req) => {
   }
 }
 
-/**
- * *Valida si un ID de usuario existe en la base de datos
- * @param {string} id_user - El ID del usuario a validar.
- * @returns {boolean} - Devuelve `true` si el usuario existe, de lo contrario `false`.
- */
-const validateUserExists = async (id_user) => {
-  const user = await prisma.users.findUnique({
-    where: { id_users: id_user }
-  })
-  return user !== null
-}
+export const getUserTemplatesService = async (id_users) => {
+  try {
+    // Verificamos que el usuario existe
+    const user = await prisma.users.findUnique({
+      where: { id_users }
+    })
 
-/**
- * *Valida si el estado de la venta existe en la base de datos
- * @param {number} status - El ID del estado de la venta a validar.
- * @returns {boolean} - Devuelve `true` si el estado existe, de lo contrario `false`.
- */
-const validateSalesStatusExists = async (status) => {
-  const salesStatus = await prisma.salesStatus.findUnique({
-    where: { id_status: status }
-  })
-  return salesStatus !== null
-}
-
-/**
- * *Valida si el template existe en la base de datos
- * @param {string} id_template - El ID del template a validar.
- * @returns {boolean} - Devuelve `true` si el template existe, de lo contrario `false`.
- */
-const validateTemplateExists = async (id_template) => {
-  const template = await prisma.templates.findUnique({
-    where: { id_template }
-  })
-  return template !== null
+    // Si no encontramos al usuario, lanzamos un error 'NotFoundError'
+    if (!user) {
+      const error = new Error(`El usuario con id ${id_users} no existe.`)
+      error.name = 'NotFoundError' // Error para usuario no encontrado
+      throw error
+    }
+    const templates = await prisma.templates.findMany({
+      where: { id_users },
+      select: {
+        id_template: true,
+        id_users: true,
+        design: true,
+        decorator: true,
+        create_at: true
+      }
+    })
+    return templates
+  } catch (error) {
+    console.error('Error al traer los diseños del usuario', error)
+    const customError = new Error('Error al traer los diseños del usuario')
+    customError.name = 'InternalError' // Error genérico para fallos internos
+    throw customError
+  }
 }
 
 /**
@@ -261,56 +257,12 @@ const validateTemplateBelongsToUser = async (id_user, id_template) => {
   return template !== null
 }
 
-async function validateTemplates (status, salesTemplates) {
-  // ?Solo valida si el status es 1
-  if (status === 1) {
-    const templateData = await prisma.templates.findUnique({
-      where: { id_template: salesTemplates[0].id_template },
-      select: { decorator: true }
-    })
-
-    if (!templateData || templateData.decorator === null) {
-      const error = new Error('Para poder generar una cotización el campo DECORADOR no puede venir nulo')
-      error.name = 'MissingFieldsError'
-      throw error
-    }
-
-    if (salesTemplates[0].decorator_price !== null) {
-      const error = new Error('Para poder generar una cotización el campo PRECIO DEL DECORADOR no puede con datos')
-      error.name = 'MissingFieldsError'
-      throw error
-    }
-  }
-  return true
-}
-
-export async function generateUniqueCode () {
-  // Buscar la última venta registrada
-  const lastSale = await prisma.sales.findFirst({
-    orderBy: {
-      id_sales: 'desc' // Ordenar por el ID más reciente
-    }
-  })
-
-  // Obtener el nuevo número consecutivo
-  const newId = lastSale ? lastSale.id + 1 : 1
-
-  // Formatear el código único (por ejemplo, 'SALE-2024-0001')
-  const year = new Date().getFullYear()
-  const formattedId = `SALE-${year}-${newId.toString().padStart(4, '0')}`
-
-  return formattedId
-}
-
 /**
  * ?Crea una venta (Sales) junto con los detalles de los templates (SalesTemplate).
  * @param {Object} salesData - Datos de la venta a crear.
  * @returns {Object} - Objeto con la venta creada.
  */
 export const createPurchaseService = async (salesData) => {
-  // !Vaidaciones pendientes: que el usuario sea cliente,
-  // !que no si el estado no es para produccion no haya fecha de pagado
-
   const {
     id_user,
     status,
@@ -334,15 +286,26 @@ export const createPurchaseService = async (salesData) => {
       throw error
     }
   }
+  await validateUserExists(id_user) // ?Validar que el usuario exista
 
-  // Validar que si el estado es 1, total_price debe ser null o vacío
-  if (status === 1 && total_price != null && total_price !== '') {
-    const error = new Error('Si el estado de la compra es cotización, el campo precio total debe estar vacío.')
-    error.name = 'InvalidTotalPriceError'
-    throw error
+  for (const template of salesTemplates) {
+    const templateExists = await validateTemplateExists(template.id_template)
+    if (!templateExists) {
+      const error = new Error(`El template con id ${template.id_template} no existe.`)
+      error.name = 'NotFoundError'
+      throw error
+    }
+
+    // await validateTemplateBelongsToUser(id_user, template.id_template)
+    const templateBelongsToUser = await validateTemplateBelongsToUser(id_user, template.id_template)
+    if (!templateBelongsToUser) {
+      const error = new Error(`El template con id ${template.id_template} no pertenece al usuario con id ${id_user}.`)
+      error.name = 'ForbiddenError'
+      throw error
+    }
   }
 
-  await validateTemplates(status, salesTemplates)
+  await validateTemplates(status, salesTemplates, total_price) // ? validate Templates when status in 1 "Cotizacion"
 
   if (status === 2 || status === 4 || status === 5 || status === 6) {
     const error = new Error('el estado de la compra no puede ser para pagar, enviado, entregado o cancelado')
@@ -353,46 +316,10 @@ export const createPurchaseService = async (salesData) => {
   // Validar que si el estado es 1, total_price debe ser null o vacío
   if (status === 3) {
     total_price = ((salesTemplates[0].box_price * salesTemplates[0].box_amount) + salesTemplates[0].decorator_price)
-  }
-
-  // Validar que el usuario exista
-  const userExists = await validateUserExists(id_user)
-  if (!userExists) {
-    const error = new Error(`El usuario con id ${id_user} no existe.`)
-    error.name = 'NotFoundError'
-    throw error
-  }
-
-  if (status === 3) {
     purchased_at = new Date()
   }
+  await validateSalesStatusExists(status) // ?validate if status exists in database
 
-  // Validar que el estado de la venta exista
-  const statusExists = await validateSalesStatusExists(status)
-  if (!statusExists) {
-    const error = new Error(`El estado con id ${status} no existe.`)
-    error.name = 'NotFoundError'
-    throw error
-  }
-
-  // Validar que todos los templates existan y que pertenezcan al usuario
-  for (const template of salesTemplates) {
-    const templateExists = await validateTemplateExists(template.id_template)
-    if (!templateExists) {
-      const error = new Error(`El template con id ${template.id_template} no existe.`)
-      error.name = 'NotFoundError'
-      throw error
-    }
-
-    const templateBelongsToUser = await validateTemplateBelongsToUser(id_user, template.id_template)
-    if (!templateBelongsToUser) {
-      const error = new Error(`El template con id ${template.id_template} no pertenece al usuario con id ${id_user}.`)
-      error.name = 'ForbiddenError'
-      throw error
-    }
-  }
-
-  // const id_sales = await generateUniqueCode()
   try {
     // Crear la venta en la base de datos
     const sale = await prisma.sales.create({
@@ -627,6 +554,7 @@ export const updatePurchaseToPayService = async (data) => {
   // ?el problema viene de aqui al momento de actualizar el precio total
   const { id_sales, total_price, decorator_price, email } = data
   try {
+    await validateSaleExists(id_sales)
     const updatedSale = await prisma.sales.update({
       where: { id_sales },
       data: {
@@ -653,28 +581,10 @@ export const updatePurchaseToPayService = async (data) => {
     throw customError
   }
 }
-async function validateSaleExists (id_sales) {
-  // Verifica si existe el registro en la base de datos
-  if (!id_sales) {
-    const customError = new Error('El ID de la venta es obligatorio')
-    customError.name = 'InternalError'
-    throw customError
-  }
-  const sale = await prisma.sales.findUnique({
-    where: { id_sales },
-    select: { id_sales: true } // Solo selecciona el campo necesario
-  })
 
-  if (!sale) {
-    const customError = new Error(`La venta con el ID ${id_sales} no existe en la base de datos.`)
-    customError.name = 'InternalError'
-    throw customError
-  }
-  return true // Retorna true si el registro existe
-}
 export const updatePurchaseToShippedService = async (data) => {
   const { id_sales, email, oldStatus } = data
-  validateSaleExists(id_sales)
+  await validateSaleExists(id_sales)
   if (oldStatus > 4) {
     const customError = new Error('Si la venta fue entregada o cancelada, su estado no puede volver a ser enviado.')
     customError.name = 'InternalError'
@@ -700,7 +610,7 @@ export const updatePurchaseToShippedService = async (data) => {
 
 export const updatePurchaseToDeliveredService = async (data) => {
   const { id_sales, email, oldStatus } = data
-  validateSaleExists(id_sales)
+  await validateSaleExists(id_sales)
   if (oldStatus > 5) {
     const customError = new Error('Si la venta fue cancelada, su estado no puede volver a ser enviado.')
     customError.name = 'InternalError'
@@ -728,7 +638,7 @@ export const updatePurchaseToDeliveredService = async (data) => {
 // ?Cancel Purchase
 export const updatePurchaseToCancelService = async (data) => {
   const { id_sales, canceled_reason, email } = data
-  validateSaleExists(id_sales)
+  await validateSaleExists(id_sales)
   if (canceled_reason === '' || canceled_reason === null) {
     const customError = new Error('La causa de la cancelación es obligatoria')
     customError.name = 'InternalError'
