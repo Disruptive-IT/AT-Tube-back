@@ -71,8 +71,9 @@ model Country {
   id_country      Int       @id
   name            String
   currency        Currency  
-  locale          String    // Código de configuración regional, e.g., "es-CO"
-  phone_code      String 
+  locale          String    
+  phone_code      String
+  flag_code       String
   Department      Department[]
   Users           Users[]
 }
