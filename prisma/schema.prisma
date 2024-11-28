@@ -95,9 +95,12 @@ model Users {
   document_type   Int?      // Clave foránea a DocumentType
   document        String?
   name            String
-  id_country      Int?   
+  id_country      Int?
+  str_country     String   
   id_department   Int?      // Clave foránea a Department
+  str_Department  String
   id_city         Int?      // Clave foránea a City
+  str_city        String
   address         String?
   phone           String?
   email           String    @unique

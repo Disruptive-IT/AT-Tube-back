@@ -11,8 +11,11 @@ export const userRegisterService = async (userInformation) => {
       document,
       name,
       country,
+      strCountry,
       departament,
+      strDepartment,
       city,
+      strCity,
       address,
       phone,
       email,
@@ -22,7 +25,7 @@ export const userRegisterService = async (userInformation) => {
     } = userInformation
 
     // Verifica los campos requeridos
-    const requiredFields = ['email', 'document', 'name', 'password', 'documentTypeId', 'roleId', 'status', 'city', 'departament', 'address', 'phone', 'documentTypeId']
+    const requiredFields = ['email', 'document', 'name', 'password', 'documentTypeId', 'roleId', 'strCountry', 'strDepartment', 'strCity', 'address', 'phone']
 
     requiredFields.forEach((field) => {
       if (!userInformation[field]) {
