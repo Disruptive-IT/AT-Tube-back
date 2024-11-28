@@ -161,6 +161,7 @@ export const getAllCountriesService = async () => {
 // *Servicio para traer todos los paises
 export const getAllDepartmenService = async (req) => {
   const city = req
+  
   if (!city) { throw new Error('No hay departamento seleccionado.') }
   try {
     const department = await prisma.department.findMany({ where: { id_country: city } })

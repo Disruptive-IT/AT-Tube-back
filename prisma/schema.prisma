@@ -33,7 +33,6 @@ model City {
   id_department  Int   // Clave foránea a Department
 
   Department     Department @relation(fields: [id_department], references: [id_department])  // Relación con Department
-  Users       Users[]  // Relación inversa con Users
 }
 
 enum Currency {
@@ -85,7 +84,6 @@ model Department {
   id_country     Int      // Clave foránea a Country
 
   Country        Country @relation(fields: [id_country], references: [id_country])  // Relación con Department
-  Users      Users[]  // Relación inversa con Users
   City          City[]  // Relación inversa con City
 }
 
@@ -111,8 +109,6 @@ model Users {
   update_at       DateTime  @updatedAt
 
   country         Country?      @relation(fields: [id_country], references: [id_country]) //relación con Country
-  department      Department?   @relation(fields: [id_department], references: [id_department]) // relación con Department
-  city            City?         @relation(fields: [id_city], references: [id_city]) // relación con City
   role            Roles        @relation(fields: [id_rol], references: [id_rol]) // relación con Roles
   documentType    DocumentType? @relation(fields: [document_type], references: [id_document_type]) // relación con DocumentType
   Sales           Sales[]      // Relación inversa con Sales
