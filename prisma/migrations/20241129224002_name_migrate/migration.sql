@@ -142,12 +142,6 @@ ALTER TABLE `Department` ADD CONSTRAINT `Department_id_country_fkey` FOREIGN KEY
 ALTER TABLE `Users` ADD CONSTRAINT `Users_id_country_fkey` FOREIGN KEY (`id_country`) REFERENCES `Country`(`id_country`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Users` ADD CONSTRAINT `Users_id_department_fkey` FOREIGN KEY (`id_department`) REFERENCES `Department`(`id_department`) ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `Users` ADD CONSTRAINT `Users_id_city_fkey` FOREIGN KEY (`id_city`) REFERENCES `City`(`id_city`) ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE `Users` ADD CONSTRAINT `Users_id_rol_fkey` FOREIGN KEY (`id_rol`) REFERENCES `Roles`(`id_rol`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
