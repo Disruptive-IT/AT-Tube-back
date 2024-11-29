@@ -11,8 +11,11 @@ export const userRegisterService = async (userInformation) => {
       document,
       name,
       country,
+      strCountry,
       departament,
+      strDepartment,
       city,
+      strCity,
       address,
       phone,
       email,
@@ -22,7 +25,7 @@ export const userRegisterService = async (userInformation) => {
     } = userInformation
 
     // Verifica los campos requeridos
-    const requiredFields = ['email', 'document', 'name', 'password', 'documentTypeId', 'roleId', 'status', 'city', 'departament', 'address', 'phone', 'documentTypeId']
+    const requiredFields = ['email', 'document', 'name', 'password', 'documentTypeId', 'roleId', 'strCountry', 'strDepartment', 'strCity', 'address', 'phone']
 
     requiredFields.forEach((field) => {
       if (!userInformation[field]) {
@@ -62,8 +65,11 @@ export const userRegisterService = async (userInformation) => {
         document_type: documentTypeId,
         document,
         name,
+        str_country: strCountry,
+        str_Department: strDepartment,
+        str_city: strCity,
         id_country: country,
-        id_department: departament,
+        id_department: parseInt(departament),
         id_city: city,
         address,
         phone,
@@ -104,9 +110,7 @@ export async function userLoginService (email, password) {
         phone: true,
         documentType: { select: { name: true, id_document_type: true } }, // Relación con DocumentType
         document: true, // Número de documento
-        country: { select: { name: true, id_country: true } },
-        department: { select: { name: true, id_department: true } },
-        city: { select: { name: true, id_city: true } },
+        country: { select: { name: true, id_country: true, currency: true, locale: true, phone_code: true, flag_code: true } },
         address: true,
         avatar: true, // Avatar del usuario
         password: true, // Contraseña del usuario
@@ -142,6 +146,10 @@ export async function userLoginService (email, password) {
       avatar: userSearch.avatar,
       name: userSearch.name,
       email: userSearch.email,
+      locale: userSearch.country.locale,
+      flag_code: userSearch.country.flag_code,
+      currency: userSearch.country.currency,
+      phone_code: userSearch.country.phone_code,
       role: userSearch.role?.name // Extrae solo el nombre del rol
     }
 

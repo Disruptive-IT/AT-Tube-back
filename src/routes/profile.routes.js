@@ -12,7 +12,7 @@ const router = express.Router()
 
 router.post('/updatepassword', updateUserPasswordController) // ?Actualizar contraseña
 router.post('/updateUser', updateUserController) // ?Actualizar información general usuarios
-router.post('/updateUserStatus',authorizeAdmin, updateUserStatusController) // ?Actualizar estado del usuario
+router.post('/updateUserStatus', authorizeAdmin, updateUserStatusController) // ?Actualizar estado del usuario
 router.post('/getUserProfile', getUserAccountController)
 
 export default router

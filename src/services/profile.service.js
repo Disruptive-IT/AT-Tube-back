@@ -142,6 +142,10 @@ export const UpdateStateUserService = async (data) => {
 
 // *Servicio para obtener informacion de perfil
 export const getUserAccountService = async (userId) => {
+  if (!userId) {
+    throw new Error('Debe proporcionar un ID de usuario.')
+  }
+
   try {
     const userAccountInfo = await prisma.users.findFirst({
       where: { id_users: userId },
@@ -152,9 +156,12 @@ export const getUserAccountService = async (userId) => {
         phone: true,
         documentType: { select: { name: true, id_document_type: true } }, // Relación con DocumentType
         document: true, // Número de documento
-        country: { select: { name: true, id_country: true } },
-        department: { select: { name: true, id_department: true } },
-        city: { select: { name: true, id_city: true } },
+        country: { select: { name: true, id_country: true, locale: true, phone_code: true, flag_code: true } },
+        str_country: true,
+        str_Department: true,
+        str_city: true,
+        id_department: true,
+        id_city: true,
         address: true,
         avatar: true, // Avatar del usuario
         password: true, // Contraseña del usuario
@@ -176,12 +183,12 @@ export const getUserAccountService = async (userId) => {
       documentTypeName: userAccountInfo.documentType?.name,
       documentType: userAccountInfo.documentType?.id_document_type,
       id_country: userAccountInfo.country?.id_country,
-      country: userAccountInfo.country?.name,
+      country: userAccountInfo.str_country,
       document: userAccountInfo.document,
-      id_department: userAccountInfo.department?.id_department,
-      department: userAccountInfo.department?.name,
-      city: userAccountInfo.city?.name,
-      id_city: userAccountInfo.city?.id_city,
+      id_department: userAccountInfo.id_department,
+      department: userAccountInfo.str_Department,
+      city: userAccountInfo.str_city,
+      id_city: userAccountInfo.id_city,
       address: userAccountInfo.address,
       avatar: userAccountInfo.avatar,
       role: userAccountInfo.role?.name // Extrae solo el nombre del rol
