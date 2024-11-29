@@ -13,13 +13,13 @@ const storageAvatars = multer.diskStorage({
 })
 
 // Configuración para subir imágenes de referencia
-const storageReferenceImages = multer.diskStorage({
-  destination: 'uploads/reference_images',
+const storageDesignImages = multer.diskStorage({
+  destination: 'uploads/design_images',
   filename: (req, file, cb) => {
-    const referenceId = req.params.reference_id || 'unknown_reference'
+    const designId = req.params.template_id || 'unknown_design'
     const timestamp = new Date().toISOString().replace(/:/g, '-')
     const fileExt = path.extname(file.originalname).toLowerCase()
-    cb(null, `REFERENCE_${referenceId}_${timestamp}${fileExt}`)
+    cb(null, `DESIGN_${designId}_${timestamp}${fileExt}`)
   }
 })
 
@@ -37,8 +37,8 @@ const uploadAvatars = multer({
   }
 })
 
-const uploadReferenceImages = multer({
-  storage: storageReferenceImages,
+const uploadDesignImages = multer({
+  storage: storageDesignImages,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
   fileFilter: (req, file, cb) => {
     const allowedExtensions = ['.png', '.jpg', '.jpeg']
@@ -50,4 +50,4 @@ const uploadReferenceImages = multer({
   }
 })
 
-export default { uploadAvatars, uploadReferenceImages }
+export default { uploadAvatars, uploadDesignImages }

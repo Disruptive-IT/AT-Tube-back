@@ -9,7 +9,7 @@ export const uploadAvatarController = async (req, res) => {
   }
 }
 
-export const uploadReferenceImageController = async (req, res) => {
+export const uploadDesignImageController = async (req, res) => {
   try {
     const result = await handleReferenceImageUpload(req.file, req.params.reference_id)
     res.status(200).json(result)
