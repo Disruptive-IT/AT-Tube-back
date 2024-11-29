@@ -59,38 +59,25 @@ export const getUserPurchasesService = async (idUser) => {
             document_type: true,
             document: true,
             name: true,
-            id_country: true,
-            id_department: true,
-            id_city: true,
+            str_Department: true,
+            str_city: true,
             address: true,
             phone: true,
             email: true,
             id_rol: true,
             status: true,
-            create_at: true,
-            update_at: true,
             country: {
               select: {
                 id_country: true,
-                name: true // Puedes agregar más campos de Country si los necesitas
-              }
-            },
-            department: {
-              select: {
-                id_department: true,
-                name: true // Puedes agregar más campos de Department si los necesitas
-              }
-            },
-            city: {
-              select: {
-                id_city: true,
-                name: true // Puedes agregar más campos de City si los necesitas
+                name: true,
+                flag_code: true,
+                phone_code: true
               }
             },
             role: {
               select: {
                 id_rol: true,
-                name: true // Puedes agregar más campos de Role si los necesitas
+                name: true
               }
             },
             documentType: {
@@ -113,7 +100,9 @@ export const getUserPurchasesService = async (idUser) => {
       document: purchase.usuario.document,
       idTipe: purchase.usuario.documentType.name,
       country: purchase.usuario.country.name,
-      address: (purchase.usuario.department.name + '-' + purchase.usuario.city.name + '-' + purchase.usuario.address),
+      flag_code: purchase.usuario.country.flag_code,
+      phone_code: purchase.usuario.phone_code,
+      address: (purchase.usuario.str_Department + '-' + purchase.usuario.str_city + '-' + purchase.usuario.address),
       id: purchase.id_sales,
       total_price: formatCurrency(purchase.total_price) || 'No se ha cotizado',
       ivaPrice: formatCurrency((purchase.total_price * 0.19)),
@@ -431,32 +420,17 @@ export const getAllPurchasesService = async (year) => {
             document_type: true,
             document: true,
             name: true,
-            id_country: true,
-            id_department: true,
-            id_city: true,
+            str_Department: true,
+            str_city: true,
             address: true,
             phone: true,
             email: true,
             id_rol: true,
             status: true,
-            create_at: true,
-            update_at: true,
             country: {
               select: {
                 id_country: true,
                 name: true // Puedes agregar más campos de Country si los necesitas
-              }
-            },
-            department: {
-              select: {
-                id_department: true,
-                name: true // Puedes agregar más campos de Department si los necesitas
-              }
-            },
-            city: {
-              select: {
-                id_city: true,
-                name: true // Puedes agregar más campos de City si los necesitas
               }
             },
             role: {
@@ -485,7 +459,9 @@ export const getAllPurchasesService = async (year) => {
       document: purchase.usuario.document,
       idTipe: purchase.usuario.documentType.name,
       country: purchase.usuario.country.name,
-      address: (purchase.usuario.department.name + '-' + purchase.usuario.city.name + '-' + purchase.usuario.address),
+      flag_code: purchase.usuario.country.flag_code,
+      phone_code: purchase.usuario.phone_code,
+      address: (purchase.usuario.str_Department + '-' + purchase.usuario.str_city + '-' + purchase.usuario.address),
       id: purchase.id_sales,
       total_price: formatCurrency(purchase.total_price) || 'No se ha cotizado',
       ivaPrice: formatCurrency((purchase.total_price * 0.19)),

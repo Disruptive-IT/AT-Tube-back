@@ -30,6 +30,10 @@ CREATE TABLE `City` (
 CREATE TABLE `Country` (
     `id_country` INTEGER NOT NULL,
     `name` VARCHAR(191) NOT NULL,
+    `currency` ENUM('COP', 'VES', 'PEN', 'ARS', 'USD', 'CLP', 'UYU', 'BOB', 'PYG', 'BRL', 'MXN', 'GTQ', 'HNL', 'NIO', 'CRC', 'CUP', 'DOP', 'HTG', 'JMD', 'TTD', 'GYD', 'SRD', 'BZD', 'BBD', 'XCD', 'BSD', 'CAD') NOT NULL,
+    `locale` VARCHAR(191) NOT NULL,
+    `phone_code` VARCHAR(191) NOT NULL,
+    `flag_code` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`id_country`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -51,8 +55,11 @@ CREATE TABLE `Users` (
     `document` VARCHAR(191) NULL,
     `name` VARCHAR(191) NOT NULL,
     `id_country` INTEGER NULL,
+    `str_country` VARCHAR(191) NOT NULL,
     `id_department` INTEGER NULL,
+    `str_Department` VARCHAR(191) NOT NULL,
     `id_city` INTEGER NULL,
+    `str_city` VARCHAR(191) NOT NULL,
     `address` VARCHAR(191) NULL,
     `phone` VARCHAR(191) NULL,
     `email` VARCHAR(191) NOT NULL,
