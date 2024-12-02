@@ -1,6 +1,6 @@
 import express from 'express'
-import multerConfig from '../config/multerConfig.js'
-import { uploadAvatarController, uploadDesignImageController } from '../controllers/uploadController.js'
+import multerConfig from '../middlewares/multerConfig.js'
+import { uploadAvatarController, uploadDesignImageController } from '../controllers/fileUpload.controller.js'
 
 const router = express.Router()
 

@@ -1,4 +1,4 @@
-import { handleAvatarUpload, handleReferenceImageUpload } from '../services/uploadService.js'
+import { handleAvatarUpload, handleDesignImageUpload } from '../services/fileUpload.service.js'
 
 export const uploadAvatarController = async (req, res) => {
   try {
@@ -11,7 +11,7 @@ export const uploadAvatarController = async (req, res) => {
 
 export const uploadDesignImageController = async (req, res) => {
   try {
-    const result = await handleReferenceImageUpload(req.file, req.params.reference_id)
+    const result = await handleDesignImageUpload(req.file, req.params.reference_id)
     res.status(200).json(result)
   } catch (error) {
     res.status(400).json({ error: error.message })
