@@ -35,7 +35,7 @@ const uploadAvatars = multer({
     }
     cb(null, true)
   }
-})
+}).single('avatar')
 
 const uploadDesignImages = multer({
   storage: storageDesignImages,
