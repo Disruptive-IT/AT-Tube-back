@@ -26,7 +26,7 @@ const storageDesignImages = multer.diskStorage({
 // Middlewares para subida
 const uploadAvatars = multer({
   storage: storageAvatars,
-  limits: { fileSize: 2 * 1024 * 1024 }, // 2 MB
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
   fileFilter: (req, file, cb) => {
     const allowedExtensions = ['.png', '.jpg', '.jpeg']
     const fileExt = path.extname(file.originalname).toLowerCase()
