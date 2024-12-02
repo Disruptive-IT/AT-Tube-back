@@ -5,9 +5,9 @@ import { uploadAvatarController, uploadDesignImageController } from '../controll
 const router = express.Router()
 
 // Endpoint para subir avatares
-router.post('/upload/avatar/:user_id', multerConfig.uploadAvatars.single('file'), uploadAvatarController)
+router.post('/avatar/:user_id', multerConfig.uploadAvatars.single('file'), uploadAvatarController)
 
 // Endpoint para subir imágenes de referencia
-router.post('/upload/design/:template_id', multerConfig.uploadDesignImages.single('file'), uploadDesignImageController)
+router.post('/design/:template_id', multerConfig.uploadDesignImages.single('file'), uploadDesignImageController)
 
 export default router

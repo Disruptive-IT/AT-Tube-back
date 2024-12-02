@@ -4,6 +4,7 @@ import profileRoutes from './profile.routes.js'
 import authRoutes from './auth.routes.js'
 import salesRoutes from './sales.routes.js'
 import chartRoutes from './charts.routes.js'
+import fileUploadRoutes from './fileUpload.routes.js'
 
 const routes = Router()
 
@@ -13,5 +14,6 @@ routes.use('/profile', profileRoutes)
 routes.use('/auth', authRoutes)
 routes.use('/sales', salesRoutes)
 routes.use('/charts', chartRoutes)
+routes.use('/upload', fileUploadRoutes)
 
 export default routes
