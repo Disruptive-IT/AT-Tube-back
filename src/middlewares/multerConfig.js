@@ -8,7 +8,7 @@ const storageAvatars = multer.diskStorage({
     const userId = req.params.user_id || 'unknown_user'
     const timestamp = new Date().toISOString().replace(/:/g, '-')
     const fileExt = path.extname(file.originalname).toLowerCase()
-    cb(null, `AVATAR_${userId}_${timestamp}${fileExt}`)
+    cb(null, `AVATAR_${userId}_${timestamp}_${fileExt}`)
   }
 })
 
