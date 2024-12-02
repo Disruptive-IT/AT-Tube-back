@@ -58,10 +58,13 @@ export const UpdateUserService = async (data) => {
       department,
       city,
       address,
+      strDepartment,
+      strCity,
+      strCountry,
       phone
     } = data
 
-    const requiredFields = ['id', 'documentType', 'document', 'name', 'country', 'department', 'city', 'address', 'phone'] // ?campos requeridos
+    const requiredFields = ['id', 'documentType', 'document', 'name', 'strCountry', 'strDepartment', 'strCity', 'address', 'phone'] // ?campos requeridos
     requiredFields.forEach((field) => {
       if (!data[field]) {
         throw new Error(`El campo "${field}" es requerido para el registro del usuario.`)
@@ -93,8 +96,11 @@ export const UpdateUserService = async (data) => {
         document,
         name,
         country: { connect: { id_country: country } },
-        department: { connect: { id_department: department } },
-        city: { connect: { id_city: city } },
+        id_department: parseInt(department),
+        id_city: parseInt(city),
+        str_country: strCountry,
+        str_Department: strDepartment,
+        str_city: strCity,
         address,
         phone
       }
