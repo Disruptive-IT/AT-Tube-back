@@ -24,6 +24,23 @@ async function main () {
       avatar: 'https://i.pinimg.com/564x/57/3a/46/573a46c7818f8cca76e394ac5af72542.jpg',
       id_rol: 1
     },
+    {
+      document_type: 2,
+      document: '987654325',
+      name: 'Julian Millan.',
+      id_country: 1,
+      str_country: 'COLOMBIA',
+      id_department: 5,
+      str_Department: 'ANTIOQUIA',
+      id_city: 330,
+      str_city: 'Medellin',
+      address: '123 Calle Falsa',
+      phone: '3212199775',
+      email: 'juliansanti1202@gmail.com',
+      password: hashedPassword,
+      avatar: null,
+      id_rol: 1
+    },
     // {
     //   document_type: 2,
     //   document: '123456789',
