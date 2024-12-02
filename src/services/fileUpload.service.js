@@ -1,4 +1,7 @@
 import { PrismaClient } from '@prisma/client'
+import dotenv from 'dotenv'
+
+dotenv.config()
 const prisma = new PrismaClient()
 
 export const handleAvatarUpload = async (file, userId) => {
@@ -6,15 +9,16 @@ export const handleAvatarUpload = async (file, userId) => {
     throw new Error('No se recibió ningún archivo.')
   }
 
+  const fileUrl = `${process.env.URL_READFILES}/uploads/avatars/${file.filename}`
   // Actualiza el campo 'avatar' en la base de datos
   await prisma.users.update({
     where: { id_users: userId },
-    data: { avatar: file.path } // Guarda la ruta del archivo
+    data: { avatar: fileUrl } // Guarda la ruta del archivo
   })
 
   return {
     message: 'Avatar subido y guardado exitosamente.',
-    filePath: file.path,
+    fileUrl,
     userId
   }
 }
@@ -24,15 +28,16 @@ export const handleDesignImageUpload = async (file, referenceId) => {
     throw new Error('No se recibió ningún archivo.')
   }
 
+  const fileUrl = `${process.env.URL_READFILES}/uploads/design_images/${file.filename}`
   // Actualiza el campo 'decorator' en la base de datos
   await prisma.templates.update({
     where: { id_template: referenceId },
-    data: { decorator: file.path } // Guarda la ruta del archivo
+    data: { decorator: fileUrl } // Guarda la ruta del archivo
   })
 
   return {
-    message: 'Imagen de referencia subida y guardada exitosamente.',
-    filePath: file.path,
+    message: 'Imagen de diseño subida y guardada exitosamente.',
+    fileUrl,
     referenceId
   }
 }
