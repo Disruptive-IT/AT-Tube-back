@@ -51,7 +51,6 @@ export const updateUserStatusController = async (req, res) => {
 export const getUserAccountController = async (req, res) => {
   try {
     const userId = req.body.id
-    console.log(userId)
     const userAccount = await getUserAccountService(userId)
     res.status(200).json({ message: 'Usuario Encontrado.', user_account: userAccount })
   } catch (error) {
