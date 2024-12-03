@@ -1,3 +1,5 @@
+import fs from 'fs'
+import path from 'path'
 import { PrismaClient } from '@prisma/client'
 import dotenv from 'dotenv'
 
@@ -9,11 +11,31 @@ export const handleAvatarUpload = async (file, userId) => {
     throw new Error('No se recibió ningún archivo.')
   }
 
+  // Buscar al usuario en la base de datos para obtener el avatar actual
+  const user = await prisma.users.findUnique({
+    where: { id_users: userId },
+    select: { avatar: true }
+  })
+
+  // Si el usuario tiene un avatar anterior, eliminar el archivo del sistema de archivos
+  if (user && user.avatar) {
+    const previousAvatarPath = path.join(
+      'uploads/avatars',
+      path.basename(user.avatar) // Extraer solo el nombre del archivo
+    )
+
+    // Verificar si el archivo existe antes de intentar eliminarlo
+    if (fs.existsSync(previousAvatarPath)) {
+      fs.unlinkSync(previousAvatarPath) // Eliminar archivo anterior
+    }
+  }
+
   const fileUrl = `${process.env.URL_READFILES}/uploads/avatars/${file.filename}`
-  // Actualiza el campo 'avatar' en la base de datos
+
+  // Actualizar la base de datos con el nuevo avatar
   await prisma.users.update({
     where: { id_users: userId },
-    data: { avatar: fileUrl } // Guarda la ruta del archivo
+    data: { avatar: fileUrl }
   })
 
   return {
