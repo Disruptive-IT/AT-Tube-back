@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */
+import { v4 as uuidv4 } from 'uuid'
 import multer from 'multer'
 import path from 'path'
 
@@ -16,9 +17,12 @@ const storageAvatars = multer.diskStorage({
 const storageDesignImages = multer.diskStorage({
   destination: 'uploads/design_images',
   filename: (req, file, cb) => {
-    const { id_users } = req.body
+    const uniqueId = uuidv4() // Genera un UUID único
     const fileExt = path.extname(file.originalname).toLowerCase()
-    cb(null, `DESIGN_${id_users}${fileExt}`)
+    const filename = `DESIGN_${uniqueId}${fileExt}`
+
+    req.uploadedImageName = filename // Guardamos el nombre en la solicitud
+    cb(null, filename)
   }
 })
 

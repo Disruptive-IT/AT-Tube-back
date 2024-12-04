@@ -58,7 +58,7 @@ export const createTemplateWithImageService = async (templateData) => {
     throw new Error("Los campos 'id_users' y 'design' son obligatorios.")
   }
 
-  // Crear el template en la base de datos
+  // Crear el template sin la ruta de la imagen en este paso
   const newTemplate = await prisma.templates.create({
     data: {
       id_users,
@@ -68,6 +68,31 @@ export const createTemplateWithImageService = async (templateData) => {
   })
 
   return newTemplate
+}
+
+export const updateUrlImageService = async (templateId, uploadedImageName) => {
+  const oldPath = path.join('uploads/design_images', uploadedImageName)
+  const fileExtension = path.extname(uploadedImageName)
+
+  // Crear el nuevo nombre del archivo con el templateId
+  const newImageName = `DESIGN_${templateId}${fileExtension}`
+  const newPath = path.join('uploads/design_images', newImageName)
+
+  // Renombrar el archivo
+  fs.renameSync(oldPath, newPath) // Renombrar el archivo en el sistema de archivos
+
+  // Ruta completa a almacenar en la base de datos
+  const imagePath = `uploads/design_images/${newImageName}`
+
+  // Actualizar el template con la nueva ruta de la imagen
+  const updatedTemplate = await prisma.templates.update({
+    where: { id_template: templateId },
+    data: {
+      design: JSON.stringify({ imageUrl: imagePath }) // Actualiza la ruta en la base de datos
+    }
+  })
+
+  return updatedTemplate
 }
 
 export const updateTemplateImageService = async (templateId, file) => {
