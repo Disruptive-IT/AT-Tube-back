@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import multer from 'multer'
 import path from 'path'
 
@@ -6,9 +7,8 @@ const storageAvatars = multer.diskStorage({
   destination: 'uploads/avatars',
   filename: (req, file, cb) => {
     const userId = req.params.user_id || 'unknown_user'
-    const timestamp = new Date().toISOString().replace(/:/g, '-')
     const fileExt = path.extname(file.originalname).toLowerCase()
-    cb(null, `AVATAR_${userId}_${timestamp}_${fileExt}`)
+    cb(null, `AVATAR_${userId}${fileExt}`)
   }
 })
 
@@ -16,10 +16,9 @@ const storageAvatars = multer.diskStorage({
 const storageDesignImages = multer.diskStorage({
   destination: 'uploads/design_images',
   filename: (req, file, cb) => {
-    const designId = req.params.template_id || 'unknown_design'
-    const timestamp = new Date().toISOString().replace(/:/g, '-')
+    const { id_users } = req.body
     const fileExt = path.extname(file.originalname).toLowerCase()
-    cb(null, `DESIGN_${designId}_${timestamp}${fileExt}`)
+    cb(null, `DESIGN_${id_users}${fileExt}`)
   }
 })
 
