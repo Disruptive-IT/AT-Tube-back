@@ -71,17 +71,13 @@
 <body>
     <div class="container">
         <div class="content">
-            <p>Detalles de la cotizacion:</p>
-            <ul>
-                    <p>Hola {{clientName}},</p>
-                    <p>El estado de tu compra con ID <strong>{{id_sale}}</strong> ha cambiado a <strong>{{status}}</strong>.</p>
-                    <p>Total de la compra: <strong>{{totalPrice}}</strong>.</p>
-                    <p>Por favor, revisa nuestra plataforma para más detalles.</p>
-                    <p>Gracias por confiar en nosotros,</p>
-                    <p>El equipo de AT-Tube</p>
-            </ul>
-        </div>
-        <div class="footer">
+            <img src="cid:logoImage" alt="Logo" style="max-width: 120px; height: auto;">
+            <h1>Hola {{clientName}}</h1>
+            <p>{{statusMessage}}</p>
+            <p>Estado actual de tu compra: <strong>{{status}}</strong></p>
+            <p>Gracias por comprar con AT-Tube.</p>
+         </div>
+         <div class="footer">
             <p>&copy; 2024 Disruptive Information Technologies S.A.S. Todos los derechos reservados.</p>
         </div>
     </div>
