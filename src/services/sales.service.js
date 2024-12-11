@@ -572,6 +572,8 @@ export const updatePurchaseToPayService = async (data) => {
     })
     console.log(email)
 
+    await changeStatusEmail(id_sales, 2) // Cambiar 2 al estado correspondiente
+
     return updatedSale
   } catch (error) {
     console.error('Error al cotizar la etiqueta de la compra', error)
@@ -598,6 +600,9 @@ export const updatePurchaseToShippedService = async (data) => {
       }
     })
     console.log(email)
+
+    await changeStatusEmail(id_sales, 4)
+
     return updatedSale
   } catch (error) {
     console.error('Error al caambiar el estado de a venta a enviado', error)
@@ -625,6 +630,9 @@ export const updatePurchaseToDeliveredService = async (data) => {
       }
     })
     console.log(email)
+
+    await changeStatusEmail(id_sales, 5)
+
     return updatedSale
   } catch (error) {
     console.error('Error al caambiar el estado de a venta a entregado', error)
@@ -653,6 +661,9 @@ export const updatePurchaseToCancelService = async (data) => {
       }
     })
     console.log(email)
+
+    await changeStatusEmail(id_sales, 6)
+
     return updatedSale
   } catch (error) {
     console.error('Error al cancelar la compra', error)

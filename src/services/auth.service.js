@@ -1,4 +1,6 @@
 import bcrypt from 'bcryptjs'
+import { sendVerificationEmail } from './mails.service.js'
+import jwt from 'jsonwebtoken'
 
 import { PrismaClient } from '@prisma/client'
 
@@ -76,7 +78,8 @@ export const userRegisterService = async (userInformation) => {
         email,
         password: hashPassword,
         id_rol: roleId,
-        status
+        status,
+        is_verified: false
       },
       select: {
         id_users: true,
@@ -86,15 +89,51 @@ export const userRegisterService = async (userInformation) => {
         id_city: true,
         address: true,
         email: true,
-        role: true
+        role: true,
+        is_verified: true
       }
     })
+
+    await sendVerificationEmail(newUser)
 
     return newUser
   } catch (error) {
     // Mejor manejo de errores
     console.error('Error creating new user: ', error.message)
     throw new Error(`Error en el registro del usuario: ${error.message}`)
+  }
+}
+
+export const verifyAccountService = async (token) => {
+  try {
+    // Decodificar el token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    // eslint-disable-next-line no-unused-vars
+    const { userId, email } = decoded
+
+    // Verificar si el usuario ya está verificado
+    const user = await prisma.Users.findUnique({
+      where: { id_users: userId }
+    })
+
+    if (!user) {
+      throw new Error('Usuario no encontrado.')
+    }
+
+    if (user.is_verified) {
+      throw new Error('La cuenta ya ha sido verificada.')
+    }
+
+    // Actualizar el campo is_verified
+    const updatedUser = await prisma.Users.update({
+      where: { id_users: userId },
+      data: { is_verified: true }
+    })
+
+    return { message: 'Cuenta verificada exitosamente.', user: updatedUser }
+  } catch (error) {
+    console.error('Error verificando cuenta: ', error.message)
+    throw new Error('Token inválido o expirado.')
   }
 }
 
