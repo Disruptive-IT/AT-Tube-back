@@ -198,7 +198,7 @@ export const UpdateTemplatesService = async (req) => {
   }
 }
 
-export const getUserTemplatesService = async (id_users) => {
+export const getUserTemplatesService = async (id_users, page = 1, pageSize = 10) => {
   try {
     // Verificamos que el usuario existe
     const user = await prisma.users.findUnique({
@@ -211,6 +211,11 @@ export const getUserTemplatesService = async (id_users) => {
       error.name = 'NotFoundError' // Error para usuario no encontrado
       throw error
     }
+
+    // Calculamos el número de registros a omitir
+    const skip = (page - 1) * pageSize
+
+    // Obtenemos los templates con paginación
     const templates = await prisma.templates.findMany({
       where: { id_users },
       select: {
@@ -219,9 +224,27 @@ export const getUserTemplatesService = async (id_users) => {
         design: true,
         decorator: true,
         create_at: true
-      }
+      },
+      skip, // Saltar registros
+      take: pageSize // Limitar registros por página
     })
-    return templates
+
+    // Obtenemos el total de templates para calcular el número total de páginas
+    const totalTemplates = await prisma.templates.count({
+      where: { id_users }
+    })
+
+    const totalPages = Math.ceil(totalTemplates / pageSize)
+
+    return {
+      data: templates,
+      meta: {
+        total: totalTemplates,
+        page,
+        pageSize,
+        totalPages
+      }
+    }
   } catch (error) {
     console.error('Error al traer los diseños del usuario', error)
     const customError = new Error('Error al traer los diseños del usuario')
