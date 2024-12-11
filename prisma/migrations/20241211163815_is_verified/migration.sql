@@ -66,6 +66,7 @@ CREATE TABLE `Users` (
     `password` VARCHAR(191) NULL,
     `id_rol` INTEGER NOT NULL,
     `status` BOOLEAN NOT NULL DEFAULT true,
+    `is_verified` BOOLEAN NULL DEFAULT false,
     `create_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `update_at` DATETIME(3) NOT NULL,
 
