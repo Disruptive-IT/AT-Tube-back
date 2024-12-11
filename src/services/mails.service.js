@@ -36,16 +36,27 @@ export const sendVerificationEmail = async (user) => {
     const verificationLink = `${process.env.FRONTEND_URL}/verify-account?token=${verificationToken}`
 
     // Cargar y personalizar la plantilla de correo
-    const filePath = path.join(__dirname, 'templates', 'verify-account.html') // Asegúrate de tener esta carpeta y archivo
+    const filePath = path.join(emailContentDir, 'verify-account-email.html')
     let emailContent = fs.readFileSync(filePath, 'utf8')
     emailContent = emailContent.replace('{{name}}', user.name).replace('{{verificationLink}}', verificationLink)
 
     // Configurar el contenido del correo
+    const logoPath = path.join(__dirname, '../..', 'public/images/Logo.jpg')
     const mailOptions = {
       from: `YourApp <${process.env.EMAIL_USER}>`,
       to: user.email,
       subject: 'Verifica tu cuenta',
-      html: emailContent
+      html: emailContent.replace(
+        '{{logo}}',
+        'cid:logoImage' // Referencia al Content-ID del logo
+      ),
+      attachments: [
+        {
+          filename: 'Logo.jpg',
+          path: logoPath, // Ruta al archivo del logo
+          cid: 'logoImage' // Content-ID para incrustar en el HTML
+        }
+      ]
     }
 
     // Enviar el correo
