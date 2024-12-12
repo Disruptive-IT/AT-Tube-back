@@ -76,7 +76,7 @@ export const requestPasswordReset = async (req, res) => {
   })
 
   if (!user) {
-    return res.status(404).json({ message: 'User not found' })
+    return res.status(404).json({ message: 'Usuario no registrado' })
   }
 
   const resetToken = jwt.sign({ user_id: user.id_users }, secretKey, { expiresIn: '10m' })

@@ -72,7 +72,9 @@ export async function validateTemplates (status, salesTemplates, total_price) {
       throw error
     }
 
-    if (salesTemplates[0].decorator_price !== null) {
+    console.log('Datos recibidos para validar:', salesTemplates)
+
+    if (salesTemplates[0]?.decoratorPrice !== null) {
       const error = new Error('Para poder generar una cotización el campo PRECIO DEL DECORADOR no puede tener datos')
       error.name = 'MissingFieldsError'
       throw error

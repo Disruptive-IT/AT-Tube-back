@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nueva Cotización</title>
+    <title>Verifica Tu Cuenta </title>
     <style>
         body {
             font-family: "Public Sans, sans-serif, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol";
@@ -21,21 +21,26 @@
             border: 1px solid #ddd;
         }
         .header {
-            background-color: #ffffff;
+            background-color: white;
+            /* background-color: #007bff; */
             padding: 20px;
             text-align: center;
+            color: #ffffff;
         }
         .header img {
-            max-width: 150px; /* Tamaño del logo */
+            max-width: 100px;
             height: auto;
         }
         .content {
             padding: 20px;
             text-align: center;
         }
-        .content h1, .content h2, .content h3 {
-            color: rgb(138, 20, 206); /* Color morado */
-            font-weight: bold; /* Negrita */
+		.content a {
+			color: white;
+		}
+        .content h1 {
+			color: rgb(138, 20, 206);
+            /* color: #007bff; */
         }
         .content p {
             font-size: 16px;
@@ -61,13 +66,6 @@
         .footer p {
             margin: 0;
         }
-        .details-list {
-            list-style-type: none;
-            padding: 0;
-        }
-        .details-list li {
-            margin: 10px 0;
-        }
     </style>
 </head>
 <body>
@@ -76,14 +74,11 @@
             <img src="cid:logoImage" alt="Logo" style="max-width: 120px; height: auto;">
         </div>
         <div class="content">
-            <h1>Detalles de la Cotización</h1>
-            <ul class="details-list">
-                <li><strong>ID de la compra:</strong> {{purchaseId}}</li>
-                <li><strong>Fecha:</strong> {{saleDate}}</li>
-                <li><strong>Nombre del Usuario:</strong> {{userName}}</li>
-                <li><strong>Telefono del Usuario:</strong> {{userPhone}}</li>
-                <li><strong>Correo del Usuario:</strong> {{userEmail}}</li>
-            </ul>
+            <h1>¡Bienvenido a AT-Tube! 😎</h1>
+            <p>Estamos emocionados de que te unas a nuestra comunidad. 
+                <br> Para comenzar, necesitamos <strong>verificar</strong> tu cuenta.</p>
+            <p>Haz clic en el siguiente botón para confirmar tu dirección de correo electrónico y activar tu cuenta:</p>
+            <a href="{{verificationLink}}" class="button">Verificar mi cuenta</a>
         </div>
         <div class="footer">
             <p>&copy; 2024 Disruptive Information Technologies S.A.S. Todos los derechos reservados.</p>

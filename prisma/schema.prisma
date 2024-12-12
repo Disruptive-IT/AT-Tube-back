@@ -105,6 +105,7 @@ model Users {
   password        String?
   id_rol          Int    // Clave foránea a Roles
   status          Boolean   @default(true)
+  is_verified     Boolean?   @default(false)
   create_at       DateTime  @default(now())
   update_at       DateTime  @updatedAt
 

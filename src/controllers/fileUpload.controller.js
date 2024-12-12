@@ -1,4 +1,5 @@
-import { handleAvatarUpload, handleReferenceImageUpload } from '../services/uploadService.js'
+/* eslint-disable camelcase */
+import { handleAvatarUpload, createTemplateWithImageService, updateTemplateImageService } from '../services/fileUpload.service.js'
 
 export const uploadAvatarController = async (req, res) => {
   try {
@@ -9,9 +10,34 @@ export const uploadAvatarController = async (req, res) => {
   }
 }
 
-export const uploadDesignImageController = async (req, res) => {
+export const createTemplateWithImageController = async (req, res) => {
   try {
-    const result = await handleReferenceImageUpload(req.file, req.params.reference_id)
+    // `req.file` contiene la imagen si se subió
+    const templateData = {
+      id_users: req.body.id_users,
+      design: req.body.design,
+      decorator: req.file ? `${process.env.URL_READFILES}/uploads/design_images/${req.file.filename}` : null
+    }
+
+    // Llamar al servicio
+    const newTemplate = await createTemplateWithImageService(templateData)
+
+    res.status(201).json({
+      message: 'Template creado exitosamente.',
+      template: newTemplate
+    })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+}
+
+export const updateTemplateImageController = async (req, res) => {
+  try {
+    const { template_id } = req.params // Obtén el ID del template desde los parámetros de la ruta
+    const file = req.file // El archivo subido
+
+    const result = await updateTemplateImageService(template_id, file)
+
     res.status(200).json(result)
   } catch (error) {
     res.status(400).json({ error: error.message })

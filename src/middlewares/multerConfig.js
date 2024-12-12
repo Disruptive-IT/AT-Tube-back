@@ -1,3 +1,5 @@
+/* eslint-disable camelcase */
+import { v4 as uuidv4 } from 'uuid'
 import multer from 'multer'
 import path from 'path'
 
@@ -6,9 +8,8 @@ const storageAvatars = multer.diskStorage({
   destination: 'uploads/avatars',
   filename: (req, file, cb) => {
     const userId = req.params.user_id || 'unknown_user'
-    const timestamp = new Date().toISOString().replace(/:/g, '-')
     const fileExt = path.extname(file.originalname).toLowerCase()
-    cb(null, `AVATAR_${userId}_${timestamp}${fileExt}`)
+    cb(null, `AVATAR_${userId}${fileExt}`)
   }
 })
 
@@ -16,17 +17,19 @@ const storageAvatars = multer.diskStorage({
 const storageDesignImages = multer.diskStorage({
   destination: 'uploads/design_images',
   filename: (req, file, cb) => {
-    const designId = req.params.template_id || 'unknown_design'
-    const timestamp = new Date().toISOString().replace(/:/g, '-')
+    const uniqueId = uuidv4() // Genera un UUID único
     const fileExt = path.extname(file.originalname).toLowerCase()
-    cb(null, `DESIGN_${designId}_${timestamp}${fileExt}`)
+    const filename = `DESIGN_${uniqueId}${fileExt}`
+
+    req.uploadedImageName = filename // Guardamos el nombre en la solicitud
+    cb(null, filename)
   }
 })
 
 // Middlewares para subida
 const uploadAvatars = multer({
   storage: storageAvatars,
-  limits: { fileSize: 2 * 1024 * 1024 }, // 2 MB
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
   fileFilter: (req, file, cb) => {
     const allowedExtensions = ['.png', '.jpg', '.jpeg']
     const fileExt = path.extname(file.originalname).toLowerCase()

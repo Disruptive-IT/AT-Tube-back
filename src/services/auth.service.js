@@ -1,4 +1,6 @@
 import bcrypt from 'bcryptjs'
+import { sendVerificationEmail } from './mails.service.js'
+import jwt from 'jsonwebtoken'
 
 import { PrismaClient } from '@prisma/client'
 
@@ -25,7 +27,19 @@ export const userRegisterService = async (userInformation) => {
     } = userInformation
 
     // Verifica los campos requeridos
-    const requiredFields = ['email', 'document', 'name', 'password', 'documentTypeId', 'roleId', 'strCountry', 'strDepartment', 'strCity', 'address', 'phone']
+    const requiredFields = [
+      'email',
+      'document',
+      'name',
+      'password',
+      'documentTypeId',
+      'roleId',
+      'strCountry',
+      'strDepartment',
+      'strCity',
+      'address',
+      'phone'
+    ]
 
     requiredFields.forEach((field) => {
       if (!userInformation[field]) {
@@ -34,10 +48,7 @@ export const userRegisterService = async (userInformation) => {
     })
 
     // Verifica si ya existe un usuario con el mismo correo
-    const existingEmailUser = await prisma.Users.findFirst({
-      where: { email }
-    })
-
+    const existingEmailUser = await prisma.Users.findFirst({ where: { email } })
     if (existingEmailUser) {
       throw new Error('Ya hay un usuario registrado con ese correo electrónico.')
     }
@@ -45,10 +56,7 @@ export const userRegisterService = async (userInformation) => {
     // Verifica si ya existe un usuario con el mismo tipo de documento y número de documento
     const existingDocumentUser = await prisma.Users.findFirst({
       where: {
-        AND: [
-          { document_type: documentTypeId }, // Tipo de documento
-          { document } // Número de documento
-        ]
+        AND: [{ document_type: documentTypeId }, { document }]
       }
     })
 
@@ -59,42 +67,88 @@ export const userRegisterService = async (userInformation) => {
     // Hash de la contraseña
     const hashPassword = await bcrypt.hash(password, 10)
 
-    // Crear el nuevo usuario
-    const newUser = await prisma.Users.create({
-      data: {
-        document_type: documentTypeId,
-        document,
-        name,
-        str_country: strCountry,
-        str_Department: strDepartment,
-        str_city: strCity,
-        id_country: country,
-        id_department: parseInt(departament),
-        id_city: city,
-        address,
-        phone,
-        email,
-        password: hashPassword,
-        id_rol: roleId,
-        status
-      },
-      select: {
-        id_users: true,
-        name: true,
-        id_country: true,
-        id_department: true,
-        id_city: true,
-        address: true,
-        email: true,
-        role: true
+    // Usar una transacción para asegurar consistencia
+    const newUser = await prisma.$transaction(async (prisma) => {
+      const createdUser = await prisma.Users.create({
+        data: {
+          document_type: documentTypeId,
+          document,
+          name,
+          str_country: strCountry,
+          str_Department: strDepartment,
+          str_city: strCity,
+          id_country: country,
+          id_department: parseInt(departament),
+          id_city: city,
+          address,
+          phone,
+          email,
+          password: hashPassword,
+          id_rol: roleId,
+          status,
+          is_verified: false
+        },
+        select: {
+          id_users: true,
+          name: true,
+          id_country: true,
+          id_department: true,
+          id_city: true,
+          address: true,
+          email: true,
+          role: true,
+          is_verified: true
+        }
+      })
+
+      // Intentar enviar el correo de verificación
+      try {
+        await sendVerificationEmail(createdUser)
+      } catch (error) {
+        console.error('Error enviando correo de verificación:', error.message)
+        throw new Error('No se pudo enviar el correo de verificación.')
       }
+
+      return createdUser
     })
 
     return newUser
   } catch (error) {
-    // Mejor manejo de errores
-    console.error('Error creating new user: ', error.message)
+    console.error('Error en el registro del usuario:', error.message)
     throw new Error(`Error en el registro del usuario: ${error.message}`)
+  }
+}
+
+export const verifyAccountService = async (token) => {
+  try {
+    // Decodificar el token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    // eslint-disable-next-line no-unused-vars
+    const { userId, email } = decoded
+
+    // Verificar si el usuario ya está verificado
+    const user = await prisma.Users.findUnique({
+      where: { id_users: userId }
+    })
+
+    if (!user) {
+      throw new Error('Usuario no encontrado.')
+    }
+
+    if (user.is_verified) {
+      throw new Error('La cuenta ya ha sido verificada.')
+    }
+
+    // Actualizar el campo is_verified
+    const updatedUser = await prisma.Users.update({
+      where: { id_users: userId },
+      data: { is_verified: true }
+    })
+
+    return { message: 'Cuenta verificada exitosamente.', user: updatedUser }
+  } catch (error) {
+    console.error('Error verificando cuenta: ', error.message)
+    throw new Error('Token inválido o expirado.')
   }
 }
 

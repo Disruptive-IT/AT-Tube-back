@@ -66,14 +66,15 @@ export const createTemplateController = async (req, res) => {
 
 // ?Controller to get all Templates from especific user
 export const getUserTemplateController = async (req, res) => {
-  const idUsers = req.body.id_users // Usar destructuración para acceder a id_users directamente
+  const idUsers = req.query.id_users
+  const page = req.query.page
 
   if (!idUsers) {
     return res.status(400).json({ error: 'Debe proporcionar un id de usuario' }) // Manejo si el id no se proporciona
   }
 
   try {
-    const templates = await getUserTemplatesService(idUsers) // Llamada al servicio con el id_users
+    const templates = await getUserTemplatesService(idUsers, page) // Llamada al servicio con el id_users
     res.status(200).json({ message: 'Diseños traídos exitosamente', templates })
   } catch (error) {
     console.error('Error al obtener los diseños del usuario:', error)
@@ -106,7 +107,11 @@ export const createPurchaseController = async (req, res) => {
   const salesData = req.body
   try {
     const newSale = await createPurchaseService(salesData)
-    res.status(201).json({ message: 'Compra Generada exitosamente', newSale })
+    if (salesData.status === 1) {
+      res.status(201).json({ message: 'COTIZACION generada exitosamente', newSale })
+    } else {
+      res.status(201).json({ message: 'COMPRA generada exitosamente', newSale })
+    }
   } catch (error) {
     console.error(error)
 
