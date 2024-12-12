@@ -1,7 +1,7 @@
 # This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
 
-name: NUpak CI/CD (Deploy)
+name: AT-Tube Back CI/CD (Deploy)
 
 on:
   push:
@@ -36,11 +36,11 @@ jobs:
         DATABASE_URL: ${{ secrets.DATABASE_URL }}
     - name: Copy environment variables file
       run: |
-        cp -r /home/env_variables/.env_nupak_api /home/Nupak/API/actions-runner/nupak-api/NUpak-back/NUpak-back/.env
+        cp -r /home/env_variables/.env_attube_api /home/Nupak/API/actions-runner/nupak-api/AT-Tube-back/AT-Tube-back/.env
 
     - name: Stop the API (PM2)
       run: |
-        pm2 stop nupak-api
+        pm2 stop attube-api
 
     - name: Install dependencies (run npm install)
       run: |
@@ -48,7 +48,7 @@ jobs:
 
     - name: API go live
       run: |
-        pm2 restart nupak-api
+        pm2 restart attube-api
     #- run: npm run dev
     #- run: npm run build --if-present
     #- run: npm test
