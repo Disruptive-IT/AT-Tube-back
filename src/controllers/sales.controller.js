@@ -107,7 +107,11 @@ export const createPurchaseController = async (req, res) => {
   const salesData = req.body
   try {
     const newSale = await createPurchaseService(salesData)
-    res.status(201).json({ message: 'Compra Generada exitosamente', newSale })
+    if (salesData.status === 1) {
+      res.status(201).json({ message: 'COTIZACION generada exitosamente', newSale })
+    } else {
+      res.status(201).json({ message: 'COMPRA generada exitosamente', newSale })
+    }
   } catch (error) {
     console.error(error)
 
