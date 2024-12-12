@@ -187,6 +187,7 @@ async function main () {
     //   avatar: 'https://i.pinimg.com/564x/fa/59/a1/fa59a1abd2edcb8026726986fd352989.jpg',
     //   id_rol: 2
     // },
+    
     // {
     //   document_type: 2,
     //   document: '123456783',
