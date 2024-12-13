@@ -29,7 +29,7 @@ export const userRegister = async (req, res) => {
 
 export const verifyAccountController = async (req, res) => {
   try {
-    const token = req.body.token || req.headers.authorization?.split(' ')[1]
+    const token = req.query.token || req.headers.authorization?.split(' ')[1]
 
     if (!token) {
       return res.status(400).json({
@@ -42,7 +42,7 @@ export const verifyAccountController = async (req, res) => {
     await verifyAccountService(token)
 
     // Redirige al frontend
-    return res.redirect('http://localhost:5173/api/auth/login')
+    return res.redirect(`${process.env.FRONTEND_URL}/auth/login`)
   } catch (error) {
     return res.status(400).json({
       success: false,
