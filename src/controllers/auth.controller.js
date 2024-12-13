@@ -1,4 +1,4 @@
-import { userRegisterService, userLoginService } from '../services/auth.service.js'
+import { userRegisterService, userLoginService, verifyAccountService } from '../services/auth.service.js'
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcrypt'
 
@@ -26,6 +26,31 @@ export const userRegister = async (req, res) => {
     res.status(500).json({ message: 'Error interno del servidor.', error: error.message })
   }
 }
+
+export const verifyAccountController = async (req, res) => {
+  try {
+    const token = req.body.token || req.headers.authorization?.split(' ')[1]
+
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        message: 'Token no proporcionado.'
+      })
+    }
+
+    // Llama al servicio para verificar la cuenta
+    await verifyAccountService(token)
+
+    // Redirige al frontend
+    return res.redirect('http://localhost:5173/api/auth/login')
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message
+    })
+  }
+}
+
 export const userLogin = async (req, res) => {
   const { email, password } = req.body
 

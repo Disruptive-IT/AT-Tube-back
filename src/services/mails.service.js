@@ -32,8 +32,8 @@ export const sendVerificationEmail = async (user) => {
       { expiresIn: '24h' }
     )
 
-    // Crear enlace de verificación
-    const verificationLink = `${process.env.FRONTEND_URL}/verify-account?token=${verificationToken}`
+    // Crear enlace de verificación al endpoint del backend
+    const verificationLink = `${process.env.BACKEND_URL}auth/verify-account?token=${verificationToken}`
 
     // Cargar y personalizar la plantilla de correo
     const filePath = path.join(emailContentDir, 'verify-account-email.html')
@@ -43,7 +43,7 @@ export const sendVerificationEmail = async (user) => {
     // Configurar el contenido del correo
     const logoPath = path.join(__dirname, '../..', 'public/images/Logo.jpg')
     const mailOptions = {
-      from: `YourApp <${process.env.EMAIL_USER}>`,
+      from: `AT-Tube <${process.env.EMAIL_USER}>`,
       to: user.email,
       subject: 'Verifica tu cuenta',
       html: emailContent.replace(

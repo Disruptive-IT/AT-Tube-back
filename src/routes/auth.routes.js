@@ -1,23 +1,25 @@
 import { Router } from 'express'
 import passport from 'passport'
 import jwt from 'jsonwebtoken'
+import { checkUserVerification } from '../middlewares/checkUserVerification.js'
 import {
   userRegister,
   userLogin,
   userLogout,
   requestPasswordReset,
-  resetPassword
+  resetPassword,
+  verifyAccountController
 } from '../controllers/auth.controller.js'
 
 const router = Router()
 
 // Rutas para la gestión de usuarios
 router.post('/register', userRegister)
-router.post('/login', userLogin)
+router.post('/login', checkUserVerification, userLogin)
 router.post('/logout', userLogout)
 router.post('/forgot-password', requestPasswordReset)
 router.post('/reset-password/:token', resetPassword)
-
+router.post('/verify-account', verifyAccountController)
 // Rutas de autenticación con Google
 router.get('/google',
   passport.authenticate('google', { scope: ['profile', 'email'] })
