@@ -275,11 +275,7 @@ const validateTemplateBelongsToUser = async (id_user, id_template) => {
  * @returns {Object} - Objeto con la venta creada.
  */
 export const createPurchaseService = async (salesData) => {
-  const {
-    id_user,
-    status,
-    salesTemplates
-  } = salesData
+  const { id_user, status, salesTemplates } = salesData
 
   let purchased_at = null
   let total_price = null
