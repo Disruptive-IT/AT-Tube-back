@@ -171,6 +171,7 @@ model Templates {
   id_users        String
   design          Json
   decorator       String?
+  decorator_type  String?
   status          Boolean   @default(true)
   create_at       DateTime  @default(now())
   update_at       DateTime  @updatedAt
