@@ -172,6 +172,7 @@ model Templates {
   design          Json
   decorator       String?
   decorator_type  String?
+  canva_decorator Json?
   status          Boolean   @default(true)
   create_at       DateTime  @default(now())
   update_at       DateTime  @updatedAt

@@ -143,7 +143,7 @@ export const getUserPurchasesService = async (idUser) => {
 
 // *Service to create Templates
 export const createTemplatesService = async (req) => {
-  const { id_users, design, decorator, decorator_type } = req
+  const { id_users, design, decorator, decorator_type, canva_decorator } = req
   // Validación de campos obligatorios
   if (!id_users) {
     throw new Error("El campo 'id_users' es obligatorio.")
@@ -159,7 +159,8 @@ export const createTemplatesService = async (req) => {
         id_users,
         design,
         decorator,
-        decorator_type
+        decorator_type,
+        canva_decorator
       }
     })
     return newTemplate
@@ -171,7 +172,7 @@ export const createTemplatesService = async (req) => {
 
 // *Service to create Templates
 export const UpdateTemplatesService = async (req) => {
-  const { id_template, design, decorator, decorator_type } = req
+  const { id_template, design, decorator, decorator_type, canva_decorator } = req
   // Validación de campos obligatorios
   if (!design) {
     throw new Error("El campo 'design' es obligatorio.")
@@ -190,7 +191,8 @@ export const UpdateTemplatesService = async (req) => {
       data: {
         design,
         decorator,
-        decorator_type
+        decorator_type,
+        canva_decorator
       }
     })
     return updatedTemplate
@@ -225,6 +227,7 @@ export const getUserTemplatesService = async (id_users, page = 1, pageSize = 10)
         design: true,
         decorator: true,
         decorator_type: true,
+        canva_decorator: true,
         create_at: true,
         SalesTemplate: {
           take: 1, // Solo traer el último registro creado
