@@ -189,7 +189,7 @@ export const getUserPurchasesService = async (idUser, page = 1, pageSize = 10, s
 
 // *Service to create Templates
 export const createTemplatesService = async (req) => {
-  const { id_users, design, decorator } = req
+  const { id_users, design, decorator, decorator_type, canva_decorator } = req
   // Validación de campos obligatorios
   if (!id_users) {
     throw new Error("El campo 'id_users' es obligatorio.")
@@ -204,7 +204,9 @@ export const createTemplatesService = async (req) => {
       data: {
         id_users,
         design,
-        decorator
+        decorator,
+        decorator_type,
+        canva_decorator
       }
     })
     return newTemplate
@@ -216,7 +218,7 @@ export const createTemplatesService = async (req) => {
 
 // *Service to create Templates
 export const UpdateTemplatesService = async (req) => {
-  const { id_template, design, decorator } = req
+  const { id_template, design, decorator, decorator_type, canva_decorator } = req
   // Validación de campos obligatorios
   if (!design) {
     throw new Error("El campo 'design' es obligatorio.")
@@ -234,7 +236,9 @@ export const UpdateTemplatesService = async (req) => {
       },
       data: {
         design,
-        decorator
+        decorator,
+        decorator_type,
+        canva_decorator
       }
     })
     return updatedTemplate
@@ -251,10 +255,9 @@ export const getUserTemplatesService = async (id_users, page = 1, pageSize = 10,
       where: { id_users }
     })
 
-    // Si no encontramos al usuario, lanzamos un error 'NotFoundError'
     if (!user) {
       const error = new Error(`El usuario con id ${id_users} no existe.`)
-      error.name = 'NotFoundError' // Error para usuario no encontrado
+      error.name = 'NotFoundError'
       throw error
     }
 
@@ -278,7 +281,16 @@ export const getUserTemplatesService = async (id_users, page = 1, pageSize = 10,
         id_users: true,
         design: true,
         decorator: true,
-        create_at: true
+        decorator_type: true,
+        canva_decorator: true,
+        create_at: true,
+        SalesTemplate: {
+          take: 1, // Solo traer el último registro creado
+          orderBy: { create_at: 'desc' }, // Ordenar por la fecha de creación en orden descendente
+          select: {
+            decorator_price: true
+          }
+        }
       },
       skip, // Saltar registros
       take: pageSize // Limitar registros por página
@@ -291,8 +303,14 @@ export const getUserTemplatesService = async (id_users, page = 1, pageSize = 10,
 
     const totalPages = Math.ceil(totalTemplates / pageSize)
 
+    // Formateamos los datos para incluir el precio del decorador de manera clara
+    const formattedTemplates = templates.map((template) => ({
+      ...template,
+      decorator_price: template.SalesTemplate?.[0]?.decorator_price || null // Si existe el precio, lo incluimos
+    }))
+
     return {
-      data: templates,
+      data: formattedTemplates,
       meta: {
         total: totalTemplates,
         page,
@@ -301,9 +319,9 @@ export const getUserTemplatesService = async (id_users, page = 1, pageSize = 10,
       }
     }
   } catch (error) {
-    console.error('Error al traer los diseños del usuario:', error)
-    const customError = new Error('Error al traer los diseños del usuario.')
-    customError.name = 'InternalError' // Error genérico para fallos internos
+    console.error('Error al traer los diseños del usuario', error)
+    const customError = new Error('Error al traer los diseños del usuario')
+    customError.name = 'InternalError'
     throw customError
   }
 }

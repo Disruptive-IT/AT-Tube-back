@@ -19,7 +19,7 @@ router.post('/login', checkUserVerification, userLogin)
 router.post('/logout', userLogout)
 router.post('/forgot-password', requestPasswordReset)
 router.post('/reset-password/:token', resetPassword)
-router.post('/verify-account', verifyAccountController)
+router.get('/verify-account', verifyAccountController)
 // Rutas de autenticación con Google
 router.get('/google',
   passport.authenticate('google', { scope: ['profile', 'email'] })
