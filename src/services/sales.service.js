@@ -5,16 +5,43 @@ import { validateSaleExists, validateSalesStatusExists, validateTemplateExists, 
 const prisma = new PrismaClient()
 
 // *Service to get all Purchases of especific user
-export const getUserPurchasesService = async (idUser) => {
+export const getUserPurchasesService = async (idUser, page = 1, pageSize = 10, searchTerm = '') => {
   if (!idUser) {
     throw new Error('Debe proporcionar un ID de usuario.')
   }
+
   try {
+    // Verificar la existencia del usuario
+    const user = await prisma.users.findUnique({
+      where: { id_users: idUser }
+    })
+
+    if (!user) {
+      const error = new Error(`El usuario con ID ${idUser} no existe.`)
+      error.name = 'NotFoundError'
+      throw error
+    }
+
+    // Cálculo del número de registros a omitir
+    const skip = (page - 1) * pageSize
+
+    // Filtro de coincidencia
+    const filter = searchTerm
+      ? {
+          OR: [
+            { canceled_reason: { contains: searchTerm, mode: 'insensitive' } },
+            { SalesStatus: { name: { contains: searchTerm, mode: 'insensitive' } } },
+            { usuario: { name: { contains: searchTerm, mode: 'insensitive' } } }
+          ]
+        }
+      : {}
+
+    // Obtener las compras con paginación y filtro
     const purchases = await prisma.sales.findMany({
-      where: { id_user: idUser },
-      orderBy: {
-        create_at: 'desc'
-      },
+      where: { id_user: idUser, ...filter },
+      orderBy: { create_at: 'desc' },
+      skip, // Saltar registros
+      take: pageSize, // Limitar registros por página
       select: {
         id_sales: true,
         total_price: true,
@@ -30,7 +57,6 @@ export const getUserPurchasesService = async (idUser) => {
           select: {
             id_status: true,
             name: true
-            // description: true
           }
         },
         SalesTemplate: {
@@ -52,7 +78,7 @@ export const getUserPurchasesService = async (idUser) => {
             }
           }
         },
-        usuario: { // Relación con Users
+        usuario: {
           select: {
             id_users: true,
             avatar: true,
@@ -83,16 +109,26 @@ export const getUserPurchasesService = async (idUser) => {
             documentType: {
               select: {
                 id_document_type: true,
-                name: true // Puedes agregar más campos de DocumentType si los necesitas
+                name: true
               }
             }
           }
         }
       }
     })
-    const formatDate = (date) => date ? date.toISOString().split('T')[0] : null
 
-    const formattedPurchases = purchases.map(purchase => ({
+    // Calcular el número total de registros
+    const totalPurchases = await prisma.sales.count({
+      where: { id_user: idUser, ...filter }
+    })
+
+    // Calcular el número total de páginas
+    const totalPages = Math.ceil(totalPurchases / pageSize)
+
+    // Formatear las compras
+    const formatDate = (date) => (date ? date.toISOString().split('T')[0] : null)
+
+    const formattedPurchases = purchases.map((purchase) => ({
       avatar: purchase.usuario.avatar,
       name: purchase.usuario.name,
       phone: purchase.usuario.phone,
@@ -102,10 +138,10 @@ export const getUserPurchasesService = async (idUser) => {
       country: purchase.usuario.country.name,
       flag_code: purchase.usuario.country.flag_code,
       phone_code: purchase.usuario.phone_code,
-      address: (purchase.usuario.str_Department + '-' + purchase.usuario.str_city + '-' + purchase.usuario.address),
+      address: `${purchase.usuario.str_Department}-${purchase.usuario.str_city}-${purchase.usuario.address}`,
       id: purchase.id_sales,
       total_price: formatCurrency(purchase.total_price) || 'No se ha cotizado',
-      ivaPrice: formatCurrency((purchase.total_price * 0.19)),
+      ivaPrice: formatCurrency(purchase.total_price * 0.19),
       totalPlusIva: getPriceWithIva(purchase.total_price),
       status: purchase.SalesStatus.id_status,
       strStatus: purchase.SalesStatus.name,
@@ -117,8 +153,7 @@ export const getUserPurchasesService = async (idUser) => {
       purchasedAt: formatDate(purchase.purchased_at) || 'No se ha realizado el pago',
       shippingAt: formatDate(purchase.send_at) || 'No se ha realizado el envío',
       createAt: formatDate(purchase.create_at),
-      // Mapeo de las plantillas
-      salesTemplates: purchase.SalesTemplate.map(template => ({
+      salesTemplates: purchase.SalesTemplate.map((template) => ({
         idSales: template.id_sales,
         idTemplate: template.id_template,
         boxAmount: template.box_amount,
@@ -130,14 +165,25 @@ export const getUserPurchasesService = async (idUser) => {
         decoratorPrice: formatCurrency(template.decorator_price),
         design: template.template.design,
         totalBoxPrices: formatCurrency(template.box_price * template.box_amount),
-        totalBoxesPricesWithoutFormat: (template.box_price * template.box_amount)
+        totalBoxesPricesWithoutFormat: template.box_price * template.box_amount
       }))
     }))
 
-    return formattedPurchases
+    // Devolver compras formateadas junto con metadatos
+    return {
+      data: formattedPurchases,
+      meta: {
+        total: totalPurchases,
+        page,
+        pageSize,
+        totalPages
+      }
+    }
   } catch (error) {
     console.error('Error al obtener las compras con productos:', error)
-    throw error
+    const customError = new Error('Error al obtener las compras con productos.')
+    customError.name = 'InternalError'
+    throw customError
   }
 }
 
@@ -198,7 +244,7 @@ export const UpdateTemplatesService = async (req) => {
   }
 }
 
-export const getUserTemplatesService = async (id_users, page = 1, pageSize = 10) => {
+export const getUserTemplatesService = async (id_users, page = 1, pageSize = 10, searchTerm = '') => {
   try {
     // Verificamos que el usuario existe
     const user = await prisma.users.findUnique({
@@ -215,9 +261,18 @@ export const getUserTemplatesService = async (id_users, page = 1, pageSize = 10)
     // Calculamos el número de registros a omitir
     const skip = (page - 1) * pageSize
 
-    // Obtenemos los templates con paginación
+    // Construimos las condiciones de filtro por coincidencias
+    const whereClause = {
+      id_users,
+      OR: [
+        { design: { contains: searchTerm, mode: 'insensitive' } },
+        { decorator: { contains: searchTerm, mode: 'insensitive' } }
+      ]
+    }
+
+    // Obtenemos los templates con paginación y filtros por coincidencias
     const templates = await prisma.templates.findMany({
-      where: { id_users },
+      where: whereClause,
       select: {
         id_template: true,
         id_users: true,
@@ -231,7 +286,7 @@ export const getUserTemplatesService = async (id_users, page = 1, pageSize = 10)
 
     // Obtenemos el total de templates para calcular el número total de páginas
     const totalTemplates = await prisma.templates.count({
-      where: { id_users }
+      where: whereClause
     })
 
     const totalPages = Math.ceil(totalTemplates / pageSize)
@@ -246,8 +301,8 @@ export const getUserTemplatesService = async (id_users, page = 1, pageSize = 10)
       }
     }
   } catch (error) {
-    console.error('Error al traer los diseños del usuario', error)
-    const customError = new Error('Error al traer los diseños del usuario')
+    console.error('Error al traer los diseños del usuario:', error)
+    const customError = new Error('Error al traer los diseños del usuario.')
     customError.name = 'InternalError' // Error genérico para fallos internos
     throw customError
   }
@@ -379,22 +434,36 @@ const getPriceWithIva = (price) => {
 }
 
 // ?controller to get all Purchases, firts: data getted since 5months ago, if props are not null the periode will be change
-export const getAllPurchasesService = async (year) => {
+export const getAllPurchasesService = async (year, page = 1, pageSize = 10, searchTerm = '') => {
   const currentYear = new Date().getFullYear()
-  const startOfYear = new Date((year || currentYear), 0, 1) // ?1 de enero
-  const endOfYear = new Date((year || currentYear), 11, 31, 23, 59, 59) // ?31 de diciembre
+  const startOfYear = new Date(year || currentYear, 0, 1) // 1 de enero
+  const endOfYear = new Date(year || currentYear, 12, 31, 23, 59, 59) // 31 de diciembre
 
   try {
-    const purchases = await prisma.sales.findMany({
-      where: {
-        create_at: {
-          gte: startOfYear,
-          lte: endOfYear
-        }
+    // Cálculo del número de registros a omitir
+    const skip = (page - 1) * pageSize
+
+    // Construir la cláusula `where` con filtro por coincidencias
+    const whereClause = {
+      create_at: {
+        gte: startOfYear,
+        lte: endOfYear
       },
+      OR: [
+        { SalesTemplate: { some: { template: { design: { contains: searchTerm, mode: 'insensitive' } } } } },
+        { SalesTemplate: { some: { template: { decorator: { contains: searchTerm, mode: 'insensitive' } } } } },
+        { usuario: { name: { contains: searchTerm, mode: 'insensitive' } } }
+      ]
+    }
+
+    // Obtener las compras con paginación
+    const purchases = await prisma.sales.findMany({
+      where: whereClause,
       orderBy: {
         create_at: 'desc'
       },
+      skip, // Saltar registros
+      take: pageSize, // Limitar registros por página
       select: {
         id_sales: true,
         total_price: true,
@@ -410,7 +479,6 @@ export const getAllPurchasesService = async (year) => {
           select: {
             id_status: true,
             name: true
-            // description: true
           }
         },
         SalesTemplate: {
@@ -432,7 +500,7 @@ export const getAllPurchasesService = async (year) => {
             }
           }
         },
-        usuario: { // Relación con Users
+        usuario: {
           select: {
             id_users: true,
             avatar: true,
@@ -449,28 +517,38 @@ export const getAllPurchasesService = async (year) => {
             country: {
               select: {
                 id_country: true,
-                name: true // Puedes agregar más campos de Country si los necesitas
+                name: true,
+                flag_code: true,
+                phone_code: true
               }
             },
             role: {
               select: {
                 id_rol: true,
-                name: true // Puedes agregar más campos de Role si los necesitas
+                name: true
               }
             },
             documentType: {
               select: {
                 id_document_type: true,
-                name: true // Puedes agregar más campos de DocumentType si los necesitas
+                name: true
               }
             }
           }
         }
       }
     })
-    const formatDate = (date) => date ? date.toISOString().split('T')[0] : null
 
-    const formattedPurchases = purchases.map(purchase => ({
+    // Calcular el número total de registros
+    const totalPurchases = await prisma.sales.count({ where: whereClause })
+
+    // Calcular el número total de páginas
+    const totalPages = Math.ceil(totalPurchases / pageSize)
+
+    // Formatear las compras
+    const formatDate = (date) => (date ? date.toISOString().split('T')[0] : null)
+
+    const formattedPurchases = purchases.map((purchase) => ({
       avatar: purchase.usuario.avatar,
       name: purchase.usuario.name,
       phone: purchase.usuario.phone,
@@ -479,11 +557,11 @@ export const getAllPurchasesService = async (year) => {
       idTipe: purchase.usuario.documentType.name,
       country: purchase.usuario.country.name,
       flag_code: purchase.usuario.country.flag_code,
-      phone_code: purchase.usuario.phone_code,
-      address: (purchase.usuario.str_Department + '-' + purchase.usuario.str_city + '-' + purchase.usuario.address),
+      phone_code: purchase.usuario.country.phone_code,
+      address: `${purchase.usuario.str_Department}-${purchase.usuario.str_city}-${purchase.usuario.address}`,
       id: purchase.id_sales,
       total_price: formatCurrency(purchase.total_price) || 'No se ha cotizado',
-      ivaPrice: formatCurrency((purchase.total_price * 0.19)),
+      ivaPrice: formatCurrency(purchase.total_price * 0.19),
       totalPlusIva: getPriceWithIva(purchase.total_price),
       status: purchase.SalesStatus.id_status,
       strStatus: purchase.SalesStatus.name,
@@ -495,8 +573,7 @@ export const getAllPurchasesService = async (year) => {
       purchasedAt: formatDate(purchase.purchased_at) || 'No se ha realizado el pago',
       shippingAt: formatDate(purchase.send_at) || 'No se ha realizado el envío',
       createAt: formatDate(purchase.create_at),
-      // Mapeo de las plantillas
-      salesTemplates: purchase.SalesTemplate.map(template => ({
+      salesTemplates: purchase.SalesTemplate.map((template) => ({
         idSales: template.id_sales,
         idTemplate: template.id_template,
         boxAmount: template.box_amount,
@@ -508,14 +585,25 @@ export const getAllPurchasesService = async (year) => {
         decoratorPrice: formatCurrency(template.decorator_price),
         design: template.template.design,
         totalBoxPrices: formatCurrency(template.box_price * template.box_amount),
-        totalBoxesPricesWithoutFormat: (template.box_price * template.box_amount)
+        totalBoxesPricesWithoutFormat: template.box_price * template.box_amount
       }))
     }))
 
-    return formattedPurchases
+    // Devolver compras formateadas junto con metadatos
+    return {
+      data: formattedPurchases,
+      meta: {
+        total: totalPurchases,
+        page,
+        pageSize,
+        totalPages
+      }
+    }
   } catch (error) {
     console.error('Error al obtener las compras con productos:', error)
-    throw error
+    const customError = new Error('Error al obtener las compras con productos.')
+    customError.name = 'InternalError'
+    throw customError
   }
 }
 
