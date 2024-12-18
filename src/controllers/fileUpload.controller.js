@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { handleAvatarUpload, createTemplateWithImageService, updateTemplateImageService } from '../services/fileUpload.service.js'
+import { handleAvatarUpload, createTemplateWithImageService, updateTemplateImageService, deleteTemplateImageService } from '../services/fileUpload.service.js'
 
 export const uploadAvatarController = async (req, res) => {
   try {
@@ -41,5 +41,24 @@ export const updateTemplateImageController = async (req, res) => {
     res.status(200).json(result)
   } catch (error) {
     res.status(400).json({ error: error.message })
+  }
+}
+
+export const deleteTemplateImageController = async (req, res) => {
+  try {
+    const { template_id } = req.params
+    // console.log('template_id:', template_id) // Verifica que este log muestre un valor
+    if (!template_id) {
+      return res.status(400).json({ message: 'El ID del template es requerido.' })
+    }
+
+    const response = await deleteTemplateImageService(template_id)
+    return res.status(200).json({
+      message: 'Imagen eliminada con éxito.',
+      data: response
+    })
+  } catch (error) {
+    console.error(error.message)
+    return res.status(400).json({ message: error.message })
   }
 }

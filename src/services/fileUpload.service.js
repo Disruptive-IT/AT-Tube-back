@@ -140,3 +140,36 @@ export const updateTemplateImageService = async (templateId, file) => {
     throw error
   }
 }
+
+export const deleteTemplateImageService = async (templateId) => {
+  // Buscar el template en la base de datos
+  const template = await prisma.templates.findUnique({
+    where: { id_template: templateId }
+  })
+
+  if (!template) {
+    throw new Error('El template no existe.')
+  }
+
+  // Verificar si hay una imagen asociada en el campo 'decorator'
+  const imagePath = template.decorator
+
+  if (imagePath) {
+    const absolutePath = path.resolve(__dirname, '..', '..', 'uploads', 'design_images', imagePath) // Ruta completa del archivo
+
+    // Verificar si el archivo existe antes de intentar eliminarlo
+    if (fs.existsSync(absolutePath)) {
+      fs.unlinkSync(absolutePath) // Eliminar el archivo físico
+    }
+  }
+
+  // Actualizar el campo 'decorator' a `null` o una cadena vacía en la base de datos
+  const updatedTemplate = await prisma.templates.update({
+    where: { id_template: templateId },
+    data: {
+      decorator: null
+    }
+  })
+
+  return updatedTemplate
+}
