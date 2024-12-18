@@ -34,18 +34,27 @@ export const createNewUserService = async (data) => {
 
 // *Servicio que me trae todos los users con el rol Admin
 export const getAllUsersService = async (page = 1, limit = 10, searchTerm = '') => {
+  page = parseInt(page)
+  limit = parseInt(limit)
   try {
     const offset = (page - 1) * limit
 
     // Construir la cláusula de búsqueda con coincidencias
     const whereClause = {
-      id_rol: 1, // Filtra solo usuarios con rol 1
+      id_rol: 1,
       ...(searchTerm && {
         OR: [
-          { name: { contains: searchTerm, mode: 'insensitive' } }, // Coincidencias en nombre
-          { document: { contains: searchTerm, mode: 'insensitive' } }, // Coincidencias en documento
-          { email: { contains: searchTerm, mode: 'insensitive' } }, // Coincidencias en email
-          { phone: { contains: searchTerm, mode: 'insensitive' } } // Coincidencias en teléfono
+          { name: { contains: searchTerm } },
+          { document: { contains: searchTerm } },
+          { email: { contains: searchTerm } },
+          { phone: { contains: searchTerm } },
+          { address: { contains: searchTerm } },
+          { phone: { contains: searchTerm } },
+          { email: { contains: searchTerm } },
+          { str_Department: { contains: searchTerm } },
+          { str_city: { contains: searchTerm } },
+          { country: { name: { contains: searchTerm } } },
+          { documentType: { name: { contains: searchTerm } } }
         ]
       })
     }
@@ -114,19 +123,28 @@ export const getAllUsersService = async (page = 1, limit = 10, searchTerm = '') 
 }
 
 // *Servicio que me trae todos los users con el rol Client
-export const getAllClientsService = async (page = 1, limit = 10, searchTerm = '') => {
+export const getAllClientsService = async (page = 1, limit = 5, searchTerm = '') => {
+  limit = parseInt(limit)
+  page = parseInt(page)
   try {
     const offset = (page - 1) * limit
 
     // Construir la cláusula de búsqueda con coincidencias
     const whereClause = {
-      id_rol: 2, // Filtra solo clientes con rol 2
+      id_rol: 2,
       ...(searchTerm && {
         OR: [
-          { name: { contains: searchTerm, mode: 'insensitive' } }, // Coincidencias en nombre
-          { document: { contains: searchTerm, mode: 'insensitive' } }, // Coincidencias en documento
-          { email: { contains: searchTerm, mode: 'insensitive' } }, // Coincidencias en email
-          { phone: { contains: searchTerm, mode: 'insensitive' } } // Coincidencias en teléfono
+          { name: { contains: searchTerm } },
+          { document: { contains: searchTerm } },
+          { email: { contains: searchTerm } },
+          { phone: { contains: searchTerm } },
+          { address: { contains: searchTerm } },
+          { phone: { contains: searchTerm } },
+          { email: { contains: searchTerm } },
+          { str_Department: { contains: searchTerm } },
+          { str_city: { contains: searchTerm } },
+          { str_country: { contains: searchTerm } },
+          { documentType: { name: { contains: searchTerm } } }
         ]
       })
     }

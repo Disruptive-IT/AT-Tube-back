@@ -31,17 +31,17 @@ export const getUserPurchasesService = async (idUser, page = 1, pageSize = 10, s
           OR: [
             { canceled_reason: { contains: searchTerm, mode: 'insensitive' } },
             { SalesStatus: { name: { contains: searchTerm, mode: 'insensitive' } } },
-            { usuario: { name: { contains: searchTerm, mode: 'insensitive' } } }
+            { id_sales: { equals: searchTerm } }
           ]
         }
-      : {}
+      : undefined
 
     // Obtener las compras con paginación y filtro
     const purchases = await prisma.sales.findMany({
       where: { id_user: idUser, ...filter },
       orderBy: { create_at: 'desc' },
-      skip, // Saltar registros
-      take: pageSize, // Limitar registros por página
+      skip,
+      take: pageSize,
       select: {
         id_sales: true,
         total_price: true,
@@ -248,7 +248,7 @@ export const UpdateTemplatesService = async (req) => {
   }
 }
 
-export const getUserTemplatesService = async (id_users, page = 1, pageSize = 10, searchTerm = '') => {
+export const getUserTemplatesService = async (id_users, page = 1, pageSize = 10) => {
   try {
     // Verificamos que el usuario existe
     const user = await prisma.users.findUnique({
@@ -264,18 +264,9 @@ export const getUserTemplatesService = async (id_users, page = 1, pageSize = 10,
     // Calculamos el número de registros a omitir
     const skip = (page - 1) * pageSize
 
-    // Construimos las condiciones de filtro por coincidencias
-    const whereClause = {
-      id_users,
-      OR: [
-        { design: { contains: searchTerm, mode: 'insensitive' } },
-        { decorator: { contains: searchTerm, mode: 'insensitive' } }
-      ]
-    }
-
     // Obtenemos los templates con paginación y filtros por coincidencias
     const templates = await prisma.templates.findMany({
-      where: whereClause,
+      where: { id_users },
       select: {
         id_template: true,
         id_users: true,
@@ -298,7 +289,7 @@ export const getUserTemplatesService = async (id_users, page = 1, pageSize = 10,
 
     // Obtenemos el total de templates para calcular el número total de páginas
     const totalTemplates = await prisma.templates.count({
-      where: whereClause
+      where: { id_users }
     })
 
     const totalPages = Math.ceil(totalTemplates / pageSize)
