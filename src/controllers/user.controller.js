@@ -24,8 +24,9 @@ export const createNewUserController = async (req, res) => {
 
 // ?Controlador para traer todos los usuarios Admin
 export const getAllUsersController = async (req, res) => {
+  const { page, limit, searchTerm } = req.query
   try {
-    const systemUsers = await getAllUsersService()
+    const systemUsers = await getAllUsersService(page, limit, searchTerm)
     res.status(200).json({ systemUsers })
   } catch (error) {
     console.error('Error searching user account information:', error)
@@ -35,8 +36,9 @@ export const getAllUsersController = async (req, res) => {
 
 // ?Controlador para traer todos los usuarios clients
 export const getAllClientsController = async (req, res) => {
+  const { page, limit, searchTerm } = req.query
   try {
-    const systemClients = await getAllClientsService()
+    const systemClients = await getAllClientsService(page, limit, searchTerm)
     res.status(200).json({ systemClients })
   } catch (error) {
     console.error('Error searching user account information:', error)
