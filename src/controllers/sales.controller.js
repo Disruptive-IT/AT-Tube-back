@@ -28,9 +28,9 @@ export const getUserPurchasesController = async (req, res) => {
 }
 
 export const getAllPurchasesController = async (req, res) => {
+  const { year, page, pageSize, searchTerm } = req.body
   try {
-    const year = parseInt(req.body.year)
-    const Purchases = await getAllPurchasesService(year)
+    const Purchases = await getAllPurchasesService(parseInt(year), page, pageSize, searchTerm)
     res.status(200).json({ message: 'Compras Traidas con exito', purchases: Purchases })
   } catch (error) {
     if (error.message === 'ID proporcionado no existe.') {

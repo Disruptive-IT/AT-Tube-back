@@ -25,16 +25,25 @@ export const getUserPurchasesService = async (idUser, page = 1, pageSize = 10, s
     // Cálculo del número de registros a omitir
     const skip = (page - 1) * pageSize
 
-    // Filtro de coincidencia
-    const filter = searchTerm
-      ? {
-          OR: [
-            { canceled_reason: { contains: searchTerm, mode: 'insensitive' } },
-            { SalesStatus: { name: { contains: searchTerm, mode: 'insensitive' } } },
-            { id_sales: { equals: searchTerm } }
-          ]
-        }
-      : undefined
+    // Verificar si searchTerm es un número
+    const searchAsNumber = !isNaN(searchTerm) ? parseInt(searchTerm, 10) : null
+
+    // Construir el filtro de búsqueda
+    const filter = {
+      AND: [
+        { id_user: idUser }, // Asegurarse de que solo estamos buscando las compras del usuario actual
+        searchTerm
+          ? {
+              OR: [
+                { canceled_reason: { contains: searchTerm } },
+                { SalesStatus: { name: { contains: searchTerm } } },
+                { id_sales: { contains: searchTerm } }
+              ]
+            }
+          : {}
+      ]
+    }
+
 
     // Obtener las compras con paginación y filtro
     const purchases = await prisma.sales.findMany({
@@ -459,9 +468,18 @@ export const getAllPurchasesService = async (year, page = 1, pageSize = 10, sear
         lte: endOfYear
       },
       OR: [
-        { SalesTemplate: { some: { template: { design: { contains: searchTerm, mode: 'insensitive' } } } } },
-        { SalesTemplate: { some: { template: { decorator: { contains: searchTerm, mode: 'insensitive' } } } } },
-        { usuario: { name: { contains: searchTerm, mode: 'insensitive' } } }
+        { id_sales: { contains: searchTerm } },
+        // { SalesTemplate: { id_template: { contains: searchTerm } } },
+        { usuario: { name: { contains: searchTerm } } },
+        { usuario: { document: { contains: searchTerm } } },
+        { usuario: { str_Department: { contains: searchTerm } } },
+        { usuario: { str_city: { contains: searchTerm } } },
+        { usuario: { str_country: { contains: searchTerm } } },
+        { usuario: { phone: { contains: searchTerm } } },
+        { usuario: { email: { contains: searchTerm } } },
+        { usuario: { documentType: { name: { contains: searchTerm } } } },
+        { SalesStatus: { name: { contains: searchTerm } } }
+
       ]
     }
 
