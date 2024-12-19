@@ -29,9 +29,16 @@ export const getUserPurchasesService = async (idUser, page = 1, pageSize = 10, s
     const filter = searchTerm
       ? {
           OR: [
-            { canceled_reason: { contains: searchTerm, mode: 'insensitive' } },
-            { SalesStatus: { name: { contains: searchTerm, mode: 'insensitive' } } },
-            { id_sales: { equals: searchTerm } }
+            { id_sales: { contains: searchTerm } },
+            { total_price: { contains: searchTerm } },
+            { finalize_at: { contains: searchTerm } },
+            { cotized_at: { contains: searchTerm } },
+            { purchased_at: { contains: searchTerm } },
+            { send_at: { contains: searchTerm } },
+            { delivered_at: { contains: searchTerm } },
+            { canceled_at: { contains: searchTerm } },
+            { canceled_reason: { contains: searchTerm } },
+            { status: { name: { contains: searchTerm } } }
           ]
         }
       : undefined
@@ -446,7 +453,7 @@ const getPriceWithIva = (price) => {
 export const getAllPurchasesService = async (year, page = 1, pageSize = 10, searchTerm = '') => {
   const currentYear = new Date().getFullYear()
   const startOfYear = new Date(year || currentYear, 0, 1) // 1 de enero
-  const endOfYear = new Date(year || currentYear, 12, 31, 23, 59, 59) // 31 de diciembre
+  const endOfYear = new Date(year || currentYear, 11, 31, 23, 59, 59) // 31 de diciembre
 
   try {
     // Cálculo del número de registros a omitir
@@ -459,9 +466,10 @@ export const getAllPurchasesService = async (year, page = 1, pageSize = 10, sear
         lte: endOfYear
       },
       OR: [
-        { SalesTemplate: { some: { template: { design: { contains: searchTerm, mode: 'insensitive' } } } } },
-        { SalesTemplate: { some: { template: { decorator: { contains: searchTerm, mode: 'insensitive' } } } } },
-        { usuario: { name: { contains: searchTerm, mode: 'insensitive' } } }
+        { SalesTemplate: { some: { template: { design: { contains: searchTerm } } } } },
+        { SalesTemplate: { some: { template: { decorator: { contains: searchTerm } } } } },
+        { usuario: { name: { contains: searchTerm } } },
+        { id_sales: { equals: searchTerm } }
       ]
     }
 

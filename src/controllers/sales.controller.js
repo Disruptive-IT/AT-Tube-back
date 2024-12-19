@@ -14,7 +14,7 @@ import {
 
 // ?Controller to get all purchases orders for a especific user
 export const getUserPurchasesController = async (req, res) => {
-  const { id, page, pageSize, searchTerm } = req.body
+  const { id, page, pageSize, searchTerm } = req.query
   try {
     const userPurchases = await getUserPurchasesService(id, page, pageSize, searchTerm)
     res.status(200).json({ message: 'Compras Traidas con exito', purchases: userPurchases })
@@ -28,9 +28,10 @@ export const getUserPurchasesController = async (req, res) => {
 }
 
 export const getAllPurchasesController = async (req, res) => {
+  const { page, limit, searchTerm } = req.query
   try {
     const year = parseInt(req.body.year)
-    const Purchases = await getAllPurchasesService(year)
+    const Purchases = await getAllPurchasesService(year, page, limit, searchTerm)
     res.status(200).json({ message: 'Compras Traidas con exito', purchases: Purchases })
   } catch (error) {
     if (error.message === 'ID proporcionado no existe.') {
