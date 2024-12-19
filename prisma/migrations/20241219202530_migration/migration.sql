@@ -127,6 +127,7 @@ CREATE TABLE `Templates` (
     `design` JSON NOT NULL,
     `decorator` VARCHAR(191) NULL,
     `decorator_type` VARCHAR(191) NULL,
+    `canva_decorator` JSON NULL,
     `status` BOOLEAN NOT NULL DEFAULT true,
     `create_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `update_at` DATETIME(3) NOT NULL,

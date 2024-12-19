@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt'
 
 import jwt from 'jsonwebtoken'
 import { createToken } from '../middlewares/jwt.js'
-import { sendResetPasswordMail } from '../services/mails.service.js'
+import { sendResetPasswordMail, resendVerificationEmailService } from '../services/mails.service.js'
 
 const secretKey = process.env.JWT_SECRET
 
@@ -48,6 +48,24 @@ export const verifyAccountController = async (req, res) => {
       success: false,
       message: error.message
     })
+  }
+}
+
+export const resendVerificationEmailController = async (req, res) => {
+  try {
+    // Obtener el email desde los parámetros de consulta (query)
+    const { email } = req.query
+
+    if (!email) {
+      return res.status(400).json({ error: "El parámetro 'email' es requerido." })
+    }
+
+    // Llamar al servicio para reenviar el correo
+    const response = await resendVerificationEmailService(email)
+
+    return res.status(200).json(response)
+  } catch (error) {
+    return res.status(400).json({ error: error.message })
   }
 }
 

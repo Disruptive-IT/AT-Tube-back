@@ -453,24 +453,17 @@ const getPriceWithIva = (price) => {
 
 // ?controller to get all Purchases, firts: data getted since 5months ago, if props are not null the periode will be change
 export const getAllPurchasesService = async (year, page = 1, pageSize = 10, searchTerm = '') => {
-  const currentYear = new Date().getFullYear()
-  const startOfYear = new Date(year || currentYear, 0, 1) // 1 de enero
-  const endOfYear = new Date(year || currentYear, 11, 31, 23, 59, 59) // 31 de diciembre
-
   try {
     // Cálculo del número de registros a omitir
     const skip = (page - 1) * pageSize
 
     // Construir la cláusula `where` con filtro por coincidencias
     const whereClause = {
-      create_at: {
-        gte: startOfYear,
-        lte: endOfYear
-      },
+
       OR: [
-        { SalesTemplate: { some: { template: { design: { contains: searchTerm, mode: 'insensitive' } } } } },
-        { SalesTemplate: { some: { template: { decorator: { contains: searchTerm, mode: 'insensitive' } } } } },
-        { usuario: { name: { contains: searchTerm, mode: 'insensitive' } } }
+        { SalesTemplate: { contains: searchTerm, mode: 'insensitive' } },
+        { SalesTemplate: { contains: searchTerm } },
+        { usuario: { name: { contains: searchTerm } } }
       ]
     }
 

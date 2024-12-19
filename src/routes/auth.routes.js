@@ -8,7 +8,8 @@ import {
   userLogout,
   requestPasswordReset,
   resetPassword,
-  verifyAccountController
+  verifyAccountController,
+  resendVerificationEmailController
 } from '../controllers/auth.controller.js'
 
 const router = Router()
@@ -20,6 +21,7 @@ router.post('/logout', userLogout)
 router.post('/forgot-password', requestPasswordReset)
 router.post('/reset-password/:token', resetPassword)
 router.get('/verify-account', verifyAccountController)
+router.get('/resend-email', resendVerificationEmailController)
 // Rutas de autenticación con Google
 router.get('/google',
   passport.authenticate('google', { scope: ['profile', 'email'] })

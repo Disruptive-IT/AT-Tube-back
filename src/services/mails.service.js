@@ -68,6 +68,28 @@ export const sendVerificationEmail = async (user) => {
   }
 }
 
+export const resendVerificationEmailService = async (email) => {
+  try {
+    const user = await prisma.users.findUnique({
+      where: { email }
+    })
+
+    if (!user) {
+      throw new Error('Usuario no encontrado.')
+    }
+
+    if (user.is_verified) {
+      throw new Error('La cuenta ya está verificada.')
+    }
+
+    await sendVerificationEmail(user)
+
+    return { message: 'Correo de verificación reenviado con éxito.' }
+  } catch (error) {
+    throw new Error(error.message)
+  }
+}
+
 export const sendResetPasswordMail = async (user, resetToken) => {
   try {
     const { email } = user
