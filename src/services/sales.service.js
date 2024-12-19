@@ -25,23 +25,25 @@ export const getUserPurchasesService = async (idUser, page = 1, pageSize = 10, s
     // Cálculo del número de registros a omitir
     const skip = (page - 1) * pageSize
 
-    // Filtro de coincidencia
-    const filter = searchTerm
-      ? {
-          OR: [
-            { id_sales: { contains: searchTerm } },
-            { total_price: { contains: searchTerm } },
-            { finalize_at: { contains: searchTerm } },
-            { cotized_at: { contains: searchTerm } },
-            { purchased_at: { contains: searchTerm } },
-            { send_at: { contains: searchTerm } },
-            { delivered_at: { contains: searchTerm } },
-            { canceled_at: { contains: searchTerm } },
-            { canceled_reason: { contains: searchTerm } },
-            { status: { name: { contains: searchTerm } } }
-          ]
-        }
-      : undefined
+    // Verificar si searchTerm es un número
+    const searchAsNumber = !isNaN(searchTerm) ? parseInt(searchTerm, 10) : null
+
+    // Construir el filtro de búsqueda
+    const filter = {
+      AND: [
+        { id_user: idUser }, // Asegurarse de que solo estamos buscando las compras del usuario actual
+        searchTerm
+          ? {
+              OR: [
+                { canceled_reason: { contains: searchTerm } },
+                { SalesStatus: { name: { contains: searchTerm } } },
+                { id_sales: { contains: searchTerm } }
+              ]
+            }
+          : {}
+      ]
+    }
+
 
     // Obtener las compras con paginación y filtro
     const purchases = await prisma.sales.findMany({
@@ -466,10 +468,9 @@ export const getAllPurchasesService = async (year, page = 1, pageSize = 10, sear
         lte: endOfYear
       },
       OR: [
-        { SalesTemplate: { some: { template: { design: { contains: searchTerm } } } } },
-        { SalesTemplate: { some: { template: { decorator: { contains: searchTerm } } } } },
-        { usuario: { name: { contains: searchTerm } } },
-        { id_sales: { equals: searchTerm } }
+        { SalesTemplate: { some: { template: { design: { contains: searchTerm, mode: 'insensitive' } } } } },
+        { SalesTemplate: { some: { template: { decorator: { contains: searchTerm, mode: 'insensitive' } } } } },
+        { usuario: { name: { contains: searchTerm, mode: 'insensitive' } } }
       ]
     }
 

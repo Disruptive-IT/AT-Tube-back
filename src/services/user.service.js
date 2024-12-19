@@ -34,10 +34,16 @@ export const createNewUserService = async (data) => {
 
 // *Servicio que me trae todos los users con el rol Admin
 export const getAllUsersService = async (page = 1, limit = 10, searchTerm = '') => {
-  page = parseInt(page)
-  limit = parseInt(limit)
+  page = parseInt(page) || 1 // Si page no es un número válido, establece el valor por defecto
+  limit = parseInt(limit) || 10 // Si limit no es un número válido, establece el valor por defecto
+
+  // Asegurarse de que page y limit sean positivos
+  if (page < 1 || limit < 1) {
+    throw new Error('Page and limit must be positive numbers')
+  }
+
   try {
-    const offset = (page - 1) * limit
+    const offset = (page - 1) * limit // Calcular el desplazamiento
 
     // Construir la cláusula de búsqueda con coincidencias
     const whereClause = {
@@ -49,8 +55,6 @@ export const getAllUsersService = async (page = 1, limit = 10, searchTerm = '') 
           { email: { contains: searchTerm } },
           { phone: { contains: searchTerm } },
           { address: { contains: searchTerm } },
-          { phone: { contains: searchTerm } },
-          { email: { contains: searchTerm } },
           { str_Department: { contains: searchTerm } },
           { str_city: { contains: searchTerm } },
           { country: { name: { contains: searchTerm } } },
@@ -63,8 +67,8 @@ export const getAllUsersService = async (page = 1, limit = 10, searchTerm = '') 
     const [users, totalUsers] = await Promise.all([
       prisma.users.findMany({
         where: whereClause,
-        skip: offset,
-        take: limit,
+        skip: offset, // Desplazar los resultados
+        take: limit, // Limitar el número de resultados
         select: {
           id_users: true,
           avatar: true,
@@ -83,10 +87,10 @@ export const getAllUsersService = async (page = 1, limit = 10, searchTerm = '') 
           status: true
         }
       }),
-      prisma.users.count({ where: whereClause }) // Total de usuarios que cumplen el filtro
+      prisma.users.count({ where: whereClause }) // Contar los usuarios que cumplen el filtro
     ])
 
-    // Formatear usuarios
+    // Formatear los usuarios
     const formattedUsers = users.map(user => ({
       id: user.id_users,
       avatar: user.avatar,
@@ -114,11 +118,11 @@ export const getAllUsersService = async (page = 1, limit = 10, searchTerm = '') 
       users: formattedUsers,
       total: totalUsers,
       currentPage: page,
-      totalPages: Math.ceil(totalUsers / limit)
+      totalPages: Math.ceil(totalUsers / limit) // Calcular las páginas totales
     }
   } catch (error) {
     console.error('Error fetching users with searchTerm: ', error)
-    throw error
+    throw error // Lanzar el error para que se maneje a nivel superior
   }
 }
 
