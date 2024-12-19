@@ -399,6 +399,8 @@ export const createPurchaseService = async (salesData) => {
     total_price = ((salesTemplates[0].box_price * salesTemplates[0].box_amount) + salesTemplates[0].decorator_price)
     purchased_at = new Date()
   }
+  console.log(total_price);
+  
   await validateSalesStatusExists(status) // ?validate if status exists in database
 
   try {
@@ -461,9 +463,16 @@ export const getAllPurchasesService = async (year, page = 1, pageSize = 10, sear
     const whereClause = {
 
       OR: [
-        { SalesTemplate: { contains: searchTerm, mode: 'insensitive' } },
-        { SalesTemplate: { contains: searchTerm } },
-        { usuario: { name: { contains: searchTerm } } }
+        { id_sales: { contains: searchTerm } },
+        { usuario: { name: { contains: searchTerm } } },
+        { usuario: { document: { contains: searchTerm } } },
+        { usuario: { str_Department: { contains: searchTerm } } },
+        { usuario: { str_city: { contains: searchTerm } } },
+        { usuario: { str_country: { contains: searchTerm } } },
+        { usuario: { phone: { contains: searchTerm } } },
+        { usuario: { email: { contains: searchTerm } } },
+        { usuario: { documentType: { name: { contains: searchTerm } } } },
+        { SalesStatus: { name: { contains: searchTerm } } }
       ]
     }
 

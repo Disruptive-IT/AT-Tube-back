@@ -14,7 +14,7 @@ import {
 
 // ?Controller to get all purchases orders for a especific user
 export const getUserPurchasesController = async (req, res) => {
-  const { id, page, pageSize, searchTerm } = req.query
+  const { id, page, pageSize, searchTerm } = req.body
   try {
     const userPurchases = await getUserPurchasesService(id, page, pageSize, searchTerm)
     res.status(200).json({ message: 'Compras Traidas con exito', purchases: userPurchases })
