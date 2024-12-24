@@ -7,6 +7,7 @@ import {
   getUserTemplateController,
   getYearsPurchasesController,
   updatePurchaseToPayController,
+  updateSaleToProductionController,
   updateStatusPurchaseController,
   UpdateTemplateController,
   updateToCancelPurchaseController
@@ -24,5 +25,6 @@ router.post('/updatePurchaseToPay', updatePurchaseToPayController) // ?Update th
 router.post('/updatePurchaseToCancel', updateToCancelPurchaseController) // ?Update the quote so the user can pay
 router.post('/updateStatusPurchase', updateStatusPurchaseController) // ?Update purchase to delivered, shipping and cancel
 router.get('/getUserTemplates', getUserTemplateController) // ?Update purchase to delivered, shipping and cancel
+router.post('/updatePurchaseToProduction', updateSaleToProductionController) // ?update paiment after pay
 
 export default router

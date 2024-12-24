@@ -131,6 +131,9 @@ model Sales {
   status             Int
   id_orden_pago      String?
   id_pago_reslizado  String?
+  date_approve       String?
+  status_approve     String?
+  checkoutType       String?
 
   create_at          DateTime  @default(now())
   update_at          DateTime  @updatedAt

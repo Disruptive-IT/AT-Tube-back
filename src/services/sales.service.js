@@ -654,7 +654,6 @@ export const getYearsPurchasesService = async () => {
  * @returns {Object} - Objeto con la venta creada.
  */
 export const updatePurchaseToPayService = async (data) => {
-  // ?el problema viene de aqui al momento de actualizar el precio total
   const { id_sales, total_price, decorator_price, email } = data
   try {
     await validateSaleExists(id_sales)
@@ -768,6 +767,30 @@ export const updatePurchaseToCancelService = async (data) => {
 
     await changeStatusEmail(id_sales, 6)
 
+    return updatedSale
+  } catch (error) {
+    console.error('Error al cancelar la compra', error)
+    const customError = new Error('Error al cancelar la compra', error)
+    customError.name = 'InternalError'
+    throw customError
+  }
+}
+
+export const updatePurchaseToProductionService = async (description, id_orden_pago, id_pago_reslizado, date_approve, status, checkoutType) => {
+  try {
+    const updatedSale = await prisma.sales.update({
+      where: { id_sales: description },
+      data: {
+        id_orden_pago,
+        id_pago_reslizado,
+        date_approve,
+        status: 3,
+        status_approve: status,
+        purchased_at: new Date(),
+        checkoutType
+      }
+    })
+    await changeStatusEmail(description, 3)
     return updatedSale
   } catch (error) {
     console.error('Error al cancelar la compra', error)

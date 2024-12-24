@@ -8,6 +8,7 @@ import {
   updatePurchaseToCancelService,
   updatePurchaseToDeliveredService,
   updatePurchaseToPayService,
+  updatePurchaseToProductionService,
   updatePurchaseToShippedService,
   UpdateTemplatesService
 } from '../services/sales.service.js'
@@ -201,6 +202,30 @@ export const updateToCancelPurchaseController = async (req, res) => {
         return res.status(500).json({ error: error.message })
       default:
         return res.status(500).json({ error: 'Error interno del servidor' })
+    }
+  }
+}
+
+export const updateSaleToProductionController = async (req, res) => {
+  const { description, id_orden_pago, id_pago_reslizado, date_approve, status, checkoutType } = req.body
+  const requiredFields = ['description', 'id_orden_pago', 'id_pago_reslizado', 'date_approve', 'status', 'checkoutType'] // ?Lista de campos requeridos  
+  const missingFields = requiredFields.filter((field) => !req.body[field]) // ?Validar que todos los campos requeridos estén presentes
+  if (missingFields.length > 0) {
+    return res.status(400).json({ error: `Faltan los siguientes campos: ${missingFields.join(', ')}` })
+  }
+  try {
+    const payment = await updatePurchaseToProductionService(description, id_orden_pago, id_pago_reslizado, date_approve, status, checkoutType)
+    res.status(201).json({
+      message: `El pago de la compra con ID ${description} fue realizado con éxito`,
+      data: payment
+    })
+  } catch (error) {
+    console.error(error)
+    switch (error.name) {
+      case 'InternalError':
+        return res.status(500).json({ error: error.message })
+      default:
+        return res.status(500).json({ error: 'Error interno del servidor', message: error.message })
     }
   }
 }
