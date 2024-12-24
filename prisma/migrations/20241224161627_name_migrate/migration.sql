@@ -89,6 +89,9 @@ CREATE TABLE `Sales` (
     `status` INTEGER NOT NULL,
     `id_orden_pago` VARCHAR(191) NULL,
     `id_pago_reslizado` VARCHAR(191) NULL,
+    `date_approve` VARCHAR(191) NULL,
+    `status_approve` VARCHAR(191) NULL,
+    `checkoutType` VARCHAR(191) NULL,
     `create_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `update_at` DATETIME(3) NOT NULL,
 
@@ -126,6 +129,8 @@ CREATE TABLE `Templates` (
     `id_users` VARCHAR(191) NOT NULL,
     `design` JSON NOT NULL,
     `decorator` VARCHAR(191) NULL,
+    `decorator_type` VARCHAR(191) NULL,
+    `canva_decorator` JSON NULL,
     `status` BOOLEAN NOT NULL DEFAULT true,
     `create_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `update_at` DATETIME(3) NOT NULL,

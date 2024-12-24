@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs'
 const prisma = new PrismaClient()
 
 async function main () {
-  const hashedPassword = await bcrypt.hash('user123', 10) // ?hash de contrasena generica
+  const hashedPassword = await bcrypt.hash('User123.', 10) // ?hash de contrasena generica
   // ?json de usuarios de prueba
   const usuarios = [
     {
