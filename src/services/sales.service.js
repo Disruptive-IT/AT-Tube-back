@@ -776,13 +776,13 @@ export const updatePurchaseToCancelService = async (data) => {
   }
 }
 
-export const updatePurchaseToProductionService = async (description, id_orden_pago, id_pago_reslizado, date_approve, status, checkoutType) => {
+export const updatePurchaseToProductionService = async (description, id_orden_pago, id_pago_realizado, date_approve, status, checkoutType) => {
   try {
     const updatedSale = await prisma.sales.update({
       where: { id_sales: description },
       data: {
         id_orden_pago,
-        id_pago_reslizado,
+        id_pago_realizado,
         date_approve,
         status: 3,
         status_approve: status,
