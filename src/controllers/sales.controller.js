@@ -215,15 +215,15 @@ export const updateSaleToProductionController = async (req, res) => {
   }
 
   if (checkoutType === 'MercadoPago' && !id_pago_realizado) {
-    return res.status(400).json({ error: 'Faltan los siguientes campos: id_pago_reslizado' })
+    return res.status(400).json({ error: 'Faltan los siguientes campos: id_pago_realizado' })
   }
 
   if (checkoutType === 'PayPal' && !id_orden_pago) {
-    return res.status(400).json({ error: 'Faltan los siguientes campos: id_pago_reslizado' })
+    return res.status(400).json({ error: 'Faltan los siguientes campos: id_orden_pago' })
   }
 
   try {
-    const payment = await updatePurchaseToProductionService(description, id_orden_pago, id_pago_reslizado, date_approve, status, checkoutType)
+    const payment = await updatePurchaseToProductionService(description, id_orden_pago, id_pago_realizado, date_approve, status, checkoutType)
     res.status(201).json({
       message: `El pago de la compra con ID ${description} fue realizado con éxito`,
       data: payment
