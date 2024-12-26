@@ -399,6 +399,8 @@ export const createPurchaseService = async (salesData) => {
     total_price = ((salesTemplates[0].box_price * salesTemplates[0].box_amount) + salesTemplates[0].decorator_price)
     purchased_at = new Date()
   }
+  console.log(total_price);
+  
   await validateSalesStatusExists(status) // ?validate if status exists in database
 
   try {
@@ -461,9 +463,16 @@ export const getAllPurchasesService = async (year, page = 1, pageSize = 10, sear
     const whereClause = {
 
       OR: [
-        { SalesTemplate: { contains: searchTerm, mode: 'insensitive' } },
-        { SalesTemplate: { contains: searchTerm } },
-        { usuario: { name: { contains: searchTerm } } }
+        { id_sales: { contains: searchTerm } },
+        { usuario: { name: { contains: searchTerm } } },
+        { usuario: { document: { contains: searchTerm } } },
+        { usuario: { str_Department: { contains: searchTerm } } },
+        { usuario: { str_city: { contains: searchTerm } } },
+        { usuario: { str_country: { contains: searchTerm } } },
+        { usuario: { phone: { contains: searchTerm } } },
+        { usuario: { email: { contains: searchTerm } } },
+        { usuario: { documentType: { name: { contains: searchTerm } } } },
+        { SalesStatus: { name: { contains: searchTerm } } }
       ]
     }
 
@@ -645,7 +654,6 @@ export const getYearsPurchasesService = async () => {
  * @returns {Object} - Objeto con la venta creada.
  */
 export const updatePurchaseToPayService = async (data) => {
-  // ?el problema viene de aqui al momento de actualizar el precio total
   const { id_sales, total_price, decorator_price, email } = data
   try {
     await validateSaleExists(id_sales)
@@ -759,6 +767,36 @@ export const updatePurchaseToCancelService = async (data) => {
 
     await changeStatusEmail(id_sales, 6)
 
+    return updatedSale
+  } catch (error) {
+    console.error('Error al cancelar la compra', error)
+    const customError = new Error('Error al cancelar la compra', error)
+    customError.name = 'InternalError'
+    throw customError
+  }
+}
+
+export const updatePurchaseToProductionService = async (description, id_orden_pago, id_pago_realizado, date_approve, status, checkoutType) => {
+  try {
+    // const validateSaleExist = await prisma.sales.findUnique({
+    //   select: {
+    //     id_sales: true
+    //   }
+    // })
+
+    const updatedSale = await prisma.sales.update({
+      where: { id_sales: description },
+      data: {
+        id_orden_pago,
+        id_pago_realizado,
+        date_approve,
+        status: 3,
+        status_approve: status,
+        purchased_at: new Date(),
+        checkoutType
+      }
+    })
+    await changeStatusEmail(description, 3)
     return updatedSale
   } catch (error) {
     console.error('Error al cancelar la compra', error)

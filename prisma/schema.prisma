@@ -130,7 +130,10 @@ model Sales {
   canceled_reason    String?
   status             Int
   id_orden_pago      String?
-  id_pago_reslizado  String?
+  id_pago_realizado  String?
+  date_approve       String?
+  status_approve     String?
+  checkoutType       String?
 
   create_at          DateTime  @default(now())
   update_at          DateTime  @updatedAt
