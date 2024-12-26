@@ -142,34 +142,39 @@ export const updateTemplateImageService = async (templateId, file) => {
 }
 
 export const deleteTemplateImageService = async (templateId) => {
-  // Buscar el template en la base de datos
-  const template = await prisma.templates.findUnique({
-    where: { id_template: templateId }
-  })
+  try {
+    // Buscar el template existente
+    const existingTemplate = await prisma.templates.findUnique({
+      where: { id_template: templateId }
+    })
 
-  if (!template) {
-    throw new Error('El template no existe.')
-  }
-
-  // Verificar si hay una imagen asociada en el campo 'decorator'
-  const imagePath = template.decorator
-
-  if (imagePath) {
-    const absolutePath = path.resolve(__dirname, '..', '..', 'uploads', 'design_images', imagePath) // Ruta completa del archivo
-
-    // Verificar si el archivo existe antes de intentar eliminarlo
-    if (fs.existsSync(absolutePath)) {
-      fs.unlinkSync(absolutePath) // Eliminar el archivo físico
+    if (!existingTemplate) {
+      throw new Error('Template no encontrado.')
     }
-  }
 
-  // Actualizar el campo 'decorator' a `null` o una cadena vacía en la base de datos
-  const updatedTemplate = await prisma.templates.update({
-    where: { id_template: templateId },
-    data: {
-      decorator: null
+    // Eliminar la imagen anterior si existe
+    if (existingTemplate.decorator) {
+      const oldFilePath = path.join(__dirname, '..', '..', 'uploads', 'design_images', path.basename(existingTemplate.decorator))
+
+      // Verifica si el archivo existe antes de intentar eliminarlo
+      if (fs.existsSync(oldFilePath)) {
+        fs.unlinkSync(oldFilePath) // Elimina el archivo antiguo
+      }
     }
-  })
 
-  return updatedTemplate
+    // Actualizar los campos 'decorator' y 'decorator_type' a `null` en la base de datos
+    const updatedTemplate = await prisma.templates.update({
+      where: { id_template: templateId },
+      data: {
+        decorator: null,
+        decorator_type: null,
+        canva_decorator: null
+      }
+    })
+
+    return updatedTemplate
+  } catch (error) {
+    console.error('Error al actualizar la imagen del template:', error)
+    throw error
+  }
 }

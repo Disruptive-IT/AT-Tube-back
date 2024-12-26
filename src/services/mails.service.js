@@ -289,3 +289,78 @@ export const changeStatusEmail = async (saleId, newStatus) => {
     throw new Error(`Error actualizando estado: ${error.message}`)
   }
 }
+
+export const notifyPendingDesignsService = async (userId) => {
+  try {
+    // Buscar diseños pendientes del usuario
+    const pendingDesigns = await prisma.designs.findMany({
+      where: {
+        user_id: userId,
+        NOT: {
+          id_designs: {
+            in: await prisma.salesTemplate.findMany({
+              where: {
+                sale: {
+                  status: { notIn: [2, 3] } // Estados de "cotización" o "compra"
+                }
+              },
+              select: { design_id: true }
+            }).map((sale) => sale.design_id)
+          }
+        }
+      },
+      include: {
+        user: true // Información del usuario
+      }
+    })
+
+    if (pendingDesigns.length === 0) {
+      throw new Error('No hay diseños pendientes para este usuario.')
+    }
+
+    // Obtener información del usuario
+    const user = pendingDesigns[0].user
+    if (!user) {
+      throw new Error('Usuario no encontrado.')
+    }
+
+    // Detalles del usuario y diseño
+    const { email: userEmail, name: userName } = user
+    const totalPending = pendingDesigns.length
+
+    // Cargar y personalizar la plantilla del correo
+    const filePath = path.join(emailContentDir, 'notify-pending-designs.html')
+    let htmlContent = fs.readFileSync(filePath, 'utf8')
+
+    htmlContent = htmlContent
+      .replace('{{userName}}', userName || 'Usuario')
+      .replace('{{totalPending}}', totalPending)
+      .replace('{{designList}}', pendingDesigns.map(d => `<li>${d.name}</li>`).join('') || 'Ninguno')
+
+    const logoPath = path.join(__dirname, '../..', 'public/images/Logo.jpg')
+    const mailOptions = {
+      to: userEmail,
+      from: `AT-Tube <${process.env.EMAIL_USER}>`,
+      subject: 'Notificación: Diseños pendientes',
+      html: htmlContent.replace(
+        '{{logo}}',
+        'cid:logoImage' // Referencia al Content-ID del logo
+      ),
+      attachments: [
+        {
+          filename: 'Logo.jpg',
+          path: logoPath,
+          cid: 'logoImage'
+        }
+      ]
+    }
+
+    // Enviar correo
+    await transporter.sendMail(mailOptions)
+    console.log(`Correo enviado a ${userEmail} con ${totalPending} diseños pendientes.`)
+    return { message: `Correo enviado a ${userName}.`, pendingDesigns }
+  } catch (error) {
+    console.error('Error notificando diseños pendientes:', error)
+    throw new Error(`Error notificando: ${error.message}`)
+  }
+}

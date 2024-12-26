@@ -6,7 +6,8 @@ import {
   deleteUserController,
   getallCountriesController,
   getAllDepartmentController,
-  getAllCityController
+  getAllCityController,
+  notifyPendingDesignsController
 } from '../controllers/user.controller.js'
 import { authorizeAdmin } from '../middlewares/autorizeAdmin.js'
 
@@ -19,5 +20,6 @@ router.delete('/deleteUser', authorizeAdmin, deleteUserController)
 router.get('/getCountries', getallCountriesController)
 router.post('/getDepartments', getAllDepartmentController)
 router.post('/getCities', getAllCityController)
+router.get('/notify-pending-designs/:userId', notifyPendingDesignsController)
 
 export default router
