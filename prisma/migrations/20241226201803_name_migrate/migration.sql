@@ -88,7 +88,7 @@ CREATE TABLE `Sales` (
     `canceled_reason` VARCHAR(191) NULL,
     `status` INTEGER NOT NULL,
     `id_orden_pago` VARCHAR(191) NULL,
-    `id_pago_reslizado` VARCHAR(191) NULL,
+    `id_pago_realizado` VARCHAR(191) NULL,
     `date_approve` VARCHAR(191) NULL,
     `status_approve` VARCHAR(191) NULL,
     `checkoutType` VARCHAR(191) NULL,

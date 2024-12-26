@@ -207,12 +207,21 @@ export const updateToCancelPurchaseController = async (req, res) => {
 }
 
 export const updateSaleToProductionController = async (req, res) => {
-  const { description, id_orden_pago, id_pago_reslizado, date_approve, status, checkoutType } = req.body
-  const requiredFields = ['description', 'id_orden_pago', 'date_approve', 'status', 'checkoutType'] // ?Lista de campos requeridos  
+  const { description, id_orden_pago, id_pago_realizado, date_approve, status, checkoutType } = req.body
+  const requiredFields = ['description', 'date_approve', 'status', 'checkoutType'] // ?Lista de campos requeridos  
   const missingFields = requiredFields.filter((field) => !req.body[field]) // ?Validar que todos los campos requeridos estén presentes
   if (missingFields.length > 0) {
     return res.status(400).json({ error: `Faltan los siguientes campos: ${missingFields.join(', ')}` })
   }
+
+  if (checkoutType === 'MercadoPago' && !id_pago_realizado) {
+    return res.status(400).json({ error: 'Faltan los siguientes campos: id_pago_reslizado' })
+  }
+
+  if (checkoutType === 'PayPal' && !id_orden_pago) {
+    return res.status(400).json({ error: 'Faltan los siguientes campos: id_pago_reslizado' })
+  }
+
   try {
     const payment = await updatePurchaseToProductionService(description, id_orden_pago, id_pago_reslizado, date_approve, status, checkoutType)
     res.status(201).json({
