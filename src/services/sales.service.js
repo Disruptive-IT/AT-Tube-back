@@ -388,19 +388,18 @@ export const createPurchaseService = async (salesData) => {
 
   await validateTemplates(status, salesTemplates, total_price) // ? validate Templates when status in 1 "Cotizacion"
 
-  if (status === 2 || status === 4 || status === 5 || status === 6) {
-    const error = new Error('el estado de la compra no puede ser para pagar, enviado, entregado o cancelado')
+  if (status >= 3) {
+    const error = new Error('el estado de la compra no puede ser produccion, enviado, entregado o cancelado')
     error.name = 'ForbiddenError'
     throw error
   }
 
   // Validar que si el estado es 1, total_price debe ser null o vacío
-  if (status === 3) {
+  if (status === 2) {
     total_price = ((salesTemplates[0].box_price * salesTemplates[0].box_amount) + salesTemplates[0].decorator_price)
-    purchased_at = new Date()
+    // purchased_at = new Date()
   }
   console.log(total_price);
-  
   await validateSalesStatusExists(status) // ?validate if status exists in database
 
   try {
@@ -433,7 +432,7 @@ export const createPurchaseService = async (salesData) => {
     return sale
   } catch (error) {
     console.error('Error creando la venta:', error)
-    const customError = new Error('Error al crear la venta')
+    const customError = new Error('Error al crear la venta', error)
     customError.name = 'InternalError'
     throw customError
   }
