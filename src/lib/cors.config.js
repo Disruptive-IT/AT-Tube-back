@@ -1,4 +1,4 @@
-const allowOrigins = ['https://panelnupak.disruptiveinfotech.com', 'http://localhost:5173', 'https://mercadopago.disruptiveinfotech.com']
+const allowOrigins = ['https://panelnupak.disruptiveinfotech.com', 'http://localhost:5173', 'https://mercadopago.disruptiveinfotech.com', 'https://paypal.disruptiveinfotech.com']
 
 export const CorsConfig = {
   origin: allowOrigins,
