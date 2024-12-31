@@ -1,5 +1,7 @@
 import nodemailer from 'nodemailer'
+import { differenceInHours } from 'date-fns'
 import fs from 'fs'
+import cron from 'node-cron'
 import path from 'path'
 import jwt from 'jsonwebtoken'
 import { fileURLToPath } from 'url'
@@ -290,77 +292,73 @@ export const changeStatusEmail = async (saleId, newStatus) => {
   }
 }
 
-export const notifyPendingDesignsService = async (userId) => {
+export const notifyPendingDesignService = async () => {
   try {
-    // Buscar diseños pendientes del usuario
-    const pendingDesigns = await prisma.designs.findMany({
+    // Obtener los templates no relacionados con ventas
+    const templates = await prisma.templates.findMany({
       where: {
-        user_id: userId,
-        NOT: {
-          id_designs: {
-            in: await prisma.salesTemplate.findMany({
-              where: {
-                sale: {
-                  status: { notIn: [2, 3] } // Estados de "cotización" o "compra"
-                }
-              },
-              select: { design_id: true }
-            }).map((sale) => sale.design_id)
-          }
-        }
+        NOT: { SalesTemplate: { some: {} } } // No relacionados con ventas
       },
-      include: {
-        user: true // Información del usuario
-      }
+      include: { Users: true }
     })
 
-    if (pendingDesigns.length === 0) {
-      throw new Error('No hay diseños pendientes para este usuario.')
-    }
+    const now = new Date()
 
-    // Obtener información del usuario
-    const user = pendingDesigns[0].user
-    if (!user) {
-      throw new Error('Usuario no encontrado.')
-    }
+    for (const template of templates) {
+      const { createAt, idTemplate, Users: user } = template
 
-    // Detalles del usuario y diseño
-    const { email: userEmail, name: userName } = user
-    const totalPending = pendingDesigns.length
+      // Calcular la diferencia en horas
+      const hoursDiff = differenceInHours(now, createAt)
 
-    // Cargar y personalizar la plantilla del correo
-    const filePath = path.join(emailContentDir, 'notify-pending-designs.html')
-    let htmlContent = fs.readFileSync(filePath, 'utf8')
-
-    htmlContent = htmlContent
-      .replace('{{userName}}', userName || 'Usuario')
-      .replace('{{totalPending}}', totalPending)
-      .replace('{{designList}}', pendingDesigns.map(d => `<li>${d.name}</li>`).join('') || 'Ninguno')
-
-    const logoPath = path.join(__dirname, '../..', 'public/images/Logo.jpg')
-    const mailOptions = {
-      to: userEmail,
-      from: `AT-Tube <${process.env.EMAIL_USER}>`,
-      subject: 'Notificación: Diseños pendientes',
-      html: htmlContent.replace(
-        '{{logo}}',
-        'cid:logoImage' // Referencia al Content-ID del logo
-      ),
-      attachments: [
-        {
-          filename: 'Logo.jpg',
-          path: logoPath,
-          cid: 'logoImage'
+      // Si han pasado más de 4 horas, enviar el correo
+      if (hoursDiff >= 4) {
+        if (!user) {
+          console.error(`Usuario asociado al template ${idTemplate} no encontrado.`)
+          continue
         }
-      ]
-    }
 
-    // Enviar correo
-    await transporter.sendMail(mailOptions)
-    console.log(`Correo enviado a ${userEmail} con ${totalPending} diseños pendientes.`)
-    return { message: `Correo enviado a ${userName}.`, pendingDesigns }
+        const { email: userEmail, name: userName } = user
+
+        // Cargar y personalizar la plantilla del correo
+        const filePath = path.join(emailContentDir, 'notify-pending-designs.html')
+        let htmlContent = fs.readFileSync(filePath, 'utf8')
+
+        htmlContent = htmlContent
+          .replace('{{userName}}', userName || 'Usuario')
+          .replace('{{totalPending}}', 1)
+          .replace('{{designList}}', `<li>${template.design?.name || 'Sin nombre'}</li>`)
+
+        const logoPath = path.join(__dirname, '../..', 'public/images/Logo.jpg')
+        const mailOptions = {
+          to: userEmail,
+          from: `AT-Tube <${process.env.EMAIL_USER}>`,
+          subject: 'Notificación: Diseño pendiente',
+          html: htmlContent.replace(
+            '{{logo}}',
+            'cid:logoImage' // Referencia al Content-ID del logo
+          ),
+          attachments: [
+            {
+              filename: 'Logo.jpg',
+              path: logoPath,
+              cid: 'logoImage'
+            }
+          ]
+        }
+
+        // Enviar correo
+        await transporter.sendMail(mailOptions)
+        console.log(`Correo enviado a ${userEmail} notificando diseño pendiente (${idTemplate}).`)
+      }
+    }
+    cron.schedule('0 */4 * * *', async () => { // Cada 4 horas
+      console.log('Ejecutando tarea de notificación de diseños pendientes...')
+      await notifyPendingDesignService()
+    })
+
+    return { message: 'Proceso de verificación de diseños completado.' }
   } catch (error) {
-    console.error('Error notificando diseños pendientes:', error)
-    throw new Error(`Error notificando: ${error.message}`)
+    console.error('Error verificando diseños pendientes:', error)
+    throw new Error(`Error verificando diseños: ${error.message}`)
   }
 }

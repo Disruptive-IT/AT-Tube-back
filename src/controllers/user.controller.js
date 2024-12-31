@@ -7,7 +7,6 @@ import {
   getAllCityService,
   getAllDepartmenService
 } from '../services/user.service.js'
-import { notifyPendingDesignsService } from '../services/mails.service.js'
 
 // ?Controlador que se utiliza para un usuario nuevo
 export const createNewUserController = async (req, res) => {
@@ -97,30 +96,5 @@ export const getAllCityController = async (req, res) => {
   } catch (error) {
     console.error('Error al llamar las ciudades', error)
     return res.status(500).json({ message: 'Internal server error.', error })
-  }
-}
-
-// ?Controller to send email pending design
-export const notifyPendingDesignsController = async (req, res) => {
-  try {
-    // Obtener el ID del usuario desde los parámetros de la solicitud
-    const { userId } = req.params
-
-    // Validar que el parámetro userId esté presente
-    if (!userId) {
-      return res.status(400).json({ error: 'El ID del usuario es obligatorio.' })
-    }
-
-    // Llamar al servicio para enviar la notificación
-    const result = await notifyPendingDesignsService(userId)
-
-    // Responder con éxito
-    return res.status(200).json({
-      message: 'Notificación enviada con éxito.',
-      details: result
-    })
-  } catch (error) {
-    // Manejo de errores
-    return res.status(500).json({ error: error.message })
   }
 }

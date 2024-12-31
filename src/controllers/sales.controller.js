@@ -12,6 +12,7 @@ import {
   updatePurchaseToShippedService,
   UpdateTemplatesService
 } from '../services/sales.service.js'
+import { notifyPendingDesignService } from '../services/mails.service.js'
 
 // ?Controller to get all purchases orders for a especific user
 export const getUserPurchasesController = async (req, res) => {
@@ -236,5 +237,29 @@ export const updateSaleToProductionController = async (req, res) => {
       default:
         return res.status(500).json({ error: 'Error interno del servidor', message: error.message })
     }
+  }
+}
+// ?Controller to send email pending design
+export const notifyPendingDesignsController = async (req, res) => {
+  try {
+    // Obtener el ID del usuario desde los parámetros de la solicitud
+    const { userId } = req.params
+
+    // Validar que el parámetro userId esté presente
+    if (!userId) {
+      return res.status(400).json({ error: 'El ID del usuario es obligatorio.' })
+    }
+
+    // Llamar al servicio para enviar la notificación
+    const result = await notifyPendingDesignService(userId)
+
+    // Responder con éxito
+    return res.status(200).json({
+      message: 'Notificación enviada con éxito.',
+      details: result
+    })
+  } catch (error) {
+    // Manejo de errores
+    return res.status(500).json({ error: error.message })
   }
 }
