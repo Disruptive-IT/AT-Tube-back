@@ -777,12 +777,6 @@ export const updatePurchaseToCancelService = async (data) => {
 
 export const updatePurchaseToProductionService = async (description, id_orden_pago, id_pago_realizado, date_approve, status, checkoutType) => {
   try {
-    // const validateSaleExist = await prisma.sales.findUnique({
-    //   select: {
-    //     id_sales: true
-    //   }
-    // })
-
     const updatedSale = await prisma.sales.update({
       where: { id_sales: description },
       data: {

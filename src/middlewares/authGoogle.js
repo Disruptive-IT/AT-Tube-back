@@ -31,7 +31,7 @@ async function (accessToken, refreshToken, profile, cb) {
           avatar: profile.photos[0]?.value,
           status: true,
           id_rol: 2,
-          id_contry: 1,
+          id_country: 1,
           str_country: 'COLOMBIA',
           id_city: 330,
           str_city: 'Medellin',
