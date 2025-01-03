@@ -1,7 +1,6 @@
 import nodemailer from 'nodemailer'
 import { differenceInHours } from 'date-fns'
 import fs from 'fs'
-import cron from 'node-cron'
 import path from 'path'
 import jwt from 'jsonwebtoken'
 import { fileURLToPath } from 'url'
@@ -294,10 +293,11 @@ export const changeStatusEmail = async (saleId, newStatus) => {
 
 export const notifyPendingDesignService = async () => {
   try {
-    // Obtener los templates no relacionados con ventas
+    // Obtener los templates no relacionados con ventas y con menos de 3 notificaciones enviadas
     const templates = await prisma.templates.findMany({
       where: {
-        NOT: { SalesTemplate: { some: {} } } // No relacionados con ventas
+        NOT: { SalesTemplate: { some: {} } }, // No relacionados con ventas
+        notification_count: { lt: 3 } // Menos de 3 notificaciones enviadas
       },
       include: { Users: true }
     })
@@ -305,13 +305,13 @@ export const notifyPendingDesignService = async () => {
     const now = new Date()
 
     for (const template of templates) {
-      const { createAt, idTemplate, Users: user } = template
+      const { createAt, idTemplate, Users: user, notificationCount } = template
 
-      // Calcular la diferencia en horas
-      const hoursDiff = differenceInHours(now, createAt)
+      // Calcular la diferencia en minutos
+      const minutesDiff = differenceInMinutes(now, createAt)
 
-      // Si han pasado más de 4 horas, enviar el correo
-      if (hoursDiff >= 4) {
+      // Si han pasado al menos 2 minutos, enviar el correo
+      if (minutesDiff >= 2) {
         if (!user) {
           console.error(`Usuario asociado al template ${idTemplate} no encontrado.`)
           continue
@@ -333,10 +333,7 @@ export const notifyPendingDesignService = async () => {
           to: userEmail,
           from: `AT-Tube <${process.env.EMAIL_USER}>`,
           subject: 'Notificación: Diseño pendiente',
-          html: htmlContent.replace(
-            '{{logo}}',
-            'cid:logoImage' // Referencia al Content-ID del logo
-          ),
+          html: htmlContent.replace('{{logo}}', 'cid:logoImage'),
           attachments: [
             {
               filename: 'Logo.jpg',
@@ -349,14 +346,16 @@ export const notifyPendingDesignService = async () => {
         // Enviar correo
         await transporter.sendMail(mailOptions)
         console.log(`Correo enviado a ${userEmail} notificando diseño pendiente (${idTemplate}).`)
+
+        // Incrementar el contador de notificaciones
+        await prisma.templates.update({
+          where: { idTemplate },
+          data: { notificationCount: (notificationCount || 0) + 1 }
+        })
       }
     }
-    cron.schedule('0 */4 * * *', async () => { // Cada 4 horas
-      console.log('Ejecutando tarea de notificación de diseños pendientes...')
-      await notifyPendingDesignService()
-    })
 
-    return { message: 'Proceso de verificación de diseños completado.' }
+    return { message: 'Proceso de notificación de diseños pendientes completado.' }
   } catch (error) {
     console.error('Error verificando diseños pendientes:', error)
     throw new Error(`Error verificando diseños: ${error.message}`)

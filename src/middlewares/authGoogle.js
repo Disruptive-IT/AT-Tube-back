@@ -30,7 +30,13 @@ async function (accessToken, refreshToken, profile, cb) {
           email: profile.emails[0].value,
           avatar: profile.photos[0]?.value,
           status: true,
-          id_rol: 2
+          id_rol: 2,
+          id_contry: 1,
+          str_country: 'COLOMBIA',
+          id_city: 330,
+          str_city: 'Medellin',
+          id_department: 5,
+          str_Department: 'ANTIOQUIA'
         }
       })
     }

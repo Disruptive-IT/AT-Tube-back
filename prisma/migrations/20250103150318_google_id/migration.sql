@@ -50,6 +50,7 @@ CREATE TABLE `Department` (
 -- CreateTable
 CREATE TABLE `Users` (
     `id_users` VARCHAR(191) NOT NULL,
+    `id_google` VARCHAR(191) NULL,
     `avatar` VARCHAR(191) NULL,
     `document_type` INTEGER NULL,
     `document` VARCHAR(191) NULL,
@@ -131,6 +132,7 @@ CREATE TABLE `Templates` (
     `decorator` VARCHAR(191) NULL,
     `decorator_type` VARCHAR(191) NULL,
     `canva_decorator` JSON NULL,
+    `notification_count` INTEGER NULL,
     `status` BOOLEAN NOT NULL DEFAULT true,
     `create_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `update_at` DATETIME(3) NOT NULL,
