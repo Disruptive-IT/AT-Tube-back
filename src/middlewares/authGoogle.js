@@ -36,7 +36,8 @@ async function (accessToken, refreshToken, profile, cb) {
           id_city: 330,
           str_city: 'Medellin',
           id_department: 5,
-          str_Department: 'ANTIOQUIA'
+          str_Department: 'ANTIOQUIA',
+          is_verified: true
         }
       })
     }
