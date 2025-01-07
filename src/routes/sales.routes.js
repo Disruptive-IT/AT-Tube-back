@@ -10,7 +10,9 @@ import {
   updateSaleToProductionController,
   updateStatusPurchaseController,
   UpdateTemplateController,
-  updateToCancelPurchaseController
+  updateToCancelPurchaseController,
+  notifyPendingDesignsController,
+  ValidateSalesExistController
 } from '../controllers/sales.controller.js'
 import { authorizeClient } from '../middlewares/AutorizeClient.js'
 const router = express.Router()
@@ -26,5 +28,7 @@ router.post('/updatePurchaseToCancel', updateToCancelPurchaseController) // ?Upd
 router.post('/updateStatusPurchase', updateStatusPurchaseController) // ?Update purchase to delivered, shipping and cancel
 router.get('/getUserTemplates', getUserTemplateController) // ?Update purchase to delivered, shipping and cancel
 router.post('/updatePurchaseToProduction', updateSaleToProductionController) // ?update paiment after pay
+router.get('/notify-pending-designs/:userId', notifyPendingDesignsController)
+router.get('/verifySalesExist', ValidateSalesExistController)
 
 export default router

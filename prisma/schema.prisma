@@ -89,6 +89,7 @@ model Department {
 
 model Users {
   id_users        String       @id @default(uuid())
+  id_google       String?
   avatar          String?
   document_type   Int?      // Clave foránea a DocumentType
   document        String?
@@ -176,6 +177,7 @@ model Templates {
   decorator       String?
   decorator_type  String?
   canva_decorator Json?
+  notification_count Int?
   status          Boolean   @default(true)
   create_at       DateTime  @default(now())
   update_at       DateTime  @updatedAt
