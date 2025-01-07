@@ -35,8 +35,12 @@ jobs:
         NODEJS_SERVER_PORT: ${{ secrets.NODEJS_SERVER_PORT }}
         DATABASE_URL: ${{ secrets.DATABASE_URL }}
     - name: Copy environment variables file
+   
       run: |
         cp -r /home/env_variables/.env_attube_api /home/Nupak/API/actions-runner/nupak-api/AT-Tube-back/AT-Tube-back/.env
+    - name: Install PM2 for this version
+      run: |
+          npm install -g pm2
 
     - name: Stop the API (PM2)
       run: |
