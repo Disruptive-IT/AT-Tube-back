@@ -38,6 +38,7 @@ jobs:
    
       run: |
         cp -r /home/env_variables/.env_attube_api /home/Nupak/API/actions-runner/nupak-api/AT-Tube-back/AT-Tube-back/.env
+        
     - name: Install PM2 for this version
       run: |
           npm install -g pm2

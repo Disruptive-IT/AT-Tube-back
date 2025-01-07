@@ -287,7 +287,7 @@ export const ValidateSalesExistController = async (req, res) => {
     }
 
     const sales = await ValidateSalesExistService(idSale)
-    res.status(201).json({ message: 'La cotización se cancelo con éxito', sales })
+    res.status(201).json({ message: 'La venta se encontro con éxito', sales })
   } catch (error) {
     console.error(error)
     switch (error.name) {
