@@ -10,7 +10,8 @@ import {
   updatePurchaseToPayService,
   updatePurchaseToProductionService,
   updatePurchaseToShippedService,
-  UpdateTemplatesService
+  UpdateTemplatesService,
+  ValidateSalesExistService
 } from '../services/sales.service.js'
 import { notifyPendingDesignService } from '../services/mails.service.js'
 import { ValidateSignaturePayment } from '../lib/paymentsValidations.js'
@@ -275,5 +276,25 @@ export const notifyPendingDesignsController = async (req, res) => {
   } catch (error) {
     // Manejo de errores
     return res.status(500).json({ error: error.message })
+  }
+}
+
+export const ValidateSalesExistController = async (req, res) => {
+  try {
+    const idSale = req.query.id_sales
+    if (!idSale) {
+      return res.status(400).json({ error: 'El ID del usuario es obligatorio.' })
+    }
+
+    const sales = await ValidateSalesExistService(idSale)
+    res.status(201).json({ message: 'La cotización se cancelo con éxito', sales })
+  } catch (error) {
+    console.error(error)
+    switch (error.name) {
+      case 'InternalError':
+        return res.status(500).json({ error: error.message })
+      default:
+        return res.status(500).json({ error: 'Error interno del servidor', message: error.message })
+    }
   }
 }

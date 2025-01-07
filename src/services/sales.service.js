@@ -44,7 +44,6 @@ export const getUserPurchasesService = async (idUser, page = 1, pageSize = 10, s
       ]
     }
 
-
     // Obtener las compras con paginación y filtro
     const purchases = await prisma.sales.findMany({
       where: { id_user: idUser, ...filter },
@@ -350,7 +349,7 @@ const validateTemplateBelongsToUser = async (id_user, id_template) => {
 export const createPurchaseService = async (salesData) => {
   const { id_user, status, salesTemplates } = salesData
 
-  let purchased_at = null
+  const purchased_at = null
   let total_price = null
   // Lista de campos obligatorios para validar
   const requiredFields = [
@@ -399,7 +398,7 @@ export const createPurchaseService = async (salesData) => {
     total_price = ((salesTemplates[0].box_price * salesTemplates[0].box_amount) + salesTemplates[0].decorator_price)
     // purchased_at = new Date()
   }
-  console.log(total_price);
+  console.log(total_price)
   await validateSalesStatusExists(status) // ?validate if status exists in database
 
   try {
@@ -794,6 +793,31 @@ export const updatePurchaseToProductionService = async (description, id_orden_pa
   } catch (error) {
     console.error('Error al cancelar la compra', error)
     const customError = new Error('Error al cancelar la compra', error)
+    customError.name = 'InternalError'
+    throw customError
+  }
+}
+
+export const ValidateSalesExistService = async (id_sales) => {
+  try {
+    const sale = await prisma.sales.findUnique({
+      where: {
+        id_sales
+      },
+      select: {
+        id_sales: true
+      }
+    })
+    if (!sale) {
+      const customError = new Error('La venta no existe')
+      customError.name = 'NotFoundError'
+      throw customError
+    } else {
+      return true
+    }
+  } catch (error) {
+    console.error('Error al buscar la compra', error)
+    const customError = new Error('La compra no existe', error)
     customError.name = 'InternalError'
     throw customError
   }
