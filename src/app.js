@@ -19,7 +19,7 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'tuSecretoSeguro', // Asegúrate de definir SESSION_SECRET en tu archivo .env
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false } // Cambia a `true` si usas HTTPS
+  cookie: { secure: true } // Cambia a `true` si usas HTTPS
 }))
 
 // Middlewares
