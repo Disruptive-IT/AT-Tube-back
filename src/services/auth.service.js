@@ -214,14 +214,15 @@ export async function userLoginService (email, password) {
   }
 }
 
-export const loginGoogleService = async (googleToken) => {
-  if (!googleToken) {
+export const loginGoogleService = async (token) => {
+  if (!token) {
     throw new Error('Token is required')
   }
 
   try {
     // Decodificar el token usando la clave secreta
-    const decoded = jwt.verify(googleToken, process.env.JWT_SECRET)
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    console.log('Decoded token:', decoded)
     const userId = decoded.id // El ID del usuario contenido en el token
 
     // Buscar al usuario en la base de datos usando `id_users`

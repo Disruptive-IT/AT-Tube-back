@@ -95,6 +95,7 @@ export const userLogin = async (req, res) => {
 }
 
 export const loginGoogleController = async (req, res) => {
+  console.log('Body received:', req.body)
   const { token } = req.body
 
   try {

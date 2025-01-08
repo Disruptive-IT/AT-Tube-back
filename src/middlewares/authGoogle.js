@@ -41,7 +41,7 @@ async function (accessToken, refreshToken, profile, cb) {
         }
       })
     }
-    const token = jwt.sign({ id: user.id_users }, process.env.JWT_SECRET, { expiresIn: '1h' })
+    const token = jwt.sign({ id: user.id_users }, process.env.JWT_SECRET, { expiresIn: '2h' })
 
     return cb(null, { user, token })
   } catch (err) {
@@ -61,6 +61,7 @@ passport.deserializeUser(async (token, done) => {
   try {
     // Verifica y decodifica el token para obtener los datos del usuario
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    console.log('Decoded token:', decoded)
     const user = await prisma.users.findUnique({
       where: { id_users: decoded.id }
     })
