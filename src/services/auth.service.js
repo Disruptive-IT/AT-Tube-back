@@ -214,6 +214,49 @@ export async function userLoginService (email, password) {
   }
 }
 
+export const loginGoogleService = async (googleToken) => {
+  if (!googleToken) {
+    throw new Error('Token is required')
+  }
+
+  try {
+    // Decodificar el token usando la clave secreta
+    const decoded = jwt.verify(googleToken, process.env.JWT_SECRET)
+    const userId = decoded.id // El ID del usuario contenido en el token
+
+    // Buscar al usuario en la base de datos usando `id_users`
+    const userSearch = await prisma.users.findUnique({
+      where: { id_users: userId },
+      include: {
+        country: true, // Relación con el modelo Country
+        role: true // Relación con el modelo Role
+      }
+    })
+
+    if (!userSearch) {
+      throw new Error('User not found')
+    }
+
+    // Transformar los datos del usuario
+    const transformedUserSearch = {
+      id: userSearch.id_users,
+      avatar: userSearch.avatar,
+      name: userSearch.name,
+      email: userSearch.email,
+      locale: userSearch.country?.locale,
+      flag_code: userSearch.country?.flag_code,
+      currency: userSearch.country?.currency,
+      phone_code: userSearch.country?.phone_code,
+      role: userSearch.role?.name // Extrae solo el nombre del rol
+    }
+
+    return transformedUserSearch
+  } catch (error) {
+    console.error('Error decoding token:', error)
+    throw new Error('Invalid or expired token')
+  }
+}
+
 export const logout = (req, res) => {
   try {
     res.clearCookie('token', {

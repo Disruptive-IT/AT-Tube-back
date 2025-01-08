@@ -9,7 +9,8 @@ import {
   requestPasswordReset,
   resetPassword,
   verifyAccountController,
-  resendVerificationEmailController
+  resendVerificationEmailController,
+  loginGoogleController
 } from '../controllers/auth.controller.js'
 
 const router = Router()
@@ -42,5 +43,6 @@ router.get(
     res.redirect(`${process.env.URL_WEBAPP}?token=${token}`)
   }
 )
+router.post('/login-with-google', loginGoogleController)
 
 export default router
