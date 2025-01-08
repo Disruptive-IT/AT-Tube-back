@@ -41,7 +41,7 @@ async function (accessToken, refreshToken, profile, cb) {
         }
       })
     }
-    const token = jwt.sign({ id: user.id_users }, process.env.JWT_SECRET, { expiresIn: '2h' })
+    const token = jwt.sign({ id: user.id_users }, process.env.JWT_SECRET, { expiresIn: '5m' })
 
     return cb(null, { user, token })
   } catch (err) {
