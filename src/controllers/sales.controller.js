@@ -10,9 +10,11 @@ import {
   updatePurchaseToPayService,
   updatePurchaseToProductionService,
   updatePurchaseToShippedService,
-  UpdateTemplatesService
+  UpdateTemplatesService,
+  ValidateSalesExistService
 } from '../services/sales.service.js'
 import { notifyPendingDesignService } from '../services/mails.service.js'
+import { ValidateSignaturePayment } from '../lib/paymentsValidations.js'
 
 // ?Controller to get all purchases orders for a especific user
 export const getUserPurchasesController = async (req, res) => {
@@ -209,7 +211,11 @@ export const updateToCancelPurchaseController = async (req, res) => {
 
 export const updateSaleToProductionController = async (req, res) => {
   const { description, id_orden_pago, id_pago_realizado, date_approve, status, checkoutType } = req.body
-  const requiredFields = ['description', 'date_approve', 'status', 'checkoutType'] // ?Lista de campos requeridos  
+  const Xsignature = req.headers['x-signature']
+  const PAYPAL_API_KEY = 'ibja7ed3d7df592684a264610369fc2a2232de7d814e1d08a5a686fa6e6d89e2b3a7bf6353683d5c1732a5bf02f1072283490aa3ac349347576a1080ccffad1ecda'
+  const MERCADO_PAGO_API_KEY = 'd22e67f4586208fc34a8de96703c802d727ab7adf6e27056c4e4152abdd6698bbb092c907df8e5dd9db5c1a23245fa517e3164b313f2b0c73669010536cb6c4a814830'
+
+  const requiredFields = ['description', 'date_approve', 'status', 'checkoutType'] // ?Lista de campos requeridos
   const missingFields = requiredFields.filter((field) => !req.body[field]) // ?Validar que todos los campos requeridos estén presentes
   if (missingFields.length > 0) {
     return res.status(400).json({ error: `Faltan los siguientes campos: ${missingFields.join(', ')}` })
@@ -224,6 +230,15 @@ export const updateSaleToProductionController = async (req, res) => {
   }
 
   try {
+    let validation
+    if (checkoutType === 'PayPal') {
+      validation = ValidateSignaturePayment(PAYPAL_API_KEY, Xsignature, JSON.stringify(req.body))
+    } else if (checkoutType === 'MercadoPago') {
+      validation = ValidateSignaturePayment(MERCADO_PAGO_API_KEY, Xsignature, JSON.stringify(req.body))
+    }
+    if (!validation) {
+      return res.status(400).json({ error: 'La firma de pago no es válida.' })
+    }
     const payment = await updatePurchaseToProductionService(description, id_orden_pago, id_pago_realizado, date_approve, status, checkoutType)
     res.status(201).json({
       message: `El pago de la compra con ID ${description} fue realizado con éxito`,
@@ -261,5 +276,25 @@ export const notifyPendingDesignsController = async (req, res) => {
   } catch (error) {
     // Manejo de errores
     return res.status(500).json({ error: error.message })
+  }
+}
+
+export const ValidateSalesExistController = async (req, res) => {
+  try {
+    const idSale = req.query.id_sales
+    if (!idSale) {
+      return res.status(400).json({ error: 'El ID del usuario es obligatorio.' })
+    }
+
+    const sales = await ValidateSalesExistService(idSale)
+    res.status(201).json({ message: 'La cotización se cancelo con éxito', sales })
+  } catch (error) {
+    console.error(error)
+    switch (error.name) {
+      case 'InternalError':
+        return res.status(500).json({ error: error.message })
+      default:
+        return res.status(500).json({ error: 'Error interno del servidor', message: error.message })
+    }
   }
 }
