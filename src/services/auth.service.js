@@ -250,8 +250,12 @@ export const loginGoogleService = async (token) => {
       phone_code: userSearch.country?.phone_code,
       role: userSearch.role?.name // Extrae solo el nombre del rol
     }
+    // Generar un nuevo access token con la información del usuario
+    const accessToken = jwt.sign({ id: userSearch.id_users }, process.env.JWT_SECRET, {
+      expiresIn: '5m' // Duración del access token (10 minutos)
+    })
 
-    return transformedUserSearch
+    return { transformedUserSearch, accessToken }
   } catch (error) {
     console.error('Error decoding token:', error)
     throw new Error('Invalid or expired token')
