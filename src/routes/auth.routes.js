@@ -1,6 +1,5 @@
 import { Router } from 'express'
 import passport from 'passport'
-import jwt from 'jsonwebtoken'
 import { checkUserVerification } from '../middlewares/checkUserVerification.js'
 import {
   userRegister,
@@ -9,7 +8,8 @@ import {
   requestPasswordReset,
   resetPassword,
   verifyAccountController,
-  resendVerificationEmailController
+  resendVerificationEmailController,
+  loginGoogleController
 } from '../controllers/auth.controller.js'
 
 const router = Router()
@@ -31,16 +31,17 @@ router.get(
   '/google/callback',
   passport.authenticate('google', { failureRedirect: '/login', session: false }),
   (req, res) => {
-    // Genera el token JWT
-    const token = jwt.sign(
-      { id: req.user.id_users },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' }
-    )
+    // Accede al token desde req.user
+    const { token } = req.user
+
+    if (!token) {
+      return res.status(500).json({ error: 'Token not generated' })
+    }
 
     // Redirige al frontend con el token como un parámetro de consulta
     res.redirect(`${process.env.URL_WEBAPP}?token=${token}`)
   }
 )
+router.post('/login-with-google', loginGoogleController)
 
 export default router

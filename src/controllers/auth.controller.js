@@ -1,4 +1,4 @@
-import { userRegisterService, userLoginService, verifyAccountService } from '../services/auth.service.js'
+import { userRegisterService, userLoginService, verifyAccountService, loginGoogleService } from '../services/auth.service.js'
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcrypt'
 
@@ -91,6 +91,24 @@ export const userLogin = async (req, res) => {
   } catch (error) {
     console.error('Error al iniciar sesión:', error)
     res.status(500).json({ message: 'Error interno del servidor', error: error.message })
+  }
+}
+
+export const loginGoogleController = async (req, res) => {
+  console.log('Body received:', req.body)
+  const { token } = req.body
+
+  try {
+    if (!token) {
+      return res.status(400).json({ error: 'Token is required' })
+    }
+
+    // Llamar al servicio para obtener los datos del usuario
+    const userData = await loginGoogleService(token)
+
+    return res.status(200).json({ success: true, user: userData })
+  } catch (error) {
+    return res.status(500).json({ success: false, error: error.message })
   }
 }
 
