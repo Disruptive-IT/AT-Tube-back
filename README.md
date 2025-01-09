@@ -12,6 +12,7 @@ npm install
 PORT=3000
 DATABASE_URL="mysql://root:@localhost:3306/NUpak"
 FRONTEND_URL=http://localhost:5173
+ss
 ```
 
 ### Generate JWT_SECRET 
