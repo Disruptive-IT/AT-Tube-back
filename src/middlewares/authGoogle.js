@@ -11,9 +11,10 @@ const prisma = new PrismaClient()
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: 'https://panelnupak.disruptiveinfotech.com/auth/google/callback',
+  callbackURL: 'https://apinupak.disruptiveinfotech.com/api/auth/google/callback',
   scope: ['profile', 'email']
 },
+
 async function (accessToken, refreshToken, profile, cb) {
   try {
     // Buscar al usuario en la base de datos por `googleId`
