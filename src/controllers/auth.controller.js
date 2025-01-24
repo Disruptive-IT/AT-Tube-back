@@ -8,6 +8,7 @@ import { sendResetPasswordMail, resendVerificationEmailService } from '../servic
 
 const secretKey = process.env.JWT_SECRET
 
+
 const prisma = new PrismaClient()
 
 export const userRegister = async (req, res) => {
