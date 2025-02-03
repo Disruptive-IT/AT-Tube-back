@@ -252,7 +252,7 @@ export const loginGoogleService = async (token) => {
     }
     // Generar un nuevo access token con la información del usuario
     const accessToken = jwt.sign({ id: userSearch.id_users, role: userSearch.role?.name }, process.env.JWT_SECRET, {
-      expiresIn: '5m' // Duración del access token (10 minutos)
+      expiresIn: '12h'
     })
 
     return { transformedUserSearch, accessToken }
