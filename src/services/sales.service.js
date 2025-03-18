@@ -61,6 +61,7 @@ export const getUserPurchasesService = async (idUser, page = 1, pageSize = 10, s
         purchased_at: true,
         send_at: true,
         create_at: true,
+        Reasoncanceled:true,
         SalesStatus: {
           select: {
             id_status: true,
@@ -155,7 +156,8 @@ export const getUserPurchasesService = async (idUser, page = 1, pageSize = 10, s
       strStatus: purchase.SalesStatus.name,
       finalizeAt: formatDate(purchase.finalize_at),
       canceledAt: formatDate(purchase.canceled_at) || 'No se ha cancelado la compra',
-      canceledReason: purchase.canceled_reason,
+      canceledReason: purchase.Reasoncanceled ? purchase.Reasoncanceled : 'Sin motivo de cancelación',
+      ReasonCanceled: purchase.Reasoncanceled ? purchase.Reasoncanceled: { id_cancelreason: null, reason_text: 'No hay razón registrada' },
       cotizedAt: formatDate(purchase.cotized_at) || 'No se ha generado la cotización',
       deliveredAt: formatDate(purchase.delivered_at) || 'No se ha entregado el pedido',
       purchasedAt: formatDate(purchase.purchased_at) || 'No se ha realizado el pago',
@@ -499,6 +501,7 @@ export const getAllPurchasesService = async (year, page = 1, pageSize = 10, sear
             name: true
           }
         },
+        Reasoncanceled:true,
         SalesTemplate: {
           select: {
             id_sales: true,
@@ -567,6 +570,7 @@ export const getAllPurchasesService = async (year, page = 1, pageSize = 10, sear
     const formatDate = (date) => (date ? date.toISOString().split('T')[0] : null)
 
     const formattedPurchases = purchases.map((purchase) => ({
+      canceledReason: purchase.Reasoncanceled ? purchase.Reasoncanceled : 'Sin motivo de cancelación',
       avatar: purchase.usuario.avatar,
       name: purchase.usuario.name,
       phone: purchase.usuario.phone,
@@ -585,7 +589,6 @@ export const getAllPurchasesService = async (year, page = 1, pageSize = 10, sear
       strStatus: purchase.SalesStatus.name,
       finalizeAt: formatDate(purchase.finalize_at),
       canceledAt: formatDate(purchase.canceled_at) || 'No se ha cancelado la compra',
-      canceledReason: purchase.canceled_reason,
       cotizedAt: formatDate(purchase.cotized_at) || 'No se ha generado la cotización',
       deliveredAt: formatDate(purchase.delivered_at) || 'No se ha entregado el pedido',
       purchasedAt: formatDate(purchase.purchased_at) || 'No se ha realizado el pago',
@@ -692,6 +695,11 @@ export const updatePurchaseToShippedService = async (data) => {
     customError.name = 'InternalError'
     throw customError
   }
+  if (oldStatus <=2) {
+    const customError = new Error('La venta no puede ser enviada sin antes pasar por producción ')
+    customError.name = 'InternalError'
+    throw customError
+  }
   try {
     const updatedSale = await prisma.sales.update({
       where: { id_sales },
@@ -721,6 +729,11 @@ export const updatePurchaseToDeliveredService = async (data) => {
     customError.name = 'InternalError'
     throw customError
   }
+  if (oldStatus <=3) {
+    const customError = new Error('La venta no puede cambiar a entregado sin antes pasar por los demasmm.')
+    customError.name = 'InternalError'
+    throw customError
+  }
 
   try {
     const updatedSale = await prisma.sales.update({
@@ -746,6 +759,7 @@ export const updatePurchaseToDeliveredService = async (data) => {
 // ?Cancel Purchase
 export const updatePurchaseToCancelService = async (data) => {
   const { id_sales, canceled_reason, email } = data
+  console.log(canceled_reason)
   await validateSaleExists(id_sales)
   if (canceled_reason === '' || canceled_reason === null) {
     const customError = new Error('La causa de la cancelación es obligatoria')
@@ -761,9 +775,9 @@ export const updatePurchaseToCancelService = async (data) => {
         canceled_reason
       }
     })
-    console.log(email)
+    // console.log(email)
 
-    await changeStatusEmail(id_sales, 6)
+    // await changeStatusEmail(id_sales, 6)
 
     return updatedSale
   } catch (error) {
@@ -820,5 +834,21 @@ export const ValidateSalesExistService = async (id_sales) => {
     const customError = new Error('La compra no existe', error)
     customError.name = 'InternalError'
     throw customError
+  }
+}
+
+
+export const getAllCancelReasonService = async () => {
+  try{
+    const reasons = await prisma.cancelReason.findMany();
+
+    if (!reasons.length) {
+      throw new Error('No se encontraron motivos de cancelación');
+    }
+    return reasons;
+  }
+  catch(error){
+    console.error('Error al obtener los motivos de cancelación', error);
+    throw error;
   }
 }

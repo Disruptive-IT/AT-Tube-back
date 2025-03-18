@@ -1,6 +1,7 @@
 import {
   createPurchaseService,
   createTemplatesService,
+  getAllCancelReasonService,
   getAllPurchasesService,
   getUserPurchasesService,
   getUserTemplatesService,
@@ -153,9 +154,11 @@ export const updatePurchaseToPayController = async (req, res) => {
   }
 }
 
-export const updateStatusPurchaseController = async (req, res) => {
+export const updateStatusPurchaseController = async (req, res) => {3
   const status = req.body.option
   const data = req.body
+  console.log('data', data);
+  
   try {
     let result
     switch (status) {
@@ -298,3 +301,14 @@ export const ValidateSalesExistController = async (req, res) => {
     }
   }
 }
+
+
+export const getAllCancelReasonController = async (req, res) => {
+  try {
+    const reasons = await getAllCancelReasonService();
+    res.status(200).json({data: reasons })
+  }
+  catch (error){
+    res.status(500).json({ error: error.message })
+  }
+};

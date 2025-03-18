@@ -5,6 +5,18 @@ const prisma = new PrismaClient()
 
 async function main () {
   const hashedPassword = await bcrypt.hash('User123.', 10) // ?hash de contrasena generica
+
+  // reasoncanceled json
+  const reasoncanceled = [
+    {id_cancelreason:'1',reason_text:'No me gusto el producto'},
+    {id_cancelreason:'2',reason_text:'Vino malo'},
+    {id_cancelreason:'3',reason_text:'Falta stock'},
+    {id_cancelreason:'4',reason_text:'Maquina dañada'},
+    {id_cancelreason:'5',reason_text:'No traia los colores que queria'},
+    {id_cancelreason:'6',reason_text:'No era lo que esperaba'},
+    {id_cancelreason:'7',reason_text:'se demoro mucho en llegar'},
+]
+
   // ?json de usuarios de prueba
   const usuarios = [
     {
@@ -1280,6 +1292,11 @@ async function main () {
     { id_status: 5, name: 'Entregado', descriptionClient: 'sdf', descriptionAdmin: 'da' },
     { id_status: 6, name: 'Cancelado', descriptionClient: 'sdf', descriptionAdmin: 'da' }
   ]
+
+  //Insertar datos de tipos de cancelación
+  await prisma.cancelReason.createMany({
+    data: reasoncanceled
+  })
 
   // ? Insertar datos de tipos de documentos
   await prisma.salesStatus.createMany({
