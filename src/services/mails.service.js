@@ -34,7 +34,7 @@ export const sendVerificationEmail = async (user) => {
     )
 
     // Crear enlace de verificación al endpoint del backend
-    const verificationLink = `${process.env.BACKEND_URL}auth/verify-account?token=${verificationToken}`
+    const verificationLink = `${process.env.BACKEND_URL}/api/auth/verify-account?token=${verificationToken}`
 
     // Cargar y personalizar la plantilla de correo
     const filePath = path.join(emailContentDir, 'verify-account-email.html')
