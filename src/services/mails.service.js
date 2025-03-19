@@ -15,7 +15,7 @@ const emailContentDir = path.resolve(__dirname, '../../public/email/')
 // Configuración de transporte SMTP
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
-  port: parseInt(process.env.EMAIL_PORT, 10),
+  port: parseInt(process.env.SMPT_PORT, 10),
   secure: process.env.SMTP_PORT === '465', // Si el puerto es 465, usa conexión segura
   auth: {
     user: process.env.SMTP_USER,
@@ -44,7 +44,7 @@ export const sendVerificationEmail = async (user) => {
     // Configurar el contenido del correo
     const logoPath = path.join(__dirname, '../..', 'public/images/Logo.jpg')
     const mailOptions = {
-      from: `AT-Tube <${process.env.EMAIL_USER}>`,
+      from: `AT-Tube <${process.env.SMTP_USER}>`,
       to: user.email,
       subject: 'Verifica tu cuenta',
       html: emailContent.replace(
@@ -107,7 +107,7 @@ export const sendResetPasswordMail = async (user, resetToken) => {
     const logoPath = path.join(__dirname, '../..', 'public/images/Logo.jpg')
     const mailOptions = {
       to: email,
-      from: `AT-Tube <${process.env.EMAIL_USER}>`,
+      from: `AT-Tube <${process.env.SMTP_USER}>`,
       subject: 'Restablecer contraseña - AT-Tube',
       html: htmlContent.replace(
         '{{logo}}',
@@ -183,7 +183,7 @@ export const sendAdminPurchaseNotification = async (saleDetails) => {
     const logoPath = path.join(__dirname, '../..', 'public/images/Logo.jpg')
     const mailOptions = {
       to: admin.email, // Enviar el correo al administrador
-      from: `AT-Tube <${process.env.EMAIL_USER}>`,
+      from: `AT-Tube <${process.env.SMTP_USER}>`,
       subject: 'Confirmación de Compra - AT-Tube',
       html: htmlContent.replace(
         '{{logo}}',
@@ -266,7 +266,7 @@ export const changeStatusEmail = async (saleId, newStatus) => {
     const logoPath = path.join(__dirname, '../..', 'public/images/Logo.jpg')
     const mailOptions = {
       to: userEmail,
-      from: `AT-Tube <${process.env.EMAIL_USER}>`,
+      from: `AT-Tube <${process.env.SMTP_USER}>`,
       subject: `Actualizacion de estado: ${statusName}`,
       html: htmlContent.replace(
         '{{logo}}',
@@ -331,7 +331,7 @@ export const notifyPendingDesignService = async () => {
         const logoPath = path.join(__dirname, '../..', 'public/images/Logo.jpg')
         const mailOptions = {
           to: userEmail,
-          from: `AT-Tube <${process.env.EMAIL_USER}>`,
+          from: `AT-Tube <${process.env.SMTP_USER}>`,
           subject: 'Notificación: Diseño pendiente',
           html: htmlContent.replace('{{logo}}', 'cid:logoImage'),
           attachments: [
