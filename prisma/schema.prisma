@@ -140,9 +140,18 @@ model Sales {
   update_at          DateTime  @updatedAt
 
   SalesStatus        SalesStatus @relation(fields:[status], references: [id_status])
+  Reasoncanceled     CancelReason? @relation(fields: [canceled_reason], references: [id_cancelreason])
   usuario            Users  @relation(fields: [id_user], references: [id_users])  // Relación con Users
   SalesTemplate      SalesTemplate[]                 // Relación uno a muchos con SalesTemplate
 }
+
+model CancelReason {
+  id_cancelreason String     @id @default(cuid())
+  reason_text     String  // El texto o descripción de la razón
+
+  Sales          Sales[] 
+}
+
 
 model SalesStatus{
   id_status           Int    @id          // Usar UUID para claves primarias
