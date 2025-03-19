@@ -37,7 +37,7 @@ jobs:
     - name: Copy environment variables file
    
       run: |
-        cp -r /home/env_variables/.env_attube_api /home/Disruptive/Projects/ATTube/API/actions-runner/_work/AT-Tube-back/AT-Tube-back/.env
+        cp -r /home/Disruptive/Projects/env_variables/.env_attube_api /home/Disruptive/Projects/ATTube/API/actions-runner/_work/AT-Tube-back/AT-Tube-back/.env
         
     - name: Install PM2 for this version
       run: |
