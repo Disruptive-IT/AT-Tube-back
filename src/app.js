@@ -20,10 +20,11 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: { secure: true } // Cambia a `true` si usas HTTPS
-}))
+}));
 
 // Middlewares
-app.use(express.json())
+app.use(express.json({ limit: '10mb' })) // Aumenta el límite para JSON
+app.use(express.urlencoded({ limit: '10mb', extended: true })) // Aumenta el límite para datos codificados en URL
 app.use(express.static('public'))
 app.use(cors(CorsConfig))
 app.use('/uploads', express.static('uploads'))
